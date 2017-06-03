@@ -6,4 +6,8 @@ This project is for my parent builds.
 Installation
 ------------
 
-To install these builds, make a link from this directory to *~/.neon/c4s4*.
+To install these builds, make a link from this directory to *~/.neon/c4s4*:
+
+```
+$ ln -s /path/to/project ~/.neon/c4s4
+```

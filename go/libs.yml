@@ -1,17 +1,17 @@
 doc: 'Manage Go dependencies'
 
 properties:
-  DEPENDENCIES:
+  LIBRARIES:
   - 'github.com/mitchellh/gox'
 
 targets:
 
-  dependencies:
-    doc: 'Install dependencies'
+  libs:
+    doc: 'Install libraries'
     steps:
-    - for: 'dependency'
-      in:  'DEPENDENCIES'
+    - for: 'library'
+      in:  'LIBRARIES'
       do:
-      - print: 'Getting dependecy #{dependency}'
-      - 'go get #{dependency}'
+      - print: 'Getting library #{library}'
+      - 'go get #{library}'
 

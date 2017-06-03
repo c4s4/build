@@ -1,0 +1,11 @@
+doc: 'Manage build dir'
+
+properties:
+  BUILD_DIR: 'build'
+
+targets:
+
+  clean:
+    doc: 'Clean build directory'
+    steps:
+    - delete: '#{BUILD_DIR}'

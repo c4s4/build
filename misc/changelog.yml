@@ -1,0 +1,9 @@
+doc: 'Parent build file for changelog'
+
+targets:
+
+  release:
+    doc: 'Perform a release'
+    steps:
+    - 'release'
+

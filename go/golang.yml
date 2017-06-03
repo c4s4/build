@@ -1,0 +1,20 @@
+doc: 'Manage Go builds'
+
+properties:
+  NAME: ~
+
+environment:
+  GOPATH: '#{_BASE}'
+  PATH:   '#{_BASE}/bin:${PATH}'
+
+targets:
+
+  format:
+    doc: 'Format Go code'
+    steps:
+    - 'go fmt #{NAME}'
+
+  test:
+    doc: 'Run unit tests'
+    steps:
+    - 'go test #{NAME}/...'

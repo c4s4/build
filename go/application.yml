@@ -1,4 +1,9 @@
-doc: 'Manage Go builds'
+doc: 'Manage a Go application'
+
+extends:
+- ~/.neon/c4s4/misc/buildir.yml
+- ~/.neon/c4s4/misc/changelog.yml
+- ~/.neon/c4s4/go/libs.yml
 
 properties:
   NAME: ~

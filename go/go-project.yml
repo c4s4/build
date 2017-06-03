@@ -1,8 +1,0 @@
-doc: 'Manage go projects'
-
-extends:
-- ~/.neon/c4s4/build/latest/golang.yml
-- ~/.neon/c4s4/build/latest/buildir.yml
-- ~/.neon/c4s4/build/latest/changelog.yml
-- ~/.neon/c4s4/build/latest/version.yml
-- ~/.neon/c4s4/build/latest/dependencies.yml

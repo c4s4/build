@@ -1,9 +1,11 @@
 doc: 'Parent build file for changelog'
 
+properties:
+  VERSION: '#{run("changelog", "release", "version")}'
+
 targets:
 
   release:
     doc: 'Perform a release'
     steps:
     - 'release'
-

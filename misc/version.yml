@@ -1,4 +1,0 @@
-doc: 'Parent build file for VERSION'
-
-properties:
-  VERSION: '#{run("changelog", "release", "version")}'

@@ -21,7 +21,8 @@ targets:
       then:
       - throw: 'We are not on branch "#{DEVELOP_BRANCH}"'
     # check release date is today
-    - try: 'changelog release date check'
+    - try:
+      - 'changelog release date check'
       catch:
       - throw: 'bad release date in changelog'
     # read changelog information

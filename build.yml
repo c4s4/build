@@ -1,4 +1,3 @@
 doc: Build project neon-c4s4
 
-extends:
-- misc/changelog.yml
+extends: c4s4/build/changelog.yml

@@ -1,0 +1,43 @@
+doc: 'Build file for Go tools'
+default: test
+
+extends:
+- c4s4/build/buildir.yml
+- c4s4/build/changelog.yml
+- c4s4/build/go-libs.yml
+
+properties:
+  NAME: '#{filename(_BASE)}'
+
+targets:
+
+  test:
+    doc: Run Go tests
+    steps:
+    - 'go test'
+
+  build:
+    doc: Build Go application
+    steps:
+    - mkdir: '#{BUILD_DIR}'
+    - 'go build -o #{BUILD_DIR}/#{NAME}'
+
+  archive:
+    doc: Build distribution archive
+    steps:
+    - mkdir: '#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/'
+    - 'gox -output=#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/{{.Dir}}_{{.OS}}_{{.Arch}}'
+    - copy:
+      - 'README.md'
+      - 'CHANGELOG.yml'
+      - 'LICENSE.txt'
+      todir: '#{BUILD_DIR}/#{NAME}-#{VERSION}'
+    - tar:    '#{NAME}-#{VERSION}/**/*'
+      dir:    '#{BUILD_DIR}'
+      tofile: '#{BUILD_DIR}/#{NAME}-#{VERSION}.tar.gz'
+
+  release:
+    doc: Perform a release
+    depends: [clean, test, archive]
+    steps:
+    - super:

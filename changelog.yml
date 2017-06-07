@@ -42,7 +42,7 @@ targets:
     - try:
       - 'git checkout master'
       - 'git pull'
-      - 'git merge --no-ff develop -m "#{MESSAGE}"'
+      - 'git merge --no-ff develop -m "#{message}"'
       - 'git push'
       - 'git tag -a "#{VERSION}" -m "#{message}"'
       - 'git push origin "#{VERSION}"'

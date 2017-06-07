@@ -16,8 +16,13 @@ targets:
     steps:
     - 'go test'
 
+  run:
+    doc: Run Goo tool
+    steps:
+    - 'go run "#{NAME}.go"'
+
   build:
-    doc: Build Go application
+    doc: Build Go tool
     steps:
     - mkdir: '#{BUILD_DIR}'
     - 'go build -o #{BUILD_DIR}/#{NAME}'

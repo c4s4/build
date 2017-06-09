@@ -1,0 +1,63 @@
+doc: 'Github build file'
+
+configuration: ~/.github.yml
+
+properties:
+  NAME:           ~
+  ARCHIVE:        ~
+  GITHUB_USER:    'c4s4'
+  GITHUB_URL:     'https://api.github.com/repos/#{GITHUB_USER}/#{NAME}/releases'
+  GITHUB_SUMMARY: '#{run("changelog", "release", "summary")}'
+  GITHUB_DESC:    '#{run("changelog", "release", "to", "markdown")}'
+  GITHUB_JSON:
+    tag_name:         '#{VERSION}'
+    name:             '#{GITHUB_SUMMARY}'
+    body:             '#{GITHUB_DESC}'
+    target_commitish: 'master'
+    draft:            false
+    prerelease:       false
+
+targets:
+
+  gh_release:
+    doc: 'Perform a Github release'
+    steps:
+    - execute: 'changelog release summary'
+      output:  'summary'
+    - execute: 'changelog release to markdown'
+      output:  'description'
+    - try:
+      - request:  '#{GITHUB_URL}'
+        method:   'POST'
+        headers:  {'Content-Type': 'text/json'}
+        status:   '201'
+        body:     '#{jsonencode(GITHUB_JSON)}'
+        username: '#{GITHUB_USERNAME}'
+        password: '#{GITHUB_PASSWORD}'
+      - script: |
+          _release_id = jsondecode(_body)["id"]
+      - print: '#{_release_id}'
+      catch:
+      - try:
+        - print: 'status:  #{_status}'
+        - print: 'body: #{_body}'
+      - throw: 'error calling API to perform release'
+
+  gh_upload:
+    doc: 'Upload an asset for given release'
+    steps:
+    - try:
+      - print: 'https://uploads.github.com/repos/#{GITHUB_USER}/#{NAME}/releases/6663059/assets?name=#{filename(ARCHIVE)}'
+      - request:  'https://uploads.github.com/repos/#{GITHUB_USER}/#{NAME}/releases/6663059/assets?name=#{filename(ARCHIVE)}'
+        method:   'POST'
+        headers:  {'Content-Type': 'application/gzip'}
+        status:   '201'
+        file:     '#{ARCHIVE}'
+        username: '#{GITHUB_USERNAME}'
+        password: '#{GITHUB_TOKEN}'
+      catch:
+      - try:
+        - print: 'status:  #{_status}'
+        - print: 'body: #{_body}'
+      - throw: 'error calling API to perform release'
+

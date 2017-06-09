@@ -5,9 +5,11 @@ extends:
 - c4s4/build/buildir.yml
 - c4s4/build/changelog.yml
 - c4s4/build/go-libs.yml
+- c4s4/build/github.yml
 
 properties:
-  NAME: '#{filename(_BASE)}'
+  NAME:    '#{filename(_BASE)}'
+  ARCHIVE: '#{BUILD_DIR}/#{NAME}-#{VERSION}.tar.gz'
 
 targets:
 
@@ -39,10 +41,10 @@ targets:
       todir: '#{BUILD_DIR}/#{NAME}-#{VERSION}'
     - tar:    '#{NAME}-#{VERSION}/**/*'
       dir:    '#{BUILD_DIR}'
-      tofile: '#{BUILD_DIR}/#{NAME}-#{VERSION}.tar.gz'
+      tofile: '#{ARCHIVE}'
 
   release:
     doc: Perform a release
-    depends: [clean, test, archive]
+    depends: [clean, test, archive, gh_release, gh_upload_asset]
     steps:
     - super:

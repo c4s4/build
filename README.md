@@ -27,4 +27,10 @@ To use a given release *x.y.z*, go in installation directory and type:
 $ git checkout x.y.z
 ```
 
+To update your version when on a branch, go in installation directory and type:
+
+```
+$ git pull
+```
+
 *Enjoy!*

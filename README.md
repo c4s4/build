@@ -6,9 +6,25 @@ This project is the place for my parent build files.
 Installation
 ------------
 
-To install these parent builds, make a link from this directory to 
-*~/.neon/c4s4/build*:
+To install these parent builds, type following command:
 
 ```
-$ ln -s /path/to/project ~/.neon/c4s4/build
+$ neon -install=c4s4/build
 ```
+
+This will checkout project in directory *~/.neon/c4s4/build*, on default branch
+which is *master*.
+
+To use another branch *foo*, go in installation directory and type:
+
+```
+$ git checkout foo
+```
+
+To use a given release *x.y.z*, go in installation directory and type:
+
+```
+$ git checkout x.y.z
+```
+
+*Enjoy!*

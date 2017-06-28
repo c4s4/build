@@ -23,7 +23,7 @@ targets:
     steps:
     - 'go run "#{NAME}.go"'
 
-  build:
+  bin:
     doc: Build Go tool
     steps:
     - mkdir: '#{BUILD_DIR}'

@@ -1,5 +1,11 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 0.2.0
+  date:    2017-06-00
+  summary: Second release
+  changed:
+  - "build target to build binary in go-tool renamed bin."
+
 - version: 0.1.0
   date:    2017-06-26
   summary: First release

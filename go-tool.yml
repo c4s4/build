@@ -5,7 +5,6 @@ extends:
 - c4s4/build/buildir.yml
 - c4s4/build/changelog.yml
 - c4s4/build/go-libs.yml
-- c4s4/build/github.yml
 
 properties:
   NAME:    '#{filename(_BASE)}'
@@ -45,6 +44,6 @@ targets:
 
   release:
     doc: Perform a release
-    depends: [clean, test, archive, gh_release, gh_upload_asset]
+    depends: [clean, test, archive]
     steps:
     - super:

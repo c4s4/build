@@ -34,8 +34,7 @@ targets:
         body:     '#{jsonencode(GITHUB_JSON)}'
         username: '#{GITHUB_USERNAME}'
         password: '#{GITHUB_PASSWORD}'
-      - script: |
-          _release_id = jsondecode(_body)["id"]
+      - '_release_id = jsondecode(_body)["id"]'
       - print: '#{_release_id}'
       catch:
       - try:

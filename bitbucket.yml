@@ -20,7 +20,7 @@ targets:
   bit_upload:
     doc: Upload archive to BitBucket
     steps:
-    - 'upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}" "#{BIT_PATH}" "#{BIT_ARCHIVE}"'
+    - '$ upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}" "#{BIT_PATH}" "#{BIT_ARCHIVE}"'
 
   bit_uploads:
     doc: Upload archives to BitBucket
@@ -28,4 +28,4 @@ targets:
     - for: archive
       in:  BIT_ARCHIVE
       do:
-      - 'upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}" "#{BIT_PATH}" "#{archive}"'
+      - '$ upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}" "#{BIT_PATH}" "#{archive}"'

@@ -3,7 +3,7 @@ default: test
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/changelog.yml
+- c4s4/build/release.yml
 - c4s4/build/go-libs.yml
 
 properties:
@@ -15,12 +15,12 @@ targets:
   test:
     doc: Run Go tests
     steps:
-    - 'go test'
+    - '$ go test'
 
   run:
     doc: Run Goo tool
     steps:
-    - 'go run "#{NAME}.go"'
+    - '$ go run "#{NAME}.go"'
 
   bin:
     doc: Build Go tool

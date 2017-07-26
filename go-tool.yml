@@ -3,9 +3,8 @@ default: test
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/changelog.yml
+- c4s4/build/release.yml
 - c4s4/build/go-libs.yml
-- c4s4/build/github.yml
 
 properties:
   NAME:    '#{filename(_BASE)}'
@@ -16,14 +15,14 @@ targets:
   test:
     doc: Run Go tests
     steps:
-    - 'go test'
+    - '$ go test'
 
   run:
     doc: Run Goo tool
     steps:
-    - 'go run "#{NAME}.go"'
+    - '$ go run "#{NAME}.go"'
 
-  build:
+  bin:
     doc: Build Go tool
     steps:
     - mkdir: '#{BUILD_DIR}'
@@ -45,6 +44,6 @@ targets:
 
   release:
     doc: Perform a release
-    depends: [clean, test, archive, gh_release, gh_upload_asset]
+    depends: [clean, test, archive]
     steps:
     - super:

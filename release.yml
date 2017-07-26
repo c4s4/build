@@ -29,24 +29,25 @@ targets:
     - try:
       - execute: 'changelog release summary'
         output:  'message'
-      - if: 'message == ""'
-        then:
-        - script: 'message = "Release " + VERSION'
-        else:
-        - script: 'message = "Release " + VERSION + ": " + message'
+      - |
+          if message == "" {
+            message = "Release " + VERSION'
+          } else {
+            message = "Release " + VERSION + ": " + message
+          }
       catch:
       - throw: 'reading changelog information'
     # print information message
     - print: 'Releasing version "#{VERSION}" with message "#{message}"'
     # merge develop on master tag release and return on develop
     - try:
-      - 'git checkout master'
-      - 'git pull'
-      - 'git merge --no-ff develop -m "#{message}"'
-      - 'git push'
-      - 'git tag -a "#{VERSION}" -m "#{message}"'
-      - 'git push origin "#{VERSION}"'
+      - '$ git checkout master'
+      - '$ git pull'
+      - '$ git merge --no-ff develop -m "#{message}"'
+      - '$ git push'
+      - '$ git tag -a "#{VERSION}" -m "#{message}"'
+      - '$ git push origin "#{VERSION}"'
       catch:
       - throw: 'performing release'
       finally:
-      - 'git checkout develop'
+      - '$ git checkout develop'

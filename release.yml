@@ -11,7 +11,7 @@ targets:
     steps:
     # check uncommitted changes
     - try:
-      - 'git diff --quiet --exit-code HEAD'
+      - '$ git diff --quiet --exit-code HEAD'
       catch:
       - throw: 'There are uncommitted changes'
     # check we are on branch develop
@@ -22,19 +22,18 @@ targets:
       - throw: 'We are not on branch "#{DEVELOP_BRANCH}"'
     # check release date is today
     - try:
-      - 'changelog release date check'
+      - '$ changelog release date check'
       catch:
       - throw: 'bad release date in changelog'
     # read changelog information
     - try:
-      - execute: 'changelog release summary'
-        output:  'message'
       - |
-          if message == "" {
-            message = "Release " + VERSION'
-          } else {
-            message = "Release " + VERSION + ": " + message
-          }
+        message = run("changelog", "release", "summary")
+        if message == "" {
+          message = "Release " + VERSION
+        } else {
+          message = "Release " + VERSION + ": " + message
+        }
       catch:
       - throw: 'reading changelog information'
     # print information message

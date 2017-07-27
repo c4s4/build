@@ -59,4 +59,3 @@ targets:
         - print: 'status:  #{_status}'
         - print: 'body: #{_body}'
       - throw: 'error calling API to perform release'
-

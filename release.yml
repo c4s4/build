@@ -1,7 +1,7 @@
 doc: 'Parent build file for changelog'
 
 properties:
-  VERSION: '#{run("changelog", "release", "version")}'
+  VERSION:        '#{run("changelog", "release", "version")}'
   DEVELOP_BRANCH: 'develop'
 
 targets:

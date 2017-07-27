@@ -26,17 +26,14 @@ targets:
     doc: Build Go tool
     steps:
     - mkdir: '#{BUILD_DIR}'
-    - 'go build -o #{BUILD_DIR}/#{NAME}'
+    - '$ go build -o #{BUILD_DIR}/#{NAME}'
 
   archive:
     doc: Build distribution archive
     steps:
-    - mkdir: '#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/'
-    - 'gox -output=#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/{{.Dir}}_{{.OS}}_{{.Arch}}'
-    - copy:
-      - 'README.md'
-      - 'CHANGELOG.yml'
-      - 'LICENSE.txt'
+    - mkdir: '#{BUILD_DIR}/bin/'
+    - '$ gox -output=#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}'
+    - copy:  ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
       todir: '#{BUILD_DIR}/#{NAME}-#{VERSION}'
     - tar:    '#{NAME}-#{VERSION}/**/*'
       dir:    '#{BUILD_DIR}'

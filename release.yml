@@ -15,8 +15,8 @@ targets:
       catch:
       - throw: 'There are uncommitted changes'
     # check we are on branch develop
-    - execute: 'git rev-parse --abbrev-ref HEAD'
-      output:  'branch'
+    - $: 'git rev-parse --abbrev-ref HEAD'
+      =: 'branch'
     - if: 'branch != DEVELOP_BRANCH'
       then:
       - throw: 'We are not on branch "#{DEVELOP_BRANCH}"'

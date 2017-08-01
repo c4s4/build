@@ -22,10 +22,10 @@ targets:
   gh_release:
     doc: 'Perform a Github release'
     steps:
-    - execute: 'changelog release summary'
-      output:  'summary'
-    - execute: 'changelog release to markdown'
-      output:  'description'
+    - $: 'changelog release summary'
+      =: 'summary'
+    - $: 'changelog release to markdown'
+      =: 'description'
     - try:
       - request:  '#{GITHUB_URL}'
         method:   'POST'

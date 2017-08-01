@@ -17,9 +17,9 @@ targets:
   format:
     doc: 'Format Go code'
     steps:
-    - '$ go fmt #{NAME}'
+    - $: 'go fmt #{NAME}'
 
   test:
     doc: 'Run unit tests'
     steps:
-    - '$ go test #{NAME}/...'
+    - $: 'go test #{NAME}/...'

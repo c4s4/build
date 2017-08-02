@@ -50,3 +50,18 @@ targets:
       - throw: 'performing release'
       finally:
       - $: 'git checkout develop'
+
+  delete-release:
+    doc: Delete release by deleting local and remote tags
+    steps:
+    - prompt:  'WARNING! You are about to delete local and remote "#{VERSION}" tag. Do you confirm?'
+      to:      'confirm'
+      default: 'n'
+      pattern: '^[yn]$'
+      error:   'You must answer y or n'
+    - if: 'confirm == "y"'
+      then:
+      - $: 'git tag -d #{VERSION}'
+      - $: 'git push origin :refs/tags/#{VERSION}'
+      else:
+      - print: 'Aborting'

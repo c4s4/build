@@ -33,4 +33,4 @@ targets:
   publish:
     doc: 'Publish slides'
     steps:
-    - 'rsync -av "#{BUILD_DIR}/" "#{DESTINATION}/"'
+    - $: 'rsync -av "#{BUILD_DIR}/" "#{DESTINATION}/"'

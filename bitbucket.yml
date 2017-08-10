@@ -1,13 +1,13 @@
 doc: |
-  Build file to upload archive(s) on Bitbucket.
-  Properties:
-  - BIT_PATH: the path on Bitbucket (such as "/account/project/downloads")
-  - BIT_ARCHIVE: the path to the archive(s) to upload (as a string or list)
-  - BIT_USERNAME: the username of the bitbucket account
-  - BIT_PASSWORD: the password of the bitbucket account
-  Targets:
-  - bit_upload: to upload a single archive
-  - bit_uploads: to upload archives
+     'Build file to upload archive(s) on Bitbucket. Calls script to upload files to
+     Bitbucket at http://bitbucket.org/Swyter/bitbucket-curl-upload-to-repo-downloads
+     
+     Properties:
+     
+     - BIT_PATH:     the path on Bitbucket (such as "account/project") 
+     - BIT_ARCHIVE:  the path to the archive(s) to upload (as a string or list) 
+     - BIT_USERNAME: the username of the bitbucket account 
+     - BIT_PASSWORD: the password of the bitbucket account'
 
 properties:
   BIT_PATH:     ~
@@ -18,16 +18,10 @@ properties:
 targets:
 
   bit_upload:
-    doc: Upload archive to BitBucket
-    steps:
-    - $: 'upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}"
-         "#{BIT_PATH}" "#{BIT_ARCHIVE}"'
-
-  bit_uploads:
-    doc: Upload archives to BitBucket
+    doc: Upload archive(s) to BitBucket
     steps:
     - for: archive
-      in:  BIT_ARCHIVE
+      in:  list(BIT_ARCHIVE)
       do:
-      - $: 'upload-to-bitbucket "#{BIT_USERNAME}" "#{BIT_PASSWORD}"
-           "#{BIT_PATH}" "#{archive}"'
+      - $: 'upload-to-bitbucket #{BIT_USERNAME} #{BIT_PASSWORD}
+            #{BIT_PATH}/downloads #{BIT_ARCHIVE}'

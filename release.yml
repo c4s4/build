@@ -11,18 +11,18 @@ targets:
     steps:
     # check uncommitted changes
     - try:
-      - $: 'git diff --quiet --exit-code HEAD'
+      - $: ['git', 'diff', '--quiet', '--exit-code', 'HEAD']
       catch:
       - throw: 'There are uncommitted changes'
     # check we are on branch develop
-    - $: 'git rev-parse --abbrev-ref HEAD'
+    - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
     - if: 'branch != DEVELOP_BRANCH'
       then:
       - throw: 'We are not on branch "#{DEVELOP_BRANCH}"'
     # check release date is today
     - try:
-      - $: 'changelog release date check'
+      - $: ['changelog', 'release', 'date', 'check']
       catch:
       - throw: 'bad release date in changelog'
     # read changelog information
@@ -40,16 +40,16 @@ targets:
     - print: 'Releasing version "#{VERSION}" with message "#{message}"'
     # merge develop on master tag release and return on develop
     - try:
-      - $: 'git checkout master'
-      - $: 'git pull'
-      - $: 'git merge --no-ff develop -m "#{message}"'
-      - $: 'git push'
-      - $: 'git tag -a "#{VERSION}" -m "#{message}"'
-      - $: 'git push origin "#{VERSION}"'
+      - $: ['git', 'checkout', 'master']
+      - $: ['git', 'pull']
+      - $: ['git', 'merge', '--no-ff', 'develop', '-m', '#{message}']
+      - $: ['git', 'push']
+      - $: ['git', 'tag', '-a', '#{VERSION}', '-m', '#{message}']
+      - $: ['git', 'push', 'origin', '#{VERSION}']
       catch:
       - throw: 'performing release'
       finally:
-      - $: 'git checkout develop'
+      - $: ['git', 'checkout', 'develop']
 
   delete-release:
     doc: Delete release by deleting local and remote tags
@@ -61,7 +61,7 @@ targets:
       error:   'You must answer y or n'
     - if: 'confirm == "y"'
       then:
-      - $: 'git tag -d #{VERSION}'
-      - $: 'git push origin :refs/tags/#{VERSION}'
+      - $: ['git', 'tag', '-d', '#{VERSION}']
+      - $: ['git', 'push', 'origin', ':refs/tags/#{VERSION}']
       else:
       - print: 'Aborting'

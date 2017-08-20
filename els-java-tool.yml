@@ -21,7 +21,7 @@ targets:
   test:
     doc: Run unit tests
     steps:
-    - $: 'mvn test'
+    - $: ['mvn', 'test']
 
   archive:
     doc: 'Generate distribution archive'
@@ -33,7 +33,7 @@ targets:
       - replace: 'pom.xml'
         pattern: '$VERSION$'
         with:    '#{VERSION}'
-      - $: 'mvn package'
+      - $: ['mvn', 'package']
       finally:
       - copy:   '#{BUILD_DIR}/pom.xml'
         tofile: 'pom.xml'
@@ -46,14 +46,7 @@ targets:
       todir: '~/.tools/'
 
   release:
-    doc: 'Perform a release'
-    depends: [clean, archive]
-    steps:
-    - 'release'
-
-  release:
       doc: Perform a release
       depends: [clean, archive, bit_upload]
       steps:
       - super:
-

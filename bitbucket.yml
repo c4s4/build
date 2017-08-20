@@ -23,5 +23,5 @@ targets:
     - for: archive
       in:  list(BIT_ARCHIVE)
       do:
-      - $: 'upload-to-bitbucket #{BIT_USERNAME} #{BIT_PASSWORD}
-            #{BIT_PATH}/downloads #{BIT_ARCHIVE}'
+      - $: ['upload-to-bitbucket', '#{BIT_USERNAME}', '#{BIT_PASSWORD}',
+            '#{BIT_PATH}/downloads', '#{BIT_ARCHIVE}']

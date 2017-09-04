@@ -1,11 +1,14 @@
 default: [clean, slides, publish]
 
-extends: c4s4/build/buildir.yml
+extends:
+- c4s4/build/buildir.yml
+- c4s4/build/release.yml
 
 properties:
+  NAME:        '#{filename(_BASE)}'
   TITLE:       ~
   OPTIONS:     '{ratio: "4:3"}'
-  DESTINATION: '/home/web/slides/db-migration'
+  DESTINATION: '/home/web/slides/#{NAME}'
 
 targets:
 

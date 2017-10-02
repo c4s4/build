@@ -42,14 +42,14 @@ targets:
     - try:
       - $: ['git', 'checkout', 'master']
       - $: ['git', 'pull']
-      - $: ['git', 'merge', '--no-ff', 'develop', '-m', '#{message}']
+      - $: ['git', 'merge', '--no-ff', '#{DEVELOP_BRANCH}', '-m', '#{message}']
       - $: ['git', 'push']
       - $: ['git', 'tag', '-a', '#{VERSION}', '-m', '#{message}']
       - $: ['git', 'push', 'origin', '#{VERSION}']
       catch:
       - throw: 'performing release'
       finally:
-      - $: ['git', 'checkout', 'develop']
+      - $: ['git', 'checkout', '#{DEVELOP_BRANCH}']
 
   delete-release:
     doc: Delete release by deleting local and remote tags

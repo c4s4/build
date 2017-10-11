@@ -1,0 +1,24 @@
+doc: Parent build file for Xspec tests
+
+properties:
+  XSPEC_HOME: ~
+  XSPEC_TEST: ~
+  XSPEC_DEST: '#{BUILD_DIR}/xspec'
+
+environment:
+  TEST_DIR:   '#{XSPEC_DEST}'
+
+targets:
+
+  xspec:
+    doc: Run Xspec tests
+    steps:
+    - mkdir: '#{XSPEC_DEST}'
+    - for: test
+      in:  XSPEC_TEST
+      do:
+      - $: ['#{winexe(joinpath(XSPEC_HOME, "bin", "xspec.sh"))}', '#{test}']
+    - for: file
+      in:  'find(".", XSPEC_DEST + "/*-result.xml")'
+      do:
+      - $: ['xspec-status', '#{file}']

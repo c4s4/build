@@ -8,7 +8,7 @@ properties:
   NAME:        '#{filename(_BASE)}'
   TITLE:       ~
   OPTIONS:     '{ratio: "4:3"}'
-  DESTINATION: '/home/web/slides/#{NAME}'
+  DESTINATION: 'casa@sweetohm.net:/home/web/slides/#{NAME}'
 
 targets:
 

@@ -15,6 +15,8 @@ targets:
   compile:
     doc: 'Compile java source files'
     steps:
+    - classpath:    'classpath'
+      dependencies: 'dependencies.yml'
     - javac:  '**/*.java'
       source: '#{JAVA_SRC}'
       dest:   '#{CLASS_DIR}'
@@ -23,8 +25,9 @@ targets:
     doc: 'Run java program'
     depends: compile
     steps:
-    - classpath: 'classpath'
-      classes:   '#{CLASS_DIR}'
+    - classpath:    'classpath'
+      classes:      '#{CLASS_DIR}'
+      dependencies: 'dependencies.yml'
     - java: '#{JAVA_MAIN}'
       cp:   '#{classpath}'
 

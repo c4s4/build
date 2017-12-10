@@ -20,6 +20,7 @@ targets:
     - javac:  '**/*.java'
       source: '#{JAVA_SRC}'
       dest:   '#{CLASS_DIR}'
+      cp:     '#{classpath}'
 
   java:
     doc: 'Run java program'

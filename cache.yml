@@ -1,0 +1,21 @@
+doc: Build file to use a general purpose cache.
+
+properties:
+  CACHE:   '#{expand("~/.cache/neon")}'
+  ARCHIVE: ~
+
+targets:
+
+  purge:
+    doc: Clean cache
+    steps:
+    - delete: '#{CACHE}'
+
+  install:
+    doc: Copy archive in cache
+    steps:
+    - if: '!exists(CACHE)'
+      then:
+      - mkdir: '#{CACHE}'
+    - copy:  '#{ARCHIVE}'
+      todir: '#{CACHE}'

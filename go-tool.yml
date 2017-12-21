@@ -15,24 +15,24 @@ targets:
   test:
     doc: Run Go tests
     steps:
-    - $: 'go test'
+    - $: ['go', 'test']
 
   run:
     doc: Run Goo tool
     steps:
-    - $: 'go run "#{NAME}.go"'
+    - $: ['go', 'run', '#{NAME}.go']
 
   bin:
     doc: Build Go tool
     steps:
     - mkdir: '#{BUILD_DIR}'
-    - $: 'go build -o #{BUILD_DIR}/#{NAME}'
+    - $: ['go', 'build', '-o', '#{BUILD_DIR}/#{NAME}']
 
   archive:
     doc: Build distribution archive
     steps:
     - mkdir: '#{BUILD_DIR}/bin/'
-    - $: 'gox -output=#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}'
+    - $: ['gox', '-output=#{BUILD_DIR}/#{NAME}-#{VERSION}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}']
     - copy:  ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
       todir: '#{BUILD_DIR}/#{NAME}-#{VERSION}'
     - tar:    '#{NAME}-#{VERSION}/**/*'

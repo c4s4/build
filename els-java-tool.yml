@@ -1,0 +1,52 @@
+# Neon Build File (http://github.com/c4s4/neon)
+
+default: test
+extends:
+- c4s4/build/buildir.yml
+- c4s4/build/release.yml
+- c4s4/build/bitbucket.yml
+configuration:
+- configuration.yml
+- ~/.bitbucket.yml
+
+properties:
+  NAME:        ~
+  BUILD_DIR:   'target'
+  ARCHIVE:     '#{BUILD_DIR}/#{NAME}-#{VERSION}-bin.tar.gz'
+  BIT_PATH:    '/elsgestion/sie-#{NAME}/downloads'
+  BIT_ARCHIVE: '#{ARCHIVE}'
+
+targets:
+
+  test:
+    doc: Run unit tests
+    steps:
+    - $: ['mvn', 'test']
+
+  archive:
+    doc: 'Generate distribution archive'
+    steps:
+    - mkdir: '#{BUILD_DIR}'
+    - copy:  'pom.xml'
+      todir: '#{BUILD_DIR}'
+    - try:
+      - replace: 'pom.xml'
+        pattern: '$VERSION$'
+        with:    '#{VERSION}'
+      - $: ['mvn', 'package']
+      finally:
+      - copy:   '#{BUILD_DIR}/pom.xml'
+        tofile: 'pom.xml'
+
+  install:
+    doc: Install archive in local repository
+    depends: archive
+    steps:
+    - copy:  '#{ARCHIVE}'
+      todir: '~/.tools/'
+
+  release:
+      doc: Perform a release
+      depends: [clean, archive, bit_upload]
+      steps:
+      - super:

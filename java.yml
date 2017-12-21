@@ -1,0 +1,49 @@
+default: junit
+
+extends:
+- 'c4s4/build/buildir.yml'
+
+properties:
+  JAVA_SRC:  'src'
+  JAVA_TST:  'test'
+  CLASS_DIR: '#{BUILD_DIR}/classes'
+  CLASS_TST: '#{BUILD_DIR}/test'
+  JAVA_MAIN: ~
+
+targets:
+
+  compile:
+    doc: 'Compile java source files'
+    steps:
+    - classpath:    'classpath'
+      dependencies: 'dependencies.yml'
+    - javac:  '**/*.java'
+      source: '#{JAVA_SRC}'
+      dest:   '#{CLASS_DIR}'
+      cp:     '#{classpath}'
+
+  java:
+    doc: 'Run java program'
+    depends: compile
+    steps:
+    - classpath:    'classpath'
+      classes:      '#{CLASS_DIR}'
+      dependencies: 'dependencies.yml'
+    - java: '#{JAVA_MAIN}'
+      cp:   '#{classpath}'
+
+  junit:
+    doc: 'Run Junit tests'
+    depends: compile
+    steps:
+    - classpath:    'classpath'
+      classes:      ['#{CLASS_DIR}', '#{CLASS_TST}']
+      dependencies: 'dependencies.yml'
+      scopes:       'test'
+    - javac:  '**/*.java'
+      source: '#{JAVA_TST}'
+      cp:     '#{classpath}'
+      dest:   '#{CLASS_TST}'
+    - java: 'org.junit.runner.JUnitCore'
+      cp:   '#{classpath}'
+      args: '#{JAVA_MAIN}Test'

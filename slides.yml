@@ -1,11 +1,14 @@
 default: [clean, slides, publish]
 
-extends: c4s4/build/buildir.yml
+extends:
+- c4s4/build/buildir.yml
+- c4s4/build/release.yml
 
 properties:
+  NAME:        '#{filename(_BASE)}'
   TITLE:       ~
   OPTIONS:     '{ratio: "4:3"}'
-  DESTINATION: '/home/web/slides/db-migration'
+  DESTINATION: 'casa@sweetohm.net:/home/web/slides/#{NAME}'
 
 targets:
 
@@ -15,17 +18,13 @@ targets:
     - mkdir: '#{BUILD_DIR}'
     - copy:   'res/template.html'
       tofile: '#{BUILD_DIR}/index.html'
-    - replace: '#{BUILD_DIR}/index.html'
-      pattern: '<? OPTIONS ?>'
-      with:    '#{OPTIONS}'
-    - replace: '#{BUILD_DIR}/index.html'
-      pattern: '<? TITLE ?>'
-      with:    '#{TITLE}'
     - read: 'README.md'
       to:   'content'
     - replace: '#{BUILD_DIR}/index.html'
-      pattern: '<? CONTENT ?>'
-      with:    '#{content}'
+      with:
+        '<? OPTIONS ?>': '#{OPTIONS}'
+        '<? TITLE ?>':   '#{TITLE}'
+        '<? CONTENT ?>': '#{content}'
     - copy:  ['res/**/*', 'img/**/*']
       todir: '#{BUILD_DIR}'
       flat:  false
@@ -33,4 +32,4 @@ targets:
   publish:
     doc: 'Publish slides'
     steps:
-    - $: 'rsync -av "#{BUILD_DIR}/" "#{DESTINATION}/"'
+    - $: ['rsync', '-av', '#{BUILD_DIR}/', '#{DESTINATION}/']

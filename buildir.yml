@@ -1,11 +1,14 @@
-doc: 'Manage build dir'
+# Neon build file (http://github.com/c4s4/neon)
+
+doc: Manage build directory
 
 properties:
+  NAME:      '={filename(_BASE)}'
   BUILD_DIR: 'build'
 
 targets:
 
   clean:
-    doc: 'Clean build directory'
+    doc: Clean build directory
     steps:
-    - delete: '#{BUILD_DIR}'
+    - delete: =BUILD_DIR

@@ -1,67 +1,157 @@
-doc: 'Parent build file for changelog'
+# Neon build file (http://github.com/c4s4/neon)
+
+doc: Parent build file for release management
 
 properties:
-  VERSION:        '#{run("changelog", "release", "version")}'
+  VERSION:        '={run("changelog", "release", "version")}'
   DEVELOP_BRANCH: 'develop'
 
 targets:
 
-  release:
-    doc: 'Perform a release'
+  check-uncommitted-changes:
+    doc: Check uncommitted changes
     steps:
-    # check uncommitted changes
     - try:
       - $: ['git', 'diff', '--quiet', '--exit-code', 'HEAD']
+      - print: 'There are no uncommitted changes'
       catch:
       - throw: 'There are uncommitted changes'
-    # check we are on branch develop
+
+  check-develop-branch:
+    doc: Check that we are on branch develop
+    steps:
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
     - if: 'branch != DEVELOP_BRANCH'
       then:
-      - throw: 'We are not on branch "#{DEVELOP_BRANCH}"'
+      - throw: "We are not on branch '={DEVELOP_BRANCH}'"
+      else:
+      - print: 'We are on branch develop' 
+ 
+  check-feature-branch:
+    doc: Check that we are on a feature branch
+    steps:
+    - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      =: 'branch'
+    - if: 'branch[0:8] != "feature-"'
+      then:
+      - throw: 'We are not on a feature branch'
+      else:
+      - print: 'We are on a feature branch'
+
+  check-jira-branch:
+    doc: Check that we are on a jira branch
+    steps:
+    - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      =: 'branch'
+    - if: 'branch[0:5] != "jira-"'
+      then:
+      - throw: 'We are not on a jira branch'
+      else:
+      - print: 'We are on a jira branch' 
+
+  release:
+    doc: Perform a release
+    steps:
+    # check that there are no uncommitted changes
+    - call: check-uncommitted-changes
+    # check that we are on develop branch
+    - call: check-develop-branch
     # check release date is today
     - try:
       - $: ['changelog', 'release', 'date', 'check']
       catch:
       - throw: 'bad release date in changelog'
-    # read changelog information
+    # extract changelog information to build commit message
     - try:
-      - |
-        message = run("changelog", "release", "summary")
-        if message == "" {
-          message = "Release " + VERSION
-        } else {
-          message = "Release " + VERSION + ": " + message
-        }
+      - $: ['changelog', 'release', 'summary']
+        =: message
+      - if: 'message == ""'
+        then:
+        - 'message = "Release " + VERSION'
+        else:
+        - 'message = "Release " + VERSION + ": " + message'
       catch:
       - throw: 'reading changelog information'
     # print information message
-    - print: 'Releasing version "#{VERSION}" with message "#{message}"'
-    # merge develop on master tag release and return on develop
+    - print: 'Releasing version "={VERSION}" with message "={message}"'
+    # merge develop on master, tag release and return on develop
     - try:
       - $: ['git', 'checkout', 'master']
       - $: ['git', 'pull']
-      - $: ['git', 'merge', '--no-ff', '#{DEVELOP_BRANCH}', '-m', '#{message}']
+      - $: ['git', 'merge', '--no-ff', =DEVELOP_BRANCH, '-m', =message]
       - $: ['git', 'push']
-      - $: ['git', 'tag', '-a', '#{VERSION}', '-m', '#{message}']
-      - $: ['git', 'push', 'origin', '#{VERSION}']
+      - $: ['git', 'tag', '-a', =VERSION, '-m', =message]
+      - $: ['git', 'push', 'origin', =VERSION]
       catch:
       - throw: 'performing release'
       finally:
-      - $: ['git', 'checkout', '#{DEVELOP_BRANCH}']
+      # whatever happens, when return on develop branch
+      - $: ['git', 'checkout', =DEVELOP_BRANCH]
 
   delete-release:
-    doc: Delete release by deleting local and remote tags
+    doc: Delete release tag
     steps:
-    - prompt:  'WARNING! You are about to delete local and remote "#{VERSION}" tag. Do you confirm?'
+    - prompt:  "WARNING! You are about to delete '={VERSION}' tag. Do you confirm?"
       to:      'confirm'
       default: 'n'
       pattern: '^[yn]$'
       error:   'You must answer y or n'
     - if: 'confirm == "y"'
       then:
-      - $: ['git', 'tag', '-d', '#{VERSION}']
-      - $: ['git', 'push', 'origin', ':refs/tags/#{VERSION}']
+      - $: ['git', 'tag', '-d', =VERSION]
+      - $: ['git', 'push', 'origin', ':refs/tags/={VERSION}']
       else:
       - print: 'Aborting'
+
+  feature-open:
+    doc: Create a feature branch
+    steps:
+    - call: check-uncommitted-changes
+    - call: check-develop-branch
+    - prompt:  'Feature name'
+      to:      'feature'
+      pattern: '^\w+$'
+      error:   'A feature name must be made of letters, numbers, - and _'
+    - 'featurebranch = "feature-" + feature'
+    - $: ['git', 'checkout', '-b', =featurebranch]
+    - $: ['git', 'push', '-u', 'origin', =featurebranch]
+    - print: "Feature branch '={featurebranch}' created"
+
+  feature-close:
+    doc: Close a feature branch
+    steps:
+    - call: check-uncommitted-changes
+    - call: check-feature-branch
+    - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      =: 'branch'
+    - $: ['git', 'checkout', =DEVELOP_BRANCH]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =DEVELOP_BRANCH]
+    - print: "Feature branch '={branch}' merged"
+
+  fix-open:
+    doc: Create a fix branch
+    steps:
+    - call: check-uncommitted-changes
+    - call: check-develop-branch
+    - prompt:  'Fix number'
+      to:      'fix'
+      pattern: '^\d+$'
+      error:   'A fix number is an integer'
+    - 'fixbranch = "fix-" + fix'
+    - $: ['git', 'checkout', '-b', =fixbranch]
+    - $: ['git', 'push', '-u', 'origin', =fixbranch]
+    - print: 'Fix branch "fix-={fix}" created'
+
+  fix-close:
+    doc: Close a fix branch
+    steps:
+    - call: check-uncommitted-changes
+    - call: check-jira-branch
+    - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      =: 'branch'
+    - $: ['git', 'checkout', =DEVELOP_BRANCH]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =DEVELOP_BRANCH]
+    - print: "Fix branch '={branch}' merged"

@@ -1,3 +1,6 @@
+# Neon build file (http://github.com/c4s4/neon)
+
+doc: Parent build file for slides
 default: [clean, slides, publish]
 
 extends:
@@ -5,31 +8,29 @@ extends:
 - c4s4/build/release.yml
 
 properties:
-  NAME:        '#{filename(_BASE)}'
   TITLE:       ~
   OPTIONS:     '{ratio: "4:3"}'
-  DESTINATION: 'casa@sweetohm.net:/home/web/slides/#{NAME}'
+  DESTINATION: 'casa@sweetohm.net:/home/web/slides/={NAME}'
 
 targets:
 
   slides:
-    doc: 'Generate slides'
+    doc: Generate slides
     steps:
-    - mkdir: '#{BUILD_DIR}'
+    - mkdir: =BUILD_DIR
     - copy:   'res/template.html'
-      tofile: '#{BUILD_DIR}/index.html'
+      tofile: '={BUILD_DIR}/index.html'
     - read: 'README.md'
       to:   'content'
-    - replace: '#{BUILD_DIR}/index.html'
+    - replace: '={BUILD_DIR}/index.html'
       with:
-        '<? OPTIONS ?>': '#{OPTIONS}'
-        '<? TITLE ?>':   '#{TITLE}'
-        '<? CONTENT ?>': '#{content}'
+        '<? OPTIONS ?>': =OPTIONS
+        '<? TITLE ?>':   =TITLE
+        '<? CONTENT ?>': =content
     - copy:  ['res/**/*', 'img/**/*']
-      todir: '#{BUILD_DIR}'
-      flat:  false
+      todir: =BUILD_DIR
 
   publish:
-    doc: 'Publish slides'
+    doc: Publish slides
     steps:
-    - $: ['rsync', '-av', '#{BUILD_DIR}/', '#{DESTINATION}/']
+    - $: ['rsync', '-av', '={BUILD_DIR}/', '={DESTINATION}/']

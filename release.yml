@@ -39,16 +39,16 @@ targets:
       else:
       - print: 'We are on a feature branch'
 
-  check-jira-branch:
-    doc: Check that we are on a jira branch
+  check-fix-branch:
+    doc: Check that we are on a fix branch
     steps:
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
-    - if: 'branch[0:5] != "jira-"'
+    - if: 'branch[0:5] != "fix-"'
       then:
-      - throw: 'We are not on a jira branch'
+      - throw: 'We are not on a fix branch'
       else:
-      - print: 'We are on a jira branch' 
+      - print: 'We are on a fix branch' 
 
   release:
     doc: Perform a release
@@ -148,7 +148,7 @@ targets:
     doc: Close a fix branch
     steps:
     - call: check-uncommitted-changes
-    - call: check-jira-branch
+    - call: check-fix-branch
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
     - $: ['git', 'checkout', =DEVELOP_BRANCH]

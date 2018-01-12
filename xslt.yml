@@ -9,6 +9,7 @@ extends:
 
 properties:
   SAXON_HOME: ~
+  SAXON_MAIN: 'net.sf.saxon.Transform'
   XSPEC_HOME: ~
   XSPEC_TEST: ['xspec/main.xspec']
   XSPEC_DEST: '={BUILD_DIR}/xspec'
@@ -16,6 +17,7 @@ properties:
 
 environment:
   SAXON_HOME: =SAXON_HOME
+  XSPEC_HOME: =XSPEC_HOME
   TEST_DIR:   =XSPEC_DEST
 
 targets:

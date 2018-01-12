@@ -5,7 +5,6 @@ default: test
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/release.yml
 
 properties:
   ARCHIVE: '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
@@ -54,9 +53,3 @@ targets:
     - tar:    '={NAME}-={VERSION}/**/*'
       dir:    ={BUILD_DIR}
       tofile: ={ARCHIVE}
-
-  release:
-    doc: Perform a release
-    depends: [clean, test, archive]
-    steps:
-    - super:

@@ -7,6 +7,8 @@ targets:
   template:
     doc: Generate Golang project
     steps:
+    # prompt project name, create directory and copy files
+    - print: 'This template will generate a Golang project'
     - prompt:  'Name of this project'
       to:      'name'
       pattern: '^\w+$'
@@ -18,6 +20,7 @@ targets:
     - copy:  '*'
       dir:   '={_BASE}/golang'
       todir: '={_HERE}/={name}'
+    # rename go source file and test
     - move:   '={_HERE}/={name}/main.go'
       tofile: '={_HERE}/={name}/={name}.go'
     - move:   '={_HERE}/={name}/main_test.go'

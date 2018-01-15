@@ -7,6 +7,8 @@ extends:
 - c4s4/build/buildir.yml
 
 properties:
+  NAME:    ~
+  VERSION: ~
   ARCHIVE: '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
   LIBRARIES:
   - 'github.com/mitchellh/gox'
@@ -46,7 +48,6 @@ targets:
   archive:
     doc: Build distribution archive
     steps:
-    - mkdir: '={BUILD_DIR}/bin/'
     - $: ['gox', '-output=={BUILD_DIR}/={NAME}-={VERSION}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}']
     - copy:  ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
       todir: '={BUILD_DIR}/={NAME}-={VERSION}'

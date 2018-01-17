@@ -9,7 +9,7 @@ Installation
 To install them in your NeON repository, type:
 
 ```
-$ neon install c4s4/build
+$ neon -install c4s4/build
 ```
 
 This will checkout project in directory *~/.neon/c4s4/build*, on default branch

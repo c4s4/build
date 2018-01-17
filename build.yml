@@ -1,3 +1,6 @@
-doc: Build project build
+# Neon build file (http://github.com/c4s4/neon)
 
-extends: c4s4/build/release.yml
+doc: Project for my parent build files
+
+extends:
+- ./release.yml

@@ -1,15 +1,15 @@
-C4S4 Build Files
-================
+Build files
+===========
 
-This project is the place for my parent build files.
+This project contains my NeON parent build files.
 
 Installation
 ------------
 
-To install these parent builds, type following command:
+To install them in your NeON repository, type:
 
 ```
-$ neon -install=c4s4/build
+$ neon install c4s4/build
 ```
 
 This will checkout project in directory *~/.neon/c4s4/build*, on default branch
@@ -18,7 +18,7 @@ which is *master*.
 Using a branch
 --------------
 
-To use another branch *develop*, go in installation directory and type:
+To use another branch, such as *develop*, go in installation directory and type:
 
 ```
 $ git checkout develop

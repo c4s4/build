@@ -1,61 +1,45 @@
-doc: 'Github build file'
+# Neon build file (http://github.com/c4s4/neon)
 
-configuration: ~/.github.yml
+doc: Parent build file for Github
 
 properties:
-  NAME:           ~
-  ARCHIVE:        ~
-  GITHUB_USER:    'c4s4'
-  GITHUB_URL:     'https://api.github.com/repos/#{GITHUB_USER}/#{NAME}/releases'
-  GITHUB_SUMMARY: '#{run("changelog", "release", "summary")}'
-  GITHUB_DESC:    '#{run("changelog", "release", "to", "markdown")}'
-  GITHUB_JSON:
-    tag_name:         '#{VERSION}'
-    name:             '#{GITHUB_SUMMARY}'
-    body:             '#{GITHUB_DESC}'
-    target_commitish: 'master'
-    draft:            false
-    prerelease:       false
+  NAME:         ~
+  VERSION:      ~
+  GIT_USERNAME: ~
+  GIT_API:      'https://api.github.com'
+  GIT_UPLOAD:   'https://uploads.github.com'
+
+configuration:
+# configuration file for Github with GIT_USERNAME
+- ~/.github.yml
 
 targets:
 
-  gh_release:
-    doc: 'Perform a Github release'
+  downloads:
+    doc: Print archive downloads
     steps:
-    - $: ['changelog', 'release', 'summary']
-      =: 'summary'
-    - $: ['changelog', 'release', 'to', 'markdown']
-      =: 'description'
-    - try:
-      - request:  '#{GITHUB_URL}'
-        method:   'POST'
-        headers:  {'Content-Type': 'text/json'}
-        status:   '201'
-        body:     '#{jsonencode(GITHUB_JSON)}'
-        username: '#{GITHUB_USERNAME}'
-        password: '#{GITHUB_PASSWORD}'
-      - '_release_id = jsondecode(_body)["id"]'
-      - print: '#{_release_id}'
-      catch:
-      - try:
-        - print: 'status:  #{_status}'
-        - print: 'body: #{_body}'
-      - throw: 'error calling API to perform release'
+    - print: 'Downloads for ={NAME}:'
+    - request: '={GIT_API}/repos/={GIT_USERNAME}/={NAME}/releases'
+    - for: release
+      in:  =jsondecode(_body)
+      do:
+      - 'tag = release["tag_name"]'
+      - 'downloads = release["assets"][0]["download_count"]'
+      - print: '={tag}: ={downloads}'
 
-  gh_upload:
-    doc: 'Upload an asset for given release'
+  upload:
+    doc: Upload archive for release
     steps:
-    - try:
-      - print: 'https://uploads.github.com/repos/#{GITHUB_USER}/#{NAME}/releases/6663059/assets?name=#{filename(ARCHIVE)}'
-      - request:  'https://uploads.github.com/repos/#{GITHUB_USER}/#{NAME}/releases/6663059/assets?name=#{filename(ARCHIVE)}'
-        method:   'POST'
-        headers:  {'Content-Type': 'application/gzip'}
-        status:   '201'
-        file:     '#{ARCHIVE}'
-        username: '#{GITHUB_USERNAME}'
-        password: '#{GITHUB_TOKEN}'
-      catch:
-      - try:
-        - print: 'status:  #{_status}'
-        - print: 'body: #{_body}'
-      - throw: 'error calling API to perform release'
+    - request: '={GIT_API}/repos/={GIT_USERNAME}/={NAME}/releases/tags/={VERSION}'
+    - 'release = jsondecode(_body)'
+    - 'id = toInt(release["id"])'
+    - print: '={release["upload_url"]}'
+    - print: 'Release ={VERSION} found'
+    - 'url = GIT_UPLOAD+"/repos/"+GIT_USERNAME+"/"+NAME+"/releases/"+id+"/assets?name="+ARCHIVE'
+    - print: =url
+    - request:  =url
+      method:   POST
+      headers:  {'Content-Type': 'application/gzip'}
+      file:     =ARCHIVE
+      username: =GIT_USERNAME
+      password: =GIT_PASSWORD

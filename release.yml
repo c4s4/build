@@ -142,7 +142,7 @@ targets:
     - 'fixbranch = "fix-" + fix'
     - $: ['git', 'checkout', '-b', =fixbranch]
     - $: ['git', 'push', '-u', 'origin', =fixbranch]
-    - print: 'Fix branch "fix-={fix}" created'
+    - print: "Fix branch '={fixbranch}' created"
 
   fix-close:
     doc: Close a fix branch

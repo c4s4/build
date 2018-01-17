@@ -52,5 +52,5 @@ targets:
     - copy:  ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
       todir: '={BUILD_DIR}/={NAME}-={VERSION}'
     - tar:    '={NAME}-={VERSION}/**/*'
-      dir:    ={BUILD_DIR}
-      tofile: ={ARCHIVE}
+      dir:    =BUILD_DIR
+      tofile: =ARCHIVE

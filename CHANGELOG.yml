@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.2.0
+  date:    2018-01-20
+  summary: Added XSLT template
+
 - version: 1.1.0
   date:    2018-01-20
   summary: Added Slides template

@@ -5,9 +5,10 @@ default: xspec
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/release.yml
 
 properties:
+  NAME:       ~
+  VERSION:    ~
   SAXON_HOME: ~
   SAXON_MAIN: 'net.sf.saxon.Transform'
   XSPEC_HOME: ~

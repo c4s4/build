@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+               stylesheet="../xsl/main.xsl">
+
+  <x:scenario label="Test template that turns foo in bar">
+    <x:context>
+      <foo/>
+    </x:context>
+    <x:expect>
+      <bar/>
+    </x:expect>
+  </x:scenario>
+
+  <x:scenario label="Test that spam is untouched">
+    <x:context>
+      <spam/>
+    </x:context>
+    <x:expect>
+      <spam/>
+    </x:expect>
+  </x:scenario>
+
+</x:description>

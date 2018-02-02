@@ -1,0 +1,39 @@
+doc: Parent build file for Python projects
+
+extends:
+- c4s4/build/buildir.yml
+
+properties:
+  VENV_DIR:     'venv'
+  REQUIREMENTS: 'requirements.txt'
+  PYLINTRC:     ~
+
+environment:
+  PATH:       '={VENV_DIR}/bin:${PATH}'
+  PYTHONHOME: ''
+
+targets:
+
+  init:
+    doc: Create virtual environment
+    steps:
+    - delete: =VENV_DIR
+    - $: ['virtualenv', =VENV_DIR]
+    - $: ['={VENV_DIR}/bin/pip', 'install', '-r', =REQUIREMENTS]
+
+  lint:
+    doc: Cehck code with Pylint
+    steps:
+    - 'sources = filter(find(".", "**/*.py"), VENV_DIR+"/**/*")'
+    - if: 'PYLINTRC != nil'
+      then:
+      - $: 'pylint --rcfile=={PYLINTRC} ={join(sources, " ")}'
+      else:
+      - $: 'pylint ={join(sources, " ")}'
+
+  pylintrc:
+    doc: Generate Pylint configuration file
+    steps:
+    - print: 'Geenrating Pylint configuration in pylintrc file'
+    - $: 'pylint --generate-rcfile > pylintrc'
+    - print: 'You should set PYLINTRC property with path to this file'

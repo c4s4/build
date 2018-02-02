@@ -9,7 +9,7 @@ properties:
   PYLINTRC:     ~
 
 environment:
-  PATH:       '={VENV_DIR}/bin:${PATH}'
+  PATH:       '={_BASE}/={VENV_DIR}/bin:${PATH}'
 
 targets:
 

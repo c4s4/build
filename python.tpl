@@ -21,9 +21,10 @@ targets:
       dir:   '={_BASE}/python'
       todir: '={_HERE}/={name}'
     # rename project in build file
-    - replace: '={_HERE}/={name}/build.yml'
-      with:    {"name": =name}
+    - mkdir: '={_HERE}/={name}/={name}/test'
     - move:   '={_HERE}/={name}/main.py'
-      tofile: '={_HERE}/={name}/={name}.py'
+      tofile: '={_HERE}/={name}/={name}/__main__.py'
+    - move:   '={_HERE}/={name}/main_test.py'
+      tofile: '={_HERE}/={name}/={name}/test/main_test.py'
     - $: ['neon', '-file', '={_HERE}/={name}/build.yml', 'init']
     - print: "Project generated in '={name}' directory"

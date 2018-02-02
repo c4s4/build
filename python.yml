@@ -41,3 +41,15 @@ targets:
     doc: Run a Python console in virtual environment
     steps:
     - $: 'python'
+
+  run:
+    doc: Run python script
+    steps:
+    - $: ['python', =NAME]
+
+  clean:
+    doc: Clean generated files
+    steps:
+    - delete: =BUILD_DIR
+    - delete: '**/__pycache__'
+      dir:    =NAME

@@ -29,12 +29,5 @@ targets:
     # install dependencies and start Django project
     - chdir: '={_HERE}/={name}'
     - $: ['neon', 'init']
-    - $: ['={_HERE}/={name}/venv/bin/django-admin', 'startproject', =name]
-    - move:  '*.py'
-      dir:   =name
-      todir: '.'
-    - move:  '*'
-      dir:   '={name}/={name}'
-      todir: =name
-    - delete: '={name}/={name}'
+    - $: ['={_HERE}/={name}/venv/bin/django-admin', 'startproject', =name, '={_HERE}/={name}']
     - print: "Project generated in '={name}' directory"

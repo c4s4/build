@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.3.0
+  date:    2018-02-02
+  summary: Added Python and Django parent build files and templates
+
 - version: 1.2.0
   date:    2018-01-20
   summary: Added XSLT template

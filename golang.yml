@@ -7,7 +7,6 @@ extends:
 - c4s4/build/buildir.yml
 
 properties:
-  NAME:    ~
   VERSION: ~
   ARCHIVE: '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
   LIBRARIES:

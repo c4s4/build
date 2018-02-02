@@ -21,7 +21,7 @@ targets:
     - $: ['={VENV_DIR}/bin/pip', 'install', '-r', =REQUIREMENTS]
 
   lint:
-    doc: Cehck code with Pylint
+    doc: Check code with Pylint
     steps:
     - 'sources = filter(find(".", "**/*.py"), VENV_DIR+"/**/*")'
     - if: 'PYLINTRC != nil'

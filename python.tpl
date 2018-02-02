@@ -25,5 +25,5 @@ targets:
       with:    {"name": =name}
     - move:   '={_HERE}/={name}/main.py'
       tofile: '={_HERE}/={name}/={name}.py'
+    - $: ['neon', '-file', '={_HERE}/={name}/build.yml', 'init']
     - print: "Project generated in '={name}' directory"
-    - print: "You should run 'neon init' in the project directory"

@@ -36,3 +36,8 @@ targets:
     - print: 'Geenrating Pylint configuration in pylintrc file'
     - $: 'pylint --generate-rcfile > pylintrc'
     - print: 'You should set PYLINTRC property with path to this file'
+
+  console:
+    doc: Run a Python console in virtual environment
+    steps:
+    - $: 'python'

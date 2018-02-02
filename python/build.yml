@@ -1,8 +1,4 @@
-default: init
+default: lint
 
 extends:
 - c4s4/build/python.yml
-
-properties:
-  NAME:     'name'
-  PYLINTRC: ~

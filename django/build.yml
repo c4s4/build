@@ -1,0 +1,8 @@
+default: init
+
+extends:
+- c4s4/build/django.yml
+
+properties:
+  NAME:     'name'
+  PYLINTRC: ~

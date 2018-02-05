@@ -14,6 +14,7 @@ targets:
   pyversion:
     doc: Select Python version
     steps:
+    # make list of available python versions
     - 'versions = ""'
     - for: version
       in:  =PYVERSIONS
@@ -22,6 +23,7 @@ targets:
         - $: ['python={version}', '-V']
           =: '_'
         - 'versions += version'
+    # prompt if two versions
     - if: 'len(versions) > 1'
       then:
       - prompt:  'Please choose your Python version [={versions}]'
@@ -29,10 +31,12 @@ targets:
         pattern: '={"["+versions+"]"}'
         error:   'Python version must be in [={versions}]'
       else:
+      # remember version if only one
       - if: 'len(versions) == 1'
         then:
         - 'pyversion = versions'
         - print: 'Python ={pyversion} found'
+        # error if no version
         else:
         - if: 'len(versions) == 0'
           then:
@@ -68,7 +72,7 @@ targets:
   pylintrc:
     doc: Generate Pylint configuration file
     steps:
-    - print: 'Geenrating Pylint configuration in pylintrc file'
+    - print: 'Generating Pylint configuration in pylintrc file'
     - $: '={VENV_DIR}/bin/pylint --generate-rcfile > pylintrc'
     - print: 'You should set PYLINTRC property with path to this file'
 
@@ -85,7 +89,7 @@ targets:
   test:
     doc: Run python tests
     steps:
-    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover']
+    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose']
 
   clean:
     doc: Clean generated files

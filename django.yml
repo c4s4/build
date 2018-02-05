@@ -8,4 +8,4 @@ targets:
   run:
     doc: Run development server
     steps:
-    - $: ['python', 'manage.py', 'runserver']
+    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'runserver']

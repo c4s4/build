@@ -9,6 +9,7 @@ targets:
     steps:
     # prompt project name, create directory and copy files
     - print: 'This template will generate a Python project'
+    - print: 'Python must be installed with virtualenv and pip'
     - prompt:  'Name of this project'
       to:      'name'
       pattern: '^\w+$'

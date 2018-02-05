@@ -86,6 +86,12 @@ targets:
     - call: pyversion
     - $: ['python={PYVERSION}', =NAME]
 
+  test:
+    doc: Run python tests
+    steps:
+    - call: pyversion
+    - $: ['python={PYVERSION}', '-m', 'unittest', 'discover']
+
   clean:
     doc: Clean generated files
     steps:

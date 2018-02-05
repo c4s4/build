@@ -22,6 +22,7 @@ targets:
       todir: '={_HERE}/={name}'
     # rename project in build file
     - mkdir: '={_HERE}/={name}/={name}/test'
+    - touch: '={_HERE}/={name}/={name}/__init__.py'
     - move:   '={_HERE}/={name}/main.py'
       tofile: '={_HERE}/={name}/={name}/__main__.py'
     - move:   '={_HERE}/={name}/main_test.py'

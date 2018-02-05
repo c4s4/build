@@ -4,6 +4,7 @@ extends:
 - c4s4/build/buildir.yml
 
 properties:
+  PYVERSION:    ~
   VENV_DIR:     'venv'
   REQUIREMENTS: 'requirements.txt'
   PYLINTRC:     ~
@@ -13,12 +14,48 @@ environment:
 
 targets:
 
+  pyversion:
+    doc: Set Python executable depending on version
+    steps:
+    - if: 'defined("PYVERSION") && PYVERSION != nil'
+      then:
+      - if: 'PYVERSION != 2 && PYVERSION != 3'
+        then:
+        - throw: 'PYVERSION must be 2 or 3'
+      else:
+      - try:
+        - $: ['python3', '-V']
+          =: '_'
+        - 'PYVERSION = 3'
+        catch:
+        - try:
+          - $: ['python2', '-V']
+            =: '_'
+          - 'PYVERSION = 2'
+          catch:
+          - throw: 'Python 2 or 3 must be installed'
+      - print: 'Running Python ={PYVERSION}'
+
   init:
     doc: Create virtual environment
     steps:
     - delete: =VENV_DIR
-    - $: ['virtualenv', =VENV_DIR]
-    - $: ['={VENV_DIR}/bin/pip', 'install', '-r', =REQUIREMENTS]
+    # create virtual environment
+    - if: 'PYVERSION == 3'
+      then:
+      - $: ['python3', '-m', 'venv', =VENV_DIR]
+      else:
+      - $: ['virtualenv', =VENV_DIR]
+    # install requirements
+    - if: 'exists(REQUIREMENTS)'
+      then:
+      - if: 'PYVERSION == 3'
+        then:
+        - $: ['={VENV_DIR}/bin/python3', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
+        else:
+        - $: ['={VENV_DIR}/bin/pip', 'install', '-r', =REQUIREMENTS]
+      else:
+      - print: 'No requirements file found'
 
   lint:
     doc: Check code with Pylint
@@ -40,12 +77,14 @@ targets:
   console:
     doc: Run a Python console in virtual environment
     steps:
-    - $: 'python'
+    - call: pyversion
+    - $: 'python={PYVERSION}'
 
   run:
     doc: Run python script
     steps:
-    - $: ['python', =NAME]
+    - call: pyversion
+    - $: ['python={PYVERSION}', =NAME]
 
   clean:
     doc: Clean generated files

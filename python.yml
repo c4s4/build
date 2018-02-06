@@ -97,3 +97,5 @@ targets:
     - delete: =BUILD_DIR
     - delete: '**/__pycache__'
       dir:    =NAME
+    - delete:  '**/*.pyc'
+      exclude: '={VENV_DIR}/**/*.pyc'

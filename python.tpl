@@ -9,6 +9,7 @@ targets:
     steps:
     # prompt project name, create directory and copy files
     - print: 'This template will generate a Python project'
+    - print: 'Python must be installed with virtualenv and pip'
     - prompt:  'Name of this project'
       to:      'name'
       pattern: '^\w+$'
@@ -21,9 +22,12 @@ targets:
       dir:   '={_BASE}/python'
       todir: '={_HERE}/={name}'
     # rename project in build file
-    - replace: '={_HERE}/={name}/build.yml'
-      with:    {"name": =name}
+    - mkdir: '={_HERE}/={name}/={name}'
+    - touch: '={_HERE}/={name}/={name}/__init__.py'
     - move:   '={_HERE}/={name}/main.py'
-      tofile: '={_HERE}/={name}/={name}.py'
+      tofile: '={_HERE}/={name}/={name}/__main__.py'
+    - move:  'test_main.py'
+      dir:   '={_HERE}/={name}'
+      todir: '={_HERE}/={name}/={name}'
     - $: ['neon', '-file', '={_HERE}/={name}/build.yml', 'init']
     - print: "Project generated in '={name}' directory"

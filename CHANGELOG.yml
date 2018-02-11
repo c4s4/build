@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.4.0
+  date:    2018-02-11
+  summary: Added template for Go Webservice
+
 - version: 1.3.0
   date:    2018-02-02
   summary: Added Python and Django parent build files and templates

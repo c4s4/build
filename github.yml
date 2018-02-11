@@ -3,8 +3,6 @@
 doc: Parent build file for Github
 
 properties:
-  NAME:         ~
-  VERSION:      ~
   GIT_USERNAME: ~
   GIT_API:      'https://api.github.com'
   GIT_UPLOAD:   'https://uploads.github.com'

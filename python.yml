@@ -6,34 +6,96 @@ extends:
 properties:
   VENV_DIR:     'venv'
   REQUIREMENTS: 'requirements.txt'
+  PYVERSIONS:   ['2', '3']
   PYLINTRC:     ~
-
-environment:
-  PATH:       '={VENV_DIR}/bin:${PATH}'
-  PYTHONHOME: ''
 
 targets:
 
+  pyversion:
+    doc: Select Python version
+    steps:
+    # make list of available python versions
+    - 'versions = ""'
+    - for: version
+      in:  =PYVERSIONS
+      do:
+      - try:
+        - $: ['python={version}', '-V']
+          =: '_'
+        - 'versions += version'
+    # prompt if two versions
+    - if: 'len(versions) > 1'
+      then:
+      - prompt:  'Please choose your Python version [={versions}]'
+        to:      pyversion
+        pattern: '={"["+versions+"]"}'
+        error:   'Python version must be in [={versions}]'
+      else:
+      # remember version if only one
+      - if: 'len(versions) == 1'
+        then:
+        - 'pyversion = versions'
+        - print: 'Python ={pyversion} found'
+        # error if no version
+        else:
+        - if: 'len(versions) == 0'
+          then:
+          - throw: 'Python in version ={PYVERSIONS} must be installed'
+
   init:
     doc: Create virtual environment
+    depends: pyversion
     steps:
     - delete: =VENV_DIR
-    - $: ['virtualenv', =VENV_DIR]
-    - $: ['={VENV_DIR}/bin/pip', 'install', '-r', =REQUIREMENTS]
+    # create virtual environment
+    - if: 'pyversion == "3"'
+      then:
+      - $: ['python3', '-m', 'venv', =VENV_DIR]
+      else:
+      - $: ['python2', '-m', 'virtualenv', =VENV_DIR]
+    # install requirements
+    - if: 'exists(REQUIREMENTS)'
+      then:
+      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
+      else:
+      - print: 'No requirements file found'
 
   lint:
-    doc: Cehck code with Pylint
+    doc: Check code with Pylint
     steps:
-    - 'sources = filter(find(".", "**/*.py"), VENV_DIR+"/**/*")'
     - if: 'PYLINTRC != nil'
       then:
-      - $: 'pylint --rcfile=={PYLINTRC} ={join(sources, " ")}'
+      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}', =NAME]
       else:
-      - $: 'pylint ={join(sources, " ")}'
+      - $: ['={VENV_DIR}/bin/pylint', =NAME]
 
   pylintrc:
     doc: Generate Pylint configuration file
     steps:
-    - print: 'Geenrating Pylint configuration in pylintrc file'
-    - $: 'pylint --generate-rcfile > pylintrc'
+    - print: 'Generating Pylint configuration in pylintrc file'
+    - $: '={VENV_DIR}/bin/pylint --generate-rcfile > pylintrc'
     - print: 'You should set PYLINTRC property with path to this file'
+
+  console:
+    doc: Run a Python console in virtual environment
+    steps:
+    - $: '={VENV_DIR}/bin/python'
+
+  run:
+    doc: Run python script
+    steps:
+    - $: ['={VENV_DIR}/bin/python', =NAME]
+
+  test:
+    doc: Run python tests
+    steps:
+    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose']
+
+  clean:
+    doc: Clean generated files
+    steps:
+    - delete: =BUILD_DIR
+    - delete: '**/__pycache__'
+      dir:    =NAME
+    - delete:  '**/*.pyc'
+      exclude: '={VENV_DIR}/**/*.pyc'

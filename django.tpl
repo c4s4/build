@@ -2,6 +2,9 @@
 
 default: template
 
+properties:
+  FORBIDDEN: ['django', 'test']
+
 targets:
 
   template:
@@ -13,9 +16,9 @@ targets:
       to:      'name'
       pattern: '^\w+$'
       error:   'Project name must be made of letters, numbers, - and _'
-    - if: 'name == "test"'
+    - if: 'contains(FORBIDDEN, name)'
       then:
-      - throw: '"test" is not a valid project name as it collides with an existing Python module'
+      - throw: '"={name}" is not a valid project name as it collides with an existing Python module'
     - if: 'exists(joinpath(_HERE, name))'
       then:
       - throw: 'Project directory already exists'

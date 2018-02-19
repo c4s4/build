@@ -1,9 +1,14 @@
 # NeON build file (http://github.com/c4s4/neon)
 
 doc:     Parent build to perform maintenance on projects
-default: version
+default: help
 
 targets:
+
+  help:
+    doc: Print help on build file
+    steps:
+    - $: ['neon', '-info']
 
   pull:
     doc: Pull projects

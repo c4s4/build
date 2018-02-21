@@ -1,0 +1,44 @@
+# NeON build file (http://github.com/c4s4/neon)
+
+doc:     Parent build to perform maintenance on projects
+default: help
+
+targets:
+
+  help:
+    doc: Print help on build file
+    steps:
+    - $: ['neon', '-info']
+
+  pull:
+    doc: Pull projects
+    steps:
+    - for: project
+      in:  filter(find(".", "*"), "build.yml")
+      do:
+      - chdir: =joinpath(_BASE, project)
+      - $: ['git', 'pull']
+
+  clean:
+    doc: Clean projects
+    steps:
+    - for: project
+      in:  filter(find(".", "*"), "build.yml")
+      do:
+      - chdir: =joinpath(_BASE, project)
+      - if: 'exists("build.yml")'
+        then:
+        - try:
+          - $: ['neon', 'clean']
+
+  version:
+    doc: Print version of projects
+    steps:
+    - for: project
+      in:  filter(find(".", "*"), "build.yml")
+      do:
+      - chdir: =joinpath(_BASE, project)
+      - if: 'exists("CHANGELOG.yml")'
+        then:
+        - try:
+          - $: ['changelog', 'release', 'version']

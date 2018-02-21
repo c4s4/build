@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.5.0
+  date:    2018-02-21
+  summary: Added template for Projects
+
 - version: 1.4.0
   date:    2018-02-11
   summary: Added template for Go Webservice

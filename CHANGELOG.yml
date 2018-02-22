@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.6.0
+  date:    2018-02-22
+  summary: Checks with fmt, govet, gocyclo, golint, ineffassign and misspell
+
 - version: 1.5.0
   date:    2018-02-21
   summary: Added template for Projects

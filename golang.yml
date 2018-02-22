@@ -1,15 +1,26 @@
 # Neon build file (http://github.com/c4s4/neon)
 
 doc: Build file for Go projects
-default: test
+default: [check, test]
 
 extends:
 - c4s4/build/buildir.yml
 
 properties:
-  ARCHIVE: '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
+  ARCHIVE:  '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
+  PACKAGE:  ~
+  CYCLOMAX: '15'
   LIBRARIES:
   - 'github.com/mitchellh/gox'
+  - 'github.com/fzipp/gocyclo'
+  - 'golang.org/x/lint/golint'
+  - 'github.com/gordonklaus/ineffassign'
+  - 'github.com/client9/misspell/cmd/misspell'
+
+# Set GOPATH and PATH if necessary
+#environment:
+#  GOPATH: =_BASE
+#  PATH:   '={_BASE}/bin:${PATH}'
 
 targets:
 
@@ -52,3 +63,105 @@ targets:
     - tar:    '={NAME}-={VERSION}/**/*'
       dir:    =BUILD_DIR
       tofile: =ARCHIVE
+
+  check:
+    doc: Check code with tools
+    depends:
+    - check-fmt
+    - check-vet
+    - check-cyclo
+    - check-lint
+    - check-assign
+    - check-spell
+
+  check-fmt:
+    doc: Check code with fmt tool
+    steps:
+    - if: PACKAGE == nil
+      then:
+      - $: ['gofmt', '-l', '.']
+        =: errors
+      else:
+      - $: ['gofmt', '-l', 'src/={PACKAGE}']
+        =: errors
+    - if: len(errors) > 0
+      then:
+      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
+      - throw: 'Fmt check failure'
+      else:
+      - print: 'Fmt check OK'
+
+  check-vet:
+    doc: Check code with vet tool
+    steps:
+    - try:
+      - if: PACKAGE == nil
+        then:
+        - $: ['go', 'vet']
+        else:
+        - $: ['go', 'vet', '={PACKAGE}/...']
+      - print: 'Vet check OK'
+      catch:
+      - throw: 'Vet check failure'
+
+  check-cyclo:
+    doc: Check code with gocyclo tool
+    steps:
+    - try:
+      - if: PACKAGE == nil
+        then:
+        - $: ['gocyclo', '-over', =CYCLOMAX, '.']
+        else:
+        - $: ['gocyclo', '-over', =CYCLOMAX, 'src/={PACKAGE}']
+      - print: 'Cyclo check OK'
+      catch:
+      - throw: 'Cyclo check failure'
+
+  check-lint:
+    doc: Check code with golint tool
+    steps:
+    - if: PACKAGE == nil
+      then:
+      - $: ['golint', './...']
+        =: errors
+      else:
+      - $: ['golint', '={PACKAGE}/...']
+        =: errors
+    - if: len(errors) > 0
+      then:
+      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
+      - throw: 'Lint check failure'
+      else:
+      - print: 'Lint check OK'
+
+  check-assign:
+    doc: Check code with ineffassign tool
+    steps:
+    - try:
+      - if: PACKAGE == nil
+        then:
+        - $: ['ineffassign', '.']
+        else:
+        - $: ['ineffassign', 'src/={PACKAGE}']
+      - print: 'Assign check OK'
+      catch:
+      - throw: 'Assign check failure'
+
+  check-spell:
+    doc: Check code with misspell tool
+    steps:
+    - if: PACKAGE == nil
+      then:
+      - $: ['misspell', '.']
+        =: errors
+      else:
+      - $: ['misspell', 'src/={PACKAGE}']
+        =: errors
+    - if: len(errors) > 0
+      then:
+      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
+      - throw: 'Spell check failure'
+      else:
+      - print: 'Spell check OK'
+
+

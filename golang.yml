@@ -36,23 +36,39 @@ targets:
   fmt:
     doc: Format Go code
     steps:
-    - $: ['go', 'fmt']
+    - if: PACKAGE == nil
+      then:
+      - $: ['go', 'fmt']
+      else:
+      - $: ['go', 'fmt', '={PACKAGE}/...']
 
   test:
     doc: Run Go tests
     steps:
-    - $: ['go', 'test']
+    - if: PACKAGE == nil
+      then:
+      - $: ['go', 'test']
+      else:
+      - $: ['go', 'test', '={PACKAGE}/...']
 
   run:
     doc: Run Go tool
     steps:
-    - $: ['go', 'run', '={NAME}.go']
+    - if: PACKAGE == nil
+      then:
+      - $: ['go', 'run', '={NAME}.go']
+      else:
+      - $: ['go', 'run', 'src/={NAME}.go']
 
   bin:
     doc: Make binary
     steps:
     - mkdir: =BUILD_DIR
-    - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
+    - if: PACKAGE == nil
+      then:
+      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
+      else:
+      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}', '={PACKAGE}']
 
   archive:
     doc: Build distribution archive

@@ -47,9 +47,9 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['go', 'test']
+      - $: ['go', 'test', '-cover']
       else:
-      - $: ['go', 'test', '={PACKAGE}/...']
+      - $: ['go', 'test', '-cover', '={PACKAGE}/...']
 
   run:
     doc: Run Go tool

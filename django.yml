@@ -1,3 +1,5 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
 doc: Parent build file for Django projects
 
 extends:

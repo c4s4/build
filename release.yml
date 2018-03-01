@@ -1,4 +1,4 @@
-# Neon build file (http://github.com/c4s4/neon)
+# NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for release management
 
@@ -8,7 +8,7 @@ properties:
 
 targets:
 
-  check-uncommitted-changes:
+  _check-uncommitted-changes:
     doc: Check uncommitted changes
     steps:
     - try:
@@ -17,7 +17,7 @@ targets:
       catch:
       - throw: 'There are uncommitted changes'
 
-  check-develop-branch:
+  _check-develop-branch:
     doc: Check that we are on branch develop
     steps:
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
@@ -28,7 +28,7 @@ targets:
       else:
       - print: 'We are on branch develop' 
  
-  check-feature-branch:
+  _check-feature-branch:
     doc: Check that we are on a feature branch
     steps:
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
@@ -39,7 +39,7 @@ targets:
       else:
       - print: 'We are on a feature branch'
 
-  check-fix-branch:
+  _check-fix-branch:
     doc: Check that we are on a fix branch
     steps:
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
@@ -54,9 +54,9 @@ targets:
     doc: Perform a release
     steps:
     # check that there are no uncommitted changes
-    - call: check-uncommitted-changes
+    - call: _check-uncommitted-changes
     # check that we are on develop branch
-    - call: check-develop-branch
+    - call: _check-develop-branch
     # check release date is today
     - try:
       - $: ['changelog', 'release', 'date', 'check']
@@ -107,8 +107,8 @@ targets:
   feature-open:
     doc: Create a feature branch
     steps:
-    - call: check-uncommitted-changes
-    - call: check-develop-branch
+    - call: _check-uncommitted-changes
+    - call: _check-develop-branch
     - prompt:  'Feature name'
       to:      'feature'
       pattern: '^\w+$'
@@ -121,8 +121,8 @@ targets:
   feature-close:
     doc: Close a feature branch
     steps:
-    - call: check-uncommitted-changes
-    - call: check-feature-branch
+    - call: _check-uncommitted-changes
+    - call: _check-feature-branch
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
     - $: ['git', 'checkout', =DEVELOP_BRANCH]
@@ -133,8 +133,8 @@ targets:
   fix-open:
     doc: Create a fix branch
     steps:
-    - call: check-uncommitted-changes
-    - call: check-develop-branch
+    - call: _check-uncommitted-changes
+    - call: _check-develop-branch
     - prompt:  'Fix number'
       to:      'fix'
       pattern: '^\d+$'
@@ -147,8 +147,8 @@ targets:
   fix-close:
     doc: Close a fix branch
     steps:
-    - call: check-uncommitted-changes
-    - call: check-fix-branch
+    - call: _check-uncommitted-changes
+    - call: _check-fix-branch
     - $: ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       =: 'branch'
     - $: ['git', 'checkout', =DEVELOP_BRANCH]

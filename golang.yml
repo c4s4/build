@@ -1,15 +1,19 @@
-# Neon build file (http://github.com/c4s4/neon)
+# NeON Build File (http://github.com/c4s4/neon)
 
 doc: Build file for Go projects
 default: [check, test]
 
 extends:
 - c4s4/build/buildir.yml
+- c4s4/build/archive.yml
 
 properties:
   ARCHIVE:  '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
   PACKAGE:  ~
   CYCLOMAX: '15'
+  ARC_FILES:
+  - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
+  - {files: 'bin/*', dir: =BUILD_DIR}
   LIBRARIES:
   - 'github.com/mitchellh/gox'
   - 'github.com/fzipp/gocyclo'
@@ -61,7 +65,7 @@ targets:
       - $: ['go', 'run', 'src/={NAME}.go']
 
   bin:
-    doc: Make binary
+    doc: Make binary for current platform
     steps:
     - mkdir: =BUILD_DIR
     - if: PACKAGE == nil
@@ -69,28 +73,30 @@ targets:
       - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
       else:
       - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}', '={PACKAGE}']
+  
+  binaries:
+    doc: Make binaries for all platforms
+    steps:
+    - mkdir: '={BUILD_DIR}/bin'
+    - $: ['gox', '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}']
 
   archive:
     doc: Build distribution archive
+    depends: binaries
     steps:
-    - $: ['gox', '-output=={BUILD_DIR}/={NAME}-={VERSION}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}']
-    - copy:  ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
-      todir: '={BUILD_DIR}/={NAME}-={VERSION}'
-    - tar:    '={NAME}-={VERSION}/**/*'
-      dir:    =BUILD_DIR
-      tofile: =ARCHIVE
+    - super:
 
   check:
     doc: Check code with tools
     depends:
-    - check-fmt
-    - check-vet
-    - check-cyclo
-    - check-lint
-    - check-assign
-    - check-spell
+    - _check-fmt
+    - _check-vet
+    - _check-cyclo
+    - _check-lint
+    - _check-assign
+    - _check-spell
 
-  check-fmt:
+  _check-fmt:
     doc: Check code with fmt tool
     steps:
     - if: PACKAGE == nil
@@ -107,7 +113,7 @@ targets:
       else:
       - print: 'Fmt check OK'
 
-  check-vet:
+  _check-vet:
     doc: Check code with vet tool
     steps:
     - try:
@@ -120,7 +126,7 @@ targets:
       catch:
       - throw: 'Vet check failure'
 
-  check-cyclo:
+  _check-cyclo:
     doc: Check code with gocyclo tool
     steps:
     - try:
@@ -133,7 +139,7 @@ targets:
       catch:
       - throw: 'Cyclo check failure'
 
-  check-lint:
+  _check-lint:
     doc: Check code with golint tool
     steps:
     - if: PACKAGE == nil
@@ -150,7 +156,7 @@ targets:
       else:
       - print: 'Lint check OK'
 
-  check-assign:
+  _check-assign:
     doc: Check code with ineffassign tool
     steps:
     - try:
@@ -163,7 +169,7 @@ targets:
       catch:
       - throw: 'Assign check failure'
 
-  check-spell:
+  _check-spell:
     doc: Check code with misspell tool
     steps:
     - if: PACKAGE == nil
@@ -179,5 +185,3 @@ targets:
       - throw: 'Spell check failure'
       else:
       - print: 'Spell check OK'
-
-

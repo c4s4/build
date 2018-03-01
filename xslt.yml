@@ -1,10 +1,11 @@
-# Neon build file (http://github.com/c4s4/neon)
+# NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for XSLT project
 default: xspec
 
 extends:
 - c4s4/build/buildir.yml
+- c4s4/build/archive.yml
 
 properties:
   NAME:       ~
@@ -14,7 +15,8 @@ properties:
   XSPEC_HOME: ~
   XSPEC_TEST: ['xspec/main.xspec']
   XSPEC_DEST: '={BUILD_DIR}/xspec'
-  ARCHIVE:    '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
+  ARC_FILES:
+  - files: ['README.md', 'CHANGELOG.yml', 'xsl/**/*']
 
 environment:
   SAXON_HOME: =SAXON_HOME
@@ -35,14 +37,3 @@ targets:
       in:  'find(".", XSPEC_DEST + "/*-result.xml")'
       do:
       - $: ['xspec-status', =file]
-
-  archive:
-    doc: Generate distribution archive
-    steps:
-    - mkdir: =BUILD_DIR
-    - tar:
-      - 'README.md'
-      - 'CHANGELOG.yml'
-      - 'xsl/**/*'
-      prefix:  =NAME
-      tofile:  =ARCHIVE

@@ -1,4 +1,4 @@
-# Neon build file (http://github.com/c4s4/neon)
+# NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for slides
 default: [clean, slides, publish]

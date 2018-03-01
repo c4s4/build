@@ -1,4 +1,4 @@
-# Neon template file (http://github.com/c4s4/neon)
+# NeON Template File (http://github.com/c4s4/neon)
 
 default: template
 

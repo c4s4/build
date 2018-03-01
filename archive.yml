@@ -1,0 +1,63 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Parent build file to generate archives
+
+properties:
+  # properties that must be defined elsewhere
+  # NAME:      'foo'
+  # VERSION:   '1.2.3'
+  # BUILD_DIR: 'build'
+  # sets of files to copy: list of sets that have same fields than copy task
+  ARC_FILES:
+  - files:   '**/*'
+    dir:     '.'
+    exclude: ['={BUILD_DIR}/**/*', 'build.yml']
+    flat:    false
+  # archive type may be tar, tar.gz or zip
+  ARC_TYPE:   tar.gz
+  # directory where is built the archive
+  ARC_DIR:    '={BUILD_DIR}/archive'
+  # path of the generated archive file
+  ARC_PATH:   '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
+  # prefix for file path in archive
+  ARC_PREFIX: =NAME
+
+targets:
+
+  archive:
+    doc: Build an archive
+    steps:
+    # copy files to archive directory
+    - mkdir: =ARC_DIR
+    - for: set
+      in:  =ARC_FILES
+      do:
+      - if: set["files"] == nil
+        then:
+        - 'set["files"] = "**/*"'
+      - if: set["dir"] == nil
+        then:
+        - 'set["dir"] = "."'
+      - if: set["exclude"] == nil
+        then:
+        - 'set["exclude"] = []'
+      - if: set["flat"] == nil
+        then:
+        - 'set["flat"] = false'
+      - copy:    =set["files"]
+        dir:     =set["dir"]
+        exclude: =set["exclude"]
+        todir:   =ARC_DIR
+        flat:    =set["flat"]
+    # build the archive depending of type
+    - if: 'ARC_TYPE == "tar" || ARC_TYPE == "tar.gz"'
+      then:
+      - tar:    '**/*'
+        dir:    =ARC_DIR
+        tofile: =ARC_PATH
+        prefix: =ARC_PREFIX
+      else:
+      - zip:    '**/*'
+        dir:    =ARC_DIR
+        tofile: =ARC_PATH
+        prefix: =ARC_PREFIX

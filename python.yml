@@ -14,7 +14,7 @@ properties:
 
 targets:
 
-  pyversion:
+  _pyversion:
     doc: Select Python version
     steps:
     # make list of available python versions
@@ -47,7 +47,7 @@ targets:
 
   init:
     doc: Create virtual environment
-    depends: pyversion
+    depends: _pyversion
     steps:
     - delete: =VENV_DIR
     # create virtual environment

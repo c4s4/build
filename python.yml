@@ -61,6 +61,12 @@ targets:
       - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
+  
+  format:
+    doc: Format code using yapf
+    steps:
+    - 'files = filter(find(".", "**/*.py"), "venv/**/*")'
+    - $: '={VENV_DIR}/bin/yapf -i ={join(files, " ")}'
 
   lint:
     doc: Check code with Pylint

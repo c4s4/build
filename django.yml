@@ -7,6 +7,17 @@ extends:
 
 targets:
 
+  lint:
+    doc: Check code with Pylint
+    steps:
+    # we can't take only the project package, because of apps
+    - 'files = filter(find(".", "**/*.py"), joinpath(VENV_DIR, "**/*.py"))'
+    - if: 'PYLINTRC != nil'
+      then:
+      - $: '={VENV_DIR}/bin/pylint --rcfile=={PYLINTRC} ={join(files, " ")}'
+      else:
+      - $: '={VENV_DIR}/bin/pylint ={join(files, " ")}'
+
   run:
     doc: Run development server
     steps:

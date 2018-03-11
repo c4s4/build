@@ -2,6 +2,7 @@
 
 doc: Parent build file for Python projects
 
+default: [format, lint, test]
 extends:
 - c4s4/build/buildir.yml
 
@@ -13,54 +14,73 @@ properties:
 
 targets:
 
-  pyversion:
+  _select_python:
     doc: Select Python version
     steps:
     # make list of available python versions
-    - 'versions = ""'
-    - for: version
-      in:  =PYVERSIONS
-      do:
-      - try:
-        - $: ['python={version}', '-V']
-          =: '_'
-        - 'versions += version'
-    # prompt if two versions
-    - if: 'len(versions) > 1'
+    - |
+      pythons = []
+      for version in PYVERSIONS {
+        pythons += findinpath("python"+toString(version))
+      }
+      for i in range(len(pythons)) {
+        pythons[i] = followlink(toString(pythons[i]))
+      }
+    # print found python versions
+    - if: len(pythons) > 0
       then:
-      - prompt:  'Please choose your Python version [={versions}]'
-        to:      pyversion
-        pattern: '={"["+versions+"]"}'
-        error:   'Python version must be in [={versions}]'
+      - print: 'Found Python versions:'
+      - for: i
+        in:  range(len(pythons))
+        do:
+        - print: '={i+1}: ={pythons[i]}'
+      # prompt for Python version
+      - prompt:  'Please choose your Python version or 0 to type a new path'
+        to:      index
+        pattern: '^[0-={len(pythons)}]$'
+        error:   'Python version must be between 0 and ={len(pythons)}'
       else:
-      # remember version if only one
-      - if: 'len(versions) == 1'
+      - 'index = "0"'
+    # prompt for Python path if 0 was entered
+    - if: index == '0'
+      then:
+      - prompt: 'Please type path to selected Python binary'
+        to:     python
+      - if: '!exists(python)'
         then:
-        - 'pyversion = versions'
-        - print: 'Python ={pyversion} found'
-        # error if no version
-        else:
-        - if: 'len(versions) == 0'
-          then:
-          - throw: 'Python in version ={PYVERSIONS} must be installed'
+        - throw: 'Selected Python path not found'
+      else:
+      - 'python = pythons[toInt(index)-1]'
+    - print: 'Selected Python path: ={python}'
+    # get Python version
+    - $: [=python, '-V']
+      =: version
+    - 'version = version[7:8]'
+    - print: 'Python version ={version}'
 
   init:
     doc: Create virtual environment
-    depends: pyversion
+    depends: _select_python
     steps:
     - delete: =VENV_DIR
     # create virtual environment
-    - if: 'pyversion == "3"'
+    - if: 'version == "3"'
       then:
-      - $: ['python3', '-m', 'venv', =VENV_DIR]
+      - $: [=python, '-m', 'venv', =VENV_DIR]
       else:
-      - $: ['python2', '-m', 'virtualenv', =VENV_DIR]
+      - $: [=python, '-m', 'virtualenv', =VENV_DIR]
     # install requirements
     - if: 'exists(REQUIREMENTS)'
       then:
       - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
+  
+  format:
+    doc: Format code using yapf
+    steps:
+    - 'files = filter(find(".", "**/*.py"), "venv/**/*")'
+    - $: '={VENV_DIR}/bin/yapf -i ={join(files, " ")}'
 
   lint:
     doc: Check code with Pylint

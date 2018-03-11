@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 1.7.1
+  date:    2018-03-11
+  summary: Fixed Python selection and virtualenv creation
+
 - version: 1.7.0
   date:    2018-03-01
   summary: Added archive parent build file

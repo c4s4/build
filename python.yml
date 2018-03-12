@@ -10,7 +10,12 @@ properties:
   VENV_DIR:     'venv'
   REQUIREMENTS: 'requirements.txt'
   PYVERSIONS:   ['2', '3']
+  YAPFSTYLE:    'google'
+  PYTESTFILES:  '*_test.py'
   PYLINTRC:     ~
+
+environment:
+  PYTHONPATH: =_BASE
 
 targets:
 
@@ -80,7 +85,7 @@ targets:
     doc: Format code using yapf
     steps:
     - 'files = filter(find(".", "**/*.py"), "venv/**/*")'
-    - $: '={VENV_DIR}/bin/yapf -i ={join(files, " ")}'
+    - $: '={VENV_DIR}/bin/yapf -i --style ={YAPFSTYLE} ={join(files, " ")}'
 
   lint:
     doc: Check code with Pylint
@@ -111,7 +116,7 @@ targets:
   test:
     doc: Run python tests
     steps:
-    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose']
+    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose', '-p', =PYTESTFILES]
 
   clean:
     doc: Clean generated files

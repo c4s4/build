@@ -5,6 +5,7 @@ doc: Parent build file for release management
 properties:
   VERSION:        '={run("changelog", "release", "version")}'
   DEVELOP_BRANCH: 'develop'
+  CHANGELOG_FILE: 'CHANGELOG.yml'
 
 targets:
 
@@ -48,7 +49,35 @@ targets:
       then:
       - throw: 'We are not on a fix branch'
       else:
-      - print: 'We are on a fix branch' 
+      - print: 'We are on a fix branch'
+  
+  _check-release-date:
+    doc: Check that release date in changelog is today
+    steps:
+    - if: exists(CHANGELOG_FILE)
+      then:
+      - try:
+        - $: ['changelog', 'release', 'date', 'check']
+        catch:
+        - throw: 'bad release date in changelog'
+  
+  _get-release-message:
+    doc: Build release message extracting info from changelog
+    steps:
+    - if: exists(CHANGELOG_FILE)
+      then:
+      - try:
+        - $: ['changelog', 'release', 'summary']
+          =: message
+        - if: 'message == ""'
+          then:
+          - 'message = "Release " + VERSION'
+          else:
+          - 'message = "Release " + VERSION + ": " + message'
+        catch:
+        - throw: 'reading changelog information'
+      else:
+      - 'message = "Release " + VERSION'
 
   release:
     doc: Perform a release
@@ -58,21 +87,9 @@ targets:
     # check that we are on develop branch
     - call: _check-develop-branch
     # check release date is today
-    - try:
-      - $: ['changelog', 'release', 'date', 'check']
-      catch:
-      - throw: 'bad release date in changelog'
+    - call: _check-release-date
     # extract changelog information to build commit message
-    - try:
-      - $: ['changelog', 'release', 'summary']
-        =: message
-      - if: 'message == ""'
-        then:
-        - 'message = "Release " + VERSION'
-        else:
-        - 'message = "Release " + VERSION + ": " + message'
-      catch:
-      - throw: 'reading changelog information'
+    - call: _get-release-message
     # print information message
     - print: 'Releasing version "={VERSION}" with message "={message}"'
     # merge develop on master, tag release and return on develop

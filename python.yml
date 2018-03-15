@@ -84,8 +84,8 @@ targets:
   format:
     doc: Format code using yapf
     steps:
-    - 'files = filter(find(".", "**/*.py"), "venv/**/*")'
-    - $: '={VENV_DIR}/bin/yapf -i --style ={YAPFSTYLE} ={join(files, " ")}'
+    - $: ['={VENV_DIR}/bin/yapf', '-i', '--style', =YAPFSTYLE]
+      -: '=filter(find(".", "**/*.py"), "venv/**/*")'
 
   lint:
     doc: Check code with Pylint

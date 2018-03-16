@@ -20,6 +20,8 @@ properties:
   - 'golang.org/x/lint/golint'
   - 'github.com/gordonklaus/ineffassign'
   - 'github.com/client9/misspell/cmd/misspell'
+  TEST_CASES: []
+  TEST_OPTS:  []
 
 # Set GOPATH and PATH if necessary
 #environment:
@@ -49,11 +51,11 @@ targets:
   test:
     doc: Run Go tests
     steps:
-    - if: PACKAGE == nil
+    - if: 'PACKAGE != nil && len(TEST_CASES) == 0'
       then:
-      - $: ['go', 'test', '-cover']
-      else:
-      - $: ['go', 'test', '-cover', '={PACKAGE}/...']
+      - 'TEST_CASES = [PACKAGE]'
+    - $: ['go', 'test', '-cover', '={PACKAGE}/...']
+      -: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run Go tool

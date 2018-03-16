@@ -17,6 +17,12 @@ targets:
       - $: '={VENV_DIR}/bin/pylint --rcfile=={PYLINTRC} ={join(files, " ")}'
       else:
       - $: '={VENV_DIR}/bin/pylint ={join(files, " ")}'
+  
+  test:
+    doc: Run unit tests
+    steps:
+    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'test']
+      -: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run development server

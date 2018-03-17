@@ -22,7 +22,7 @@ targets:
     doc: Run unit tests
     steps:
     - $: ['={VENV_DIR}/bin/python', 'manage.py', 'test']
-      -: =TEST_OPTS+TEST_CASES
+      +: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run development server

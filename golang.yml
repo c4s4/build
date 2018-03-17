@@ -55,7 +55,7 @@ targets:
       then:
       - 'TEST_CASES = [PACKAGE]'
     - $: ['go', 'test', '-cover', '={PACKAGE}/...']
-      -: =TEST_OPTS+TEST_CASES
+      +: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run Go tool
@@ -103,11 +103,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['gofmt', '-l', '.']
-        =: errors
+      - $:  ['gofmt', '-l', '.']
+        3=: errors
       else:
-      - $: ['gofmt', '-l', 'src/={PACKAGE}']
-        =: errors
+      - $:  ['gofmt', '-l', 'src/={PACKAGE}']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -134,9 +134,9 @@ targets:
     - try:
       - if: PACKAGE == nil
         then:
-        - $: ['gocyclo', '-over', =CYCLOMAX, '.']
+        - $: ['gocyclo', '-over', '={CYCLOMAX}', '.']
         else:
-        - $: ['gocyclo', '-over', =CYCLOMAX, 'src/={PACKAGE}']
+        - $: ['gocyclo', '-over', '={CYCLOMAX}', 'src/={PACKAGE}']
       - print: 'Cyclo check OK'
       catch:
       - throw: 'Cyclo check failure'
@@ -146,11 +146,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['golint', './...']
-        =: errors
+      - $:  ['golint', './...']
+        3=: errors
       else:
-      - $: ['golint', '={PACKAGE}/...']
-        =: errors
+      - $:  ['golint', '={PACKAGE}/...']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -176,11 +176,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['misspell', '.']
-        =: errors
+      - $:  ['misspell', '.']
+        3=: errors
       else:
-      - $: ['misspell', 'src/={PACKAGE}']
-        =: errors
+      - $:  ['misspell', 'src/={PACKAGE}']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'

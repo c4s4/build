@@ -58,8 +58,8 @@ targets:
       - 'python = pythons[toInt(index)-1]'
     - print: 'Selected Python path: ={python}'
     # get Python version
-    - $: [=python, '-V']
-      =: version
+    - $:  [=python, '-V']
+      3=: version
     - 'version = version[7:8]'
     - print: 'Python version ={version}'
 
@@ -85,7 +85,7 @@ targets:
     doc: Format code using yapf
     steps:
     - $: ['={VENV_DIR}/bin/yapf', '-i', '--style', =YAPFSTYLE]
-      -: '=filter(find(".", "**/*.py"), "venv/**/*")'
+      +: '=filter(find(".", "**/*.py"), "venv/**/*")'
 
   lint:
     doc: Check code with Pylint

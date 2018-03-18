@@ -22,6 +22,7 @@ properties:
   - 'github.com/client9/misspell/cmd/misspell'
   TEST_CASES: []
   TEST_OPTS:  []
+  RUN_ARGS:   []
 
 # Set GOPATH and PATH if necessary
 #environment:
@@ -63,8 +64,10 @@ targets:
     - if: PACKAGE == nil
       then:
       - $: ['go', 'run', '={NAME}.go']
+        +: =RUN_ARGS
       else:
       - $: ['go', 'run', 'src/={NAME}.go']
+        +: =RUN_ARGS
 
   bin:
     doc: Make binary for current platform

@@ -5,6 +5,10 @@ doc: Parent build file for Django projects
 extends:
 - c4s4/build/python.yml
 
+properties:
+  TEST_OPTS:  []
+  TEST_CASES: []
+
 targets:
 
   lint:

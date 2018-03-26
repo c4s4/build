@@ -17,11 +17,24 @@ targets:
       catch:
       - throw: 'There are uncommitted changes'
 
+  _check-master-branch:
+    doc: Check that we are on master branch
+    steps:
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+      3x: true
+    - if: 'branch != MASTER_BRANCH'
+      then:
+      - throw: "We are not on master branch"
+      else:
+      - print: 'We are on master branch' 
+ 
   _check-rdb-branch:
     doc: Check that we are on branch named RDB-XXX
     steps:
     - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       3=: 'branch'
+      3x: true
     - if: 'branch[0:len(RDB_BRANCH)] != RDB_BRANCH'
       then:
       - throw: "We are not on RDB branch"
@@ -32,7 +45,7 @@ targets:
     doc: Create a RDB branch
     steps:
     - call: _check-uncommitted-changes
-    - call: _check-rdb-branch
+    - call: _check-master-branch
     - prompt:  'RDB number'
       to:      'rdb'
       pattern: '^\d+$'

@@ -13,6 +13,7 @@ properties:
   YAPFSTYLE:    'google'
   PYTESTFILES:  '*_test.py'
   PYLINTRC:     ~
+  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*")'
 
 environment:
   PYTHONPATH: =_BASE
@@ -92,9 +93,11 @@ targets:
     steps:
     - if: 'PYLINTRC != nil'
       then:
-      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}', =NAME]
+      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}']
+        +: =PYLINTSRC
       else:
-      - $: ['={VENV_DIR}/bin/pylint', =NAME]
+      - $: ['={VENV_DIR}/bin/pylint']
+        +: =PYLINTSRC
 
   pylintrc:
     doc: Generate Pylint configuration file

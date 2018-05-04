@@ -55,8 +55,13 @@ targets:
     - if: 'PACKAGE != nil && len(TEST_CASES) == 0'
       then:
       - 'TEST_CASES = [PACKAGE]'
-    - $: ['go', 'test', '-cover', '={PACKAGE}/...']
-      +: =TEST_OPTS+TEST_CASES
+    - if: 'PACKAGE != nil'
+      then:
+      - $: ['go', 'test', '-cover', '={PACKAGE}/...']
+        +: =TEST_OPTS+TEST_CASES
+      else:
+      - $: ['go', 'test', '-cover']
+        +: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run Go tool

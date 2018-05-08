@@ -14,12 +14,26 @@ properties:
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
-  LIBRARIES:
-  - 'github.com/mitchellh/gox'
-  - 'github.com/fzipp/gocyclo'
-  - 'golang.org/x/lint/golint'
-  - 'github.com/gordonklaus/ineffassign'
-  - 'github.com/client9/misspell/cmd/misspell'
+  LIBRARIES: []
+  GOTOOLS:
+  # cross compilation
+  - github.com/mitchellh/gox
+  # check tools
+  - github.com/fzipp/gocyclo
+  - golang.org/x/lint/golint
+  - github.com/gordonklaus/ineffassign
+  - github.com/client9/misspell/cmd/misspell
+  # vscode tools
+  - github.com/nsf/gocode
+  - github.com/uudashr/gopkgs/cmd/gopkgs
+  - github.com/ramya-rao-a/go-outline
+  - github.com/acroca/go-symbols
+  - golang.org/x/tools/cmd/guru
+  - golang.org/x/tools/cmd/gorename
+  - github.com/rogpeppe/godef
+  - golang.org/x/tools/cmd/godoc
+  - github.com/sqs/goreturns
+  - github.com/derekparker/delve/cmd/dlv
   TEST_CASES: []
   TEST_OPTS:  []
   RUN_ARGS:   []
@@ -30,6 +44,15 @@ properties:
 #  PATH:   '={_BASE}/bin:${PATH}'
 
 targets:
+
+  tools:
+    doc: Install tools
+    steps:
+    - for: 'tool'
+      in:  'GOTOOLS'
+      do:
+      - print: 'Getting tool ={tool}'
+      - $: ['go', 'get', =tool]
 
   libs:
     doc: Install libraries

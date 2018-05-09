@@ -12,7 +12,7 @@ targets:
     - print: 'Python must be installed with virtualenv and pip'
     - prompt:  'Name of this project'
       to:      'name'
-      pattern: '^\w+$'
+      pattern: '^[\w-_]+$'
       error:   'Project name must be made of letters, numbers, - and _'
     - if: 'exists(joinpath(_HERE, name))'
       then:

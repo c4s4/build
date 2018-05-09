@@ -121,6 +121,11 @@ targets:
     steps:
     - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose', '-p', =PYTESTFILES]
 
+  cloc:
+    doc: Count Python lines of code (calls 'cloc' tool on command line)
+    steps:
+    - $: ['cloc', '--exclude-dir=={VENV_DIR}', '--include-lang=Python', '.']
+
   clean:
     doc: Clean generated files
     steps:

@@ -11,7 +11,7 @@ properties:
   REQUIREMENTS: 'requirements.txt'
   PYVERSIONS:   ['2', '3']
   YAPFSTYLE:    'google'
-  PYTESTFILES:  '*_test.py'
+  PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
   PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*")'
 

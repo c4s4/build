@@ -61,7 +61,7 @@ targets:
       in:  'LIBRARIES'
       do:
       - print: 'Getting library ={library}'
-      - $: ['go', 'get', =library]
+      - $: ['go', 'get', '-u', =library]
 
   fmt:
     doc: Format Go code

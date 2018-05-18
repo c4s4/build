@@ -128,7 +128,7 @@ targets:
     - call: _check-develop-branch
     - prompt:  'Feature name'
       to:      'feature'
-      pattern: '^\w+$'
+      pattern: '^[\w-_]+$'
       error:   'A feature name must be made of letters, numbers, - and _'
     - 'featurebranch = "feature-" + feature'
     - $: ['git', 'checkout', '-b', =featurebranch]
@@ -154,8 +154,8 @@ targets:
     - call: _check-develop-branch
     - prompt:  'Fix number'
       to:      'fix'
-      pattern: '^\d+$'
-      error:   'A fix number is an integer'
+      pattern: '^[\w-_]+$'
+      error:   'A fix name must be made of letters, numbers, - and _'
     - 'fixbranch = "fix-" + fix'
     - $: ['git', 'checkout', '-b', =fixbranch]
     - $: ['git', 'push', '-u', 'origin', =fixbranch]

@@ -57,6 +57,7 @@ targets:
         - throw: 'Selected Python path not found'
       else:
       - 'python = pythons[toInt(index)-1]'
+    - 'python = followlink(python)'
     - print: 'Selected Python path: ={python}'
     # get Python version
     - $:  [=python, '-V']

@@ -14,6 +14,9 @@ properties:
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
   PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*")'
+  PYTOOLS:
+  - pylint
+  - yapf
 
 environment:
   PYTHONPATH: =_BASE
@@ -76,12 +79,20 @@ targets:
       - $: [=python, '-m', 'venv', =VENV_DIR]
       else:
       - $: [=python, '-m', 'virtualenv', =VENV_DIR]
+    # install tools
+    - call: tools
     # install requirements
     - if: 'exists(REQUIREMENTS)'
       then:
       - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
+  
+  tools:
+    doc: Install tools
+    steps:
+    - $: ['={VENV_DIR}/bin/pip', 'install']
+      +: =PYTOOLS
   
   format:
     doc: Format code using yapf

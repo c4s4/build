@@ -14,8 +14,8 @@ targets:
     - print: 'This template will generate a Django project'
     - prompt:  'Name of this project'
       to:      'name'
-      pattern: '^\w+$'
-      error:   'Project name must be made of letters, numbers, - and _'
+      pattern: '^[\w_]+$'
+      error:   'Project name must be made of letters, numbers and underscore'
     - if: 'contains(FORBIDDEN, name)'
       then:
       - throw: '"={name}" is not a valid project name as it collides with an existing Python module'

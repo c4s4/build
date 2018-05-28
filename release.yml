@@ -44,8 +44,8 @@ targets:
     doc: Check that we are on a fix branch
     steps:
     - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
-      3=: branch'
-    - if: 'branch[0:5] != "fix-"'
+      3=: 'branch'
+    - if: 'branch[0:4] != "fix-"'
       then:
       - throw: 'We are not on a fix branch'
       else:

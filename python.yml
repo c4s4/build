@@ -82,17 +82,22 @@ targets:
     # install tools
     - call: tools
     # install requirements
-    - if: 'exists(REQUIREMENTS)'
-      then:
-      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
-      else:
-      - print: 'No requirements file found'
+    - call: libs
   
   tools:
     doc: Install tools
     steps:
     - $: ['={VENV_DIR}/bin/pip', 'install']
       +: =PYTOOLS
+  
+  libs:
+    doc: Install requirements
+    steps:
+    - if: 'exists(REQUIREMENTS)'
+      then:
+      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
+      else:
+      - print: 'No requirements file found'
   
   format:
     doc: Format code using yapf

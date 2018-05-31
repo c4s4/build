@@ -32,16 +32,16 @@ targets:
     - for: set
       in:  =ARC_FILES
       do:
-      - if: set["files"] == nil
+      - if: '!haskey(set, "files")'
         then:
         - 'set["files"] = "**/*"'
-      - if: set["dir"] == nil
+      - if: '!haskey(set, "dir")'
         then:
         - 'set["dir"] = "."'
-      - if: set["exclude"] == nil
+      - if: '!haskey(set, "exclude")'
         then:
         - 'set["exclude"] = []'
-      - if: set["flat"] == nil
+      - if: '!haskey(set, "flat")'
         then:
         - 'set["flat"] = false'
       - copy:    =set["files"]

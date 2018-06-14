@@ -33,15 +33,15 @@ targets:
     - 'check_no_uncommitted()'
     - 'check_branch_equals(BRANCH_DEVELOP)'
     - call: release-info
-    - print: 'Releasing version "={version}" with message "={message}"'
+    - print: 'Releasing version "={release_version}" with message "={release_message}"'
     # merge develop on master, tag release and return on develop
     - try:
       - $: ['git', 'checkout', =BRANCH_MASTER]
       - $: ['git', 'pull']
-      - $: ['git', 'merge', '--no-ff', =BRANCH_DEVELOP, '-m', =message]
+      - $: ['git', 'merge', '--no-ff', =BRANCH_DEVELOP, '-m', =release_message]
       - $: ['git', 'push']
-      - $: ['git', 'tag', '-a', =version, '-m', =message]
-      - $: ['git', 'push', 'origin', =version]
+      - $: ['git', 'tag', '-a', =release_version, '-m', =release_message]
+      - $: ['git', 'push', 'origin', =release_version]
       catch:
       - throw: 'performing release'
       finally:

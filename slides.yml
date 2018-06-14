@@ -5,8 +5,8 @@ default: [clean, slides, publish]
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/git.yml
 - c4s4/build/changelog.yml
+- c4s4/build/git.yml
 
 properties:
   TITLE:       ~

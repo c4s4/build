@@ -25,11 +25,11 @@ func get_changelog_summary() {
     return run("changelog", "release", "summary")
 }
 
-// Get release information
-func get_release_info() {
+// Get release message
+func get_release_message() {
     release_version = get_changelog_version()
     release_summary = get_changelog_summary()
-    release_message = "Release " + version
+    release_message = "Release " + release_version
     if release_summary != "" {
         release_message += ": " + release_summary
     }

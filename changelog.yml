@@ -12,5 +12,6 @@ targets:
   release-info:
     doc: Extract release information from changelog
     steps:
-    - 'check_release_date()'
-    - 'get_release_info()'
+    - 'check_changelog_release_date()'
+    - 'release_version = get_changelog_version()'
+    - 'release_message = get_release_message()'

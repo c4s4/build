@@ -14,7 +14,7 @@ func get_changelog_version() {
 // Get changelog version and return default if no changelog file found
 func try_get_changelog_version(version) {
     if exists(CHANGELOG_FILE) {
-        return get_changelog_summary()
+        return get_changelog_version()
     } else {
         return version
     }

@@ -121,6 +121,12 @@ targets:
     steps:
     - super:
 
+  release:
+    doc: Perform a release
+    depends: [clean, test, archive]
+    steps:
+    - super:
+
   check:
     doc: Check code with tools
     depends:

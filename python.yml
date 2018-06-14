@@ -13,7 +13,7 @@ properties:
   YAPFSTYLE:    'google'
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
-  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*")'
+  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
   PYTOOLS:
   - pylint
   - yapf

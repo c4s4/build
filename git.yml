@@ -32,7 +32,7 @@ targets:
     # checks before release
     - 'check_no_uncommitted()'
     - 'check_branch_equals(BRANCH_DEVELOP)'
-    - call: release_info
+    - call: release-info
     - print: 'Releasing version "={version}" with message "={message}"'
     # merge develop on master, tag release and return on develop
     - try:

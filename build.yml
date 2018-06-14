@@ -3,4 +3,5 @@
 doc: Project for my parent build files
 
 extends:
-- ./release.yml
+- ./git.yml
+- ./changelog.yml

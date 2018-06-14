@@ -1,0 +1,37 @@
+// Name of the changelog file
+CHANGELOG_FILE = "CHANGELOG.yml"
+
+// Check release date in changelog
+func check_changelog_release_date() {
+    run("changelog", "release", "date")
+}
+
+// Get changelog version
+func get_changelog_version() {
+    return run("changelog", "release", "version")
+}
+
+// Get changelog version and return default if no changelog file found
+func try_get_changelog_version(version) {
+    if exists(CHANGELOG_FILE) {
+        return get_changelog_summary()
+    } else {
+        return version
+    }
+}
+
+// Get changelog summary
+func get_changelog_summary() {
+    return run("changelog", "release", "summary")
+}
+
+// Get release information
+func get_release_info() {
+    release_version = get_changelog_version()
+    release_summary = get_changelog_summary()
+    release_message = "Release " + version
+    if release_summary != "" {
+        release_message += ": " + release_summary
+    }
+    return release_message
+}

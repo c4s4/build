@@ -1,6 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-doc: Parent build file to generate archives
+doc: Parent build file to generate archive
 
 properties:
   # properties that must be defined elsewhere

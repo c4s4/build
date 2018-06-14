@@ -1,6 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-doc: Manage build directory
+doc: Parent build file to manage build directory
 
 properties:
   NAME:      '={filename(_BASE)}'

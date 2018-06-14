@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 2.0.0
+  date:    2018-06-14
+  summary: Refactoring
+
 - version: 1.7.1
   date:    2018-03-11
   summary: Fixed Python selection and virtualenv creation

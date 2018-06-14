@@ -1,0 +1,36 @@
+strings = import("strings")
+
+// Constants for branches
+BRANCH_DEVELOP = "develop"
+BRANCH_MASTER  = "master"
+BRANCH_FEATURE = "feature/"
+BRANCH_RELEASE = "release/"
+BRANCH_HOTFIX  = "hotfix/"
+BRANCH_FIX     = "fix/"
+
+// Check that there are no uncommitted changes
+func check_no_uncommitted() {
+    changes = run("git", "diff", "HEAD")
+    if changes != "" {
+        throw "There are uncommitted changes"
+    }
+}
+
+// Get current branch
+func get_branch() {
+    return run("git", "rev-parse", "--abbrev-ref", "HEAD")
+}
+
+// Check that we are on given branch
+func check_branch_equals(name) {
+    if get_branch() != name {
+        throw("Branch should be "+name)
+    }
+}
+
+// Check that we are on a branch which name starts with given prefix
+func check_branch_starts_with(prefix) {
+    if !strings.HasPrefix(get_branch(), prefix)  {
+        throw("Branch name should start with "+prefix)
+    }
+}

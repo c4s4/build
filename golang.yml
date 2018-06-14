@@ -123,7 +123,7 @@ targets:
 
   release:
     doc: Perform a release
-    depends: [clean, test, archive]
+    depends: [clean, check, test, archive]
     steps:
     - super:
 

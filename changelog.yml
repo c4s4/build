@@ -15,3 +15,8 @@ targets:
     - 'check_changelog_release_date()'
     - 'release_version = get_changelog_version()'
     - 'release_message = get_release_message()'
+
+  changelog:
+    doc: Print changelog for current release in markdown fomat
+    steps:
+    - $: ['changelog', 'release', 'to', 'markdown']

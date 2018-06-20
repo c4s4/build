@@ -70,9 +70,9 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['go', 'fmt']
+      - $: ['gofmt', '-s', '-w', '.']
       else:
-      - $: ['go', 'fmt', '={PACKAGE}/...']
+      - $: ['gofmt', '-s', '-w', 'src/={PACKAGE}']
 
   test:
     doc: Run Go tests

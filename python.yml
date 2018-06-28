@@ -17,6 +17,12 @@ properties:
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
   PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
+  ARC_FILES:
+  - files:   '**/*'
+    dir:     '.'
+    exclude: ['={BUILD_DIR}/**/*', '={VENV_DIR}/**/*', '.*/**/*', 'build.yml']
+    flat:    false
+
   PYTOOLS:
   - pylint
   - yapf

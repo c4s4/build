@@ -37,3 +37,9 @@ targets:
     doc: Run a shell
     steps:
     - $: ['={VENV_DIR}/bin/python', 'manage.py', 'shell']
+  
+  migrate:
+    doc: Make and run migrations
+    steps:
+    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'makemigrations']
+    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'migrate']

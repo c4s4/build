@@ -2,10 +2,14 @@
 # encoding: UTF-8
 
 '''
-This is a sample source file for Python template project.
+Sample Python source file.
 '''
 
 from __future__ import print_function
 
 
-print("Hello World!")
+def main():
+    '''
+    Sample founction.
+    '''
+    print("Hello World!")

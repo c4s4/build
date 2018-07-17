@@ -1,0 +1,153 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Parent build file for mieuxplacer git stuff
+context:
+- c4s4/build/git.ank
+
+targets:
+
+  git-init:
+    doc: Git initialization
+    steps:
+    - $: ['git', 'init']
+    - $: ['git', 'add', '*']
+    - if: exists(".gitignore")
+      then:
+      - $: ['git', 'add', '.gitignore']
+    - $: ['git', 'commit', '-m', 'Initial import']
+
+  release-info:
+    doc: Prompt for release information
+    steps:
+    - prompt:  'Release version'
+      to:      'release_version'
+      pattern: '^[\w_-]+$'
+      error:   'Release version should be made of letters, digits, _ and -'
+    - prompt:  'Release Message'
+      to:      'release_message'
+
+  release:
+    doc: Perform a release
+    steps:
+    # checks before release
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_DEVELOP)'
+    - call: release-info
+    - print: 'Releasing version "={release_version}" with message "={release_message}"'
+    # merge develop on master, tag release and return on develop
+    - try:
+      - $: ['git', 'checkout', =BRANCH_MASTER]
+      - $: ['git', 'pull']
+      - $: ['git', 'merge', '--no-ff', =BRANCH_DEVELOP, '-m', =release_message]
+      - $: ['git', 'push']
+      - $: ['git', 'tag', '-a', =release_version, '-m', =release_message]
+      - $: ['git', 'push', 'origin', =release_version]
+      catch:
+      - throw: 'performing release'
+      finally:
+      # whatever happens, when return on develop branch
+      - $: ['git', 'checkout', =BRANCH_DEVELOP]
+
+  feature-open:
+    doc: Create a feature branch from develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_DEVELOP)'
+    - prompt:  'Feature'
+      to:      'name'
+      pattern: '^[\w_-]+$'
+      error:   'Feature name should be made of letters, digits, _ and -'
+    - 'branch = BRANCH_FEATURE + name'
+    - $: ['git', 'checkout', '-b', =branch]
+    - $: ['git', 'push', '-u', 'origin', =branch]
+    - print: "Feature branch '={branch}' created"
+
+  feature-close:
+    doc: Close a feature branch and return on develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_starts_with(BRANCH_FEATURE)'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_DEVELOP]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =BRANCH_DEVELOP]
+    - print: "Feature branch '={branch}' merged"
+
+  release-open:
+    doc: Create a release branch from develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_DEVELOP)'
+    - prompt:  'Release'
+      to:      'name'
+      pattern: '^[\w_-]+$'
+      error:   'Release name should be made of letters, digits, _ and -'
+    - 'branch = BRANCH_RELEASE + name'
+    - $: ['git', 'checkout', '-b', =branch]
+    - $: ['git', 'push', '-u', 'origin', =branch]
+    - print: "Release branch '={branch}' created"
+
+  release-close:
+    doc: Close a release branch and return on develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_starts_with(BRANCH_RELEASE)'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_DEVELOP]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =BRANCH_DEVELOP]
+    - print: "Release branch '={branch}' merged"
+
+  hotfix-open:
+    doc: Create a hofix branch from develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_MASTER)'
+    - prompt:  'Hotfix'
+      to:      'name'
+      pattern: '^[\w_-]+$'
+      error:   'Hotfix name should be made of letters, digits, _ and -'
+    - 'branch = BRANCH_HOTFIX + name'
+    - $: ['git', 'checkout', '-b', =branch]
+    - $: ['git', 'push', '-u', 'origin', =branch]
+    - print: "Hotfix branch '={branch}' created"
+
+  hotfix-close:
+    doc: Close a hotfix branch and return on develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_starts_with(BRANCH_HOTFIX)'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_MASTER]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =BRANCH_MASTER]
+    - print: "Hotfix branch '={branch}' merged"
+
+  fix-open:
+    doc: Create a fix branch from develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_DEVELOP)'
+    - prompt:  'Fix'
+      to:      'name'
+      pattern: '^[\w_-]+$'
+      error:   'Fix name should be made of letters, digits, _ and -'
+    - 'branch = BRANCH_FIX + name'
+    - $: ['git', 'checkout', '-b', =branch]
+    - $: ['git', 'push', '-u', 'origin', =branch]
+    - print: "Fix branch '={branch}' created"
+
+  fix-close:
+    doc: Close a fix branch and return on develop
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_starts_with(BRANCH_FIX)'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_DEVELOP]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =BRANCH_DEVELOP]
+    - print: "Fix branch '={branch}' merged"

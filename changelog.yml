@@ -1,0 +1,22 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Parent build file for projects with semantic changelog
+context:
+- c4s4/build/changelog.ank
+
+properties:
+  VERSION: '=try_get_changelog_version("UNKNOWN")'
+
+targets:
+
+  release-info:
+    doc: Extract release information from changelog
+    steps:
+    - 'check_changelog_release_date()'
+    - 'release_version = get_changelog_version()'
+    - 'release_message = get_release_message()'
+
+  changelog:
+    doc: Print changelog for current release in markdown fomat
+    steps:
+    - $: ['changelog', 'release', 'to', 'markdown']

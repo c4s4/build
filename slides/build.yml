@@ -4,4 +4,6 @@ extends:
 - c4s4/build/slides.yml
 
 properties:
-  TITLE: 'Slides'
+  TITLE:   "Slides"
+  OPTIONS: "{ratio: '4:3'}"
+  #OPTIONS: "{ratio: '16:9'}"

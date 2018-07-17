@@ -6,6 +6,7 @@ Sample unit test.
 '''
 
 import unittest
+from $PACKAGE$.main import main
 
 
 class MainTest(unittest.TestCase):
@@ -16,7 +17,7 @@ class MainTest(unittest.TestCase):
 
     def test_main(self):
         '''Test nothing.'''
-        self.assertTrue(1 != 0)
+        main()
 
 
 if __name__ == '__main__':

@@ -5,6 +5,8 @@ default: [check, test]
 
 extends:
 - c4s4/build/buildir.yml
+- c4s4/build/changelog.yml
+- c4s4/build/git.yml
 - c4s4/build/archive.yml
 
 properties:
@@ -14,12 +16,29 @@ properties:
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
-  LIBRARIES:
-  - 'github.com/mitchellh/gox'
-  - 'github.com/fzipp/gocyclo'
-  - 'golang.org/x/lint/golint'
-  - 'github.com/gordonklaus/ineffassign'
-  - 'github.com/client9/misspell/cmd/misspell'
+  LIBRARIES: []
+  GOTOOLS:
+  # cross compilation
+  - github.com/mitchellh/gox
+  # check tools
+  - github.com/fzipp/gocyclo
+  - golang.org/x/lint/golint
+  - github.com/gordonklaus/ineffassign
+  - github.com/client9/misspell/cmd/misspell
+  # vscode tools
+  - github.com/nsf/gocode
+  - github.com/uudashr/gopkgs/cmd/gopkgs
+  - github.com/ramya-rao-a/go-outline
+  - github.com/acroca/go-symbols
+  - golang.org/x/tools/cmd/guru
+  - golang.org/x/tools/cmd/gorename
+  - github.com/rogpeppe/godef
+  - golang.org/x/tools/cmd/godoc
+  - github.com/sqs/goreturns
+  - github.com/derekparker/delve/cmd/dlv
+  TEST_CASES: []
+  TEST_OPTS:  []
+  RUN_ARGS:   []
 
 # Set GOPATH and PATH if necessary
 #environment:
@@ -28,6 +47,15 @@ properties:
 
 targets:
 
+  tools:
+    doc: Install tools
+    steps:
+    - for: 'tool'
+      in:  'GOTOOLS'
+      do:
+      - print: 'Getting tool ={tool}'
+      - $: ['go', 'get', =tool]
+
   libs:
     doc: Install libraries
     steps:
@@ -35,25 +63,30 @@ targets:
       in:  'LIBRARIES'
       do:
       - print: 'Getting library ={library}'
-      - $: ['go', 'get', =library]
+      - $: ['go', 'get', '-u', =library]
 
   fmt:
     doc: Format Go code
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['go', 'fmt']
+      - $: ['gofmt', '-s', '-w', '.']
       else:
-      - $: ['go', 'fmt', '={PACKAGE}/...']
+      - $: ['gofmt', '-s', '-w', 'src/={PACKAGE}']
 
   test:
     doc: Run Go tests
     steps:
-    - if: PACKAGE == nil
+    - if: 'PACKAGE != nil && len(TEST_CASES) == 0'
       then:
-      - $: ['go', 'test', '-cover']
-      else:
+      - 'TEST_CASES = [PACKAGE]'
+    - if: 'PACKAGE != nil'
+      then:
       - $: ['go', 'test', '-cover', '={PACKAGE}/...']
+        +: =TEST_OPTS+TEST_CASES
+      else:
+      - $: ['go', 'test', '-cover']
+        +: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run Go tool
@@ -61,8 +94,10 @@ targets:
     - if: PACKAGE == nil
       then:
       - $: ['go', 'run', '={NAME}.go']
+        +: =RUN_ARGS
       else:
       - $: ['go', 'run', 'src/={NAME}.go']
+        +: =RUN_ARGS
 
   bin:
     doc: Make binary for current platform
@@ -86,6 +121,12 @@ targets:
     steps:
     - super:
 
+  release:
+    doc: Perform a release
+    depends: [clean, check, test, archive]
+    steps:
+    - super:
+
   check:
     doc: Check code with tools
     depends:
@@ -101,11 +142,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['gofmt', '-l', '.']
-        =: errors
+      - $:  ['gofmt', '-l', '.']
+        3=: errors
       else:
-      - $: ['gofmt', '-l', 'src/={PACKAGE}']
-        =: errors
+      - $:  ['gofmt', '-l', 'src/={PACKAGE}']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -132,9 +173,9 @@ targets:
     - try:
       - if: PACKAGE == nil
         then:
-        - $: ['gocyclo', '-over', =CYCLOMAX, '.']
+        - $: ['gocyclo', '-over', '={CYCLOMAX}', '.']
         else:
-        - $: ['gocyclo', '-over', =CYCLOMAX, 'src/={PACKAGE}']
+        - $: ['gocyclo', '-over', '={CYCLOMAX}', 'src/={PACKAGE}']
       - print: 'Cyclo check OK'
       catch:
       - throw: 'Cyclo check failure'
@@ -144,11 +185,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['golint', './...']
-        =: errors
+      - $:  ['golint', './...']
+        3=: errors
       else:
-      - $: ['golint', '={PACKAGE}/...']
-        =: errors
+      - $:  ['golint', '={PACKAGE}/...']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -174,11 +215,11 @@ targets:
     steps:
     - if: PACKAGE == nil
       then:
-      - $: ['misspell', '.']
-        =: errors
+      - $:  ['misspell', '.']
+        3=: errors
       else:
-      - $: ['misspell', 'src/={PACKAGE}']
-        =: errors
+      - $:  ['misspell', 'src/={PACKAGE}']
+        3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'

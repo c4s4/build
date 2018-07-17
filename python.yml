@@ -5,12 +5,30 @@ doc: Parent build file for Python projects
 default: [format, lint, test]
 extends:
 - c4s4/build/buildir.yml
+- c4s4/build/changelog.yml
+- c4s4/build/git.yml
+- c4s4/build/archive.yml
 
 properties:
   VENV_DIR:     'venv'
   REQUIREMENTS: 'requirements.txt'
   PYVERSIONS:   ['2', '3']
+  YAPFSTYLE:    'google'
+  PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
+  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
+  ARC_FILES:
+  - files:   '**/*'
+    dir:     '.'
+    exclude: ['={BUILD_DIR}/**/*', '={VENV_DIR}/**/*', '.*/**/*', 'build.yml']
+    flat:    false
+
+  PYTOOLS:
+  - pylint
+  - yapf
+
+environment:
+  PYTHONPATH: =_BASE
 
 targets:
 
@@ -51,10 +69,11 @@ targets:
         - throw: 'Selected Python path not found'
       else:
       - 'python = pythons[toInt(index)-1]'
+    - 'python = followlink(python)'
     - print: 'Selected Python path: ={python}'
     # get Python version
-    - $: [=python, '-V']
-      =: version
+    - $:  [=python, '-V']
+      3=: version
     - 'version = version[7:8]'
     - print: 'Python version ={version}'
 
@@ -69,7 +88,20 @@ targets:
       - $: [=python, '-m', 'venv', =VENV_DIR]
       else:
       - $: [=python, '-m', 'virtualenv', =VENV_DIR]
+    # install tools
+    - call: tools
     # install requirements
+    - call: libs
+  
+  tools:
+    doc: Install tools
+    steps:
+    - $: ['={VENV_DIR}/bin/pip', 'install']
+      +: =PYTOOLS
+  
+  libs:
+    doc: Install requirements
+    steps:
     - if: 'exists(REQUIREMENTS)'
       then:
       - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
@@ -79,17 +111,19 @@ targets:
   format:
     doc: Format code using yapf
     steps:
-    - 'files = filter(find(".", "**/*.py"), "venv/**/*")'
-    - $: '={VENV_DIR}/bin/yapf -i ={join(files, " ")}'
+    - $: ['={VENV_DIR}/bin/yapf', '-i', '--style', =YAPFSTYLE]
+      +: '=filter(find(".", "**/*.py"), "venv/**/*")'
 
   lint:
     doc: Check code with Pylint
     steps:
     - if: 'PYLINTRC != nil'
       then:
-      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}', =NAME]
+      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}']
+        +: =PYLINTSRC
       else:
-      - $: ['={VENV_DIR}/bin/pylint', =NAME]
+      - $: ['={VENV_DIR}/bin/pylint']
+        +: =PYLINTSRC
 
   pylintrc:
     doc: Generate Pylint configuration file
@@ -111,7 +145,12 @@ targets:
   test:
     doc: Run python tests
     steps:
-    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose']
+    - $: ['={VENV_DIR}/bin/python', '-m', 'unittest', 'discover', '--verbose', '-p', =PYTESTFILES]
+
+  cloc:
+    doc: Count Python lines of code (calls 'cloc' tool on command line)
+    steps:
+    - $: ['cloc', '--exclude-dir=={VENV_DIR}', '--include-lang=Python', '.']
 
   clean:
     doc: Clean generated files

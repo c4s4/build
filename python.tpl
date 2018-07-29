@@ -34,5 +34,6 @@ targets:
     - replace: '={_HERE}/**/*_main*.py'
       with:
         '$PACKAGE$': =name
-    - $: ['neon', '-file', '={_HERE}/={name}/build.yml', 'init']
+    - neon:    '={_HERE}/={name}/build.yml'
+      targets: 'init'
     - print: "Project generated in '={name}' directory"

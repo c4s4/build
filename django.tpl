@@ -30,7 +30,8 @@ targets:
     - replace: '={_HERE}/={name}/build.yml'
       with:    {"name": =name}
     # install dependencies and start Django project
+    - neon:    '={_HERE}/={name}/build.yml'
+      targets: 'init'
     - chdir: '={_HERE}/={name}'
-    - $: ['neon', 'init']
     - $: ['={_HERE}/={name}/venv/bin/django-admin', 'startproject', =name, '={_HERE}/={name}']
     - print: "Project generated in '={name}' directory"

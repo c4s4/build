@@ -104,7 +104,7 @@ targets:
     steps:
     - if: 'exists(REQUIREMENTS)'
       then:
-      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
+      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-U', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
   

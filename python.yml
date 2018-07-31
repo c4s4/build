@@ -18,6 +18,7 @@ properties:
   PYLINTRC:     ~
   PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
   PYARGS:       []
+  PYSETUP:      'setup.py'
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
@@ -152,6 +153,19 @@ targets:
     doc: Count Python lines of code (calls 'cloc' tool on command line)
     steps:
     - $: ['cloc', '--exclude-dir=={VENV_DIR}', '--include-lang=Python', '.']
+
+  package:
+    doc: Generate Python package
+    steps:
+    - mkdir: =BUILD_DIR
+    - copy:  =PYSETUP
+      todir: =BUILD_DIR
+      flat:  true
+    - replace: '={BUILD_DIR}/={filename(PYSETUP)}'
+      with:
+        $VERSION$: =VERSION
+    - $: ['={VENV_DIR}/bin/python', '={BUILD_DIR}/={filename(PYSETUP)}', 'sdist', '--dist-dir', '={BUILD_DIR}']
+    - delete: '={replace(NAME, "-", "_")}.egg-info'
 
   clean:
     doc: Clean generated files

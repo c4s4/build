@@ -97,7 +97,7 @@ targets:
   tools:
     doc: Install tools
     steps:
-    - $: ['={VENV_DIR}/bin/pip', '-U', 'install']
+    - $: ['={VENV_DIR}/bin/pip', 'install', '-U']
       +: =PYTOOLS
   
   libs:

@@ -1,5 +1,9 @@
 # Semantic Change Log (http://github.com/c4s4/changelog)
 
+- version: 2.0.1
+  date:    2018-08-01
+  summary: Improved
+
 - version: 2.0.0
   date:    2018-07-17
   summary: Refactoring

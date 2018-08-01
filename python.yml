@@ -1,7 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for Python projects
-
 default: [format, lint, test]
 extends:
 - c4s4/build/buildir.yml
@@ -17,12 +16,13 @@ properties:
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
   PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
+  PYARGS:       []
+  PYSETUP:      'setup.py'
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
     exclude: ['={BUILD_DIR}/**/*', '={VENV_DIR}/**/*', '.*/**/*', 'build.yml']
     flat:    false
-
   PYTOOLS:
   - pylint
   - yapf
@@ -96,7 +96,7 @@ targets:
   tools:
     doc: Install tools
     steps:
-    - $: ['={VENV_DIR}/bin/pip', 'install']
+    - $: ['={VENV_DIR}/bin/pip', 'install', '-U']
       +: =PYTOOLS
   
   libs:
@@ -104,7 +104,7 @@ targets:
     steps:
     - if: 'exists(REQUIREMENTS)'
       then:
-      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-r', =REQUIREMENTS]
+      - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-U', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
   
@@ -141,6 +141,7 @@ targets:
     doc: Run python script
     steps:
     - $: ['={VENV_DIR}/bin/python', =NAME]
+      +: PYARGS 
 
   test:
     doc: Run python tests
@@ -151,6 +152,19 @@ targets:
     doc: Count Python lines of code (calls 'cloc' tool on command line)
     steps:
     - $: ['cloc', '--exclude-dir=={VENV_DIR}', '--include-lang=Python', '.']
+
+  package:
+    doc: Generate Python package
+    steps:
+    - mkdir: =BUILD_DIR
+    - copy:  =PYSETUP
+      todir: =BUILD_DIR
+      flat:  true
+    - replace: '={BUILD_DIR}/={filename(PYSETUP)}'
+      with:
+        $VERSION$: =VERSION
+    - $: ['={VENV_DIR}/bin/python', '={BUILD_DIR}/={filename(PYSETUP)}', 'sdist', '--dist-dir', '={BUILD_DIR}']
+    - delete: '={replace(NAME, "-", "_")}.egg-info'
 
   clean:
     doc: Clean generated files

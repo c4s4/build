@@ -54,7 +54,7 @@ targets:
       in:  'GOTOOLS'
       do:
       - print: 'Getting tool ={tool}'
-      - $: ['go', 'get', =tool]
+      - $: ['go', 'get', '-u', =tool]
 
   libs:
     doc: Install libraries

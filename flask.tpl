@@ -5,10 +5,10 @@ default: template
 targets:
 
   template:
-    doc: Generate Python project
+    doc: Generate Flask project
     steps:
     # prompt project name, create directory and copy files
-    - print: 'This template will generate a Python project'
+    - print: 'This template will generate a Flask project'
     - print: 'Python must be installed with virtualenv and pip'
     - prompt:  'Name of this project'
       to:      'name'
@@ -19,21 +19,16 @@ targets:
       - throw: 'Project directory already exists'
     - mkdir: '={_HERE}/={name}'
     - copy:  '**/*'
-      dir:   '={_BASE}/python'
+      dir:   '={_BASE}/flask'
       todir: '={_HERE}/={name}'
     # rename project in build file
-    - mkdir: '={_HERE}/={name}/={name}'
-    - touch: '={_HERE}/={name}/={name}/__init__.py'
-    - move:   '={_HERE}/={name}/__main__.py'
-      tofile: '={_HERE}/={name}/={name}/__main__.py'
     - move:   '={_HERE}/={name}/main.py'
-      tofile: '={_HERE}/={name}/={name}/main.py'
-    - move:  'test_main.py'
-      dir:   '={_HERE}/={name}'
-      todir: '={_HERE}/={name}/={name}'
-    - replace: '={_HERE}/**/*_main*.py'
+      tofile: '={_HERE}/={name}/={name}.py'
+    - move:   '={_HERE}/={name}/test_main.py'
+      tofile: '={_HERE}/={name}/test_={name}.py'
+    - replace: '={_HERE}/={name}/test_={name}.py'
       with:
-        '$PACKAGE$': =name
+        $NAME$: =name
     - neon:    '={_HERE}/={name}/build.yml'
       targets: 'init'
     - print: "Project generated in '={name}' directory"

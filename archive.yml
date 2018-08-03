@@ -11,7 +11,7 @@ properties:
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
-    exclude: ['={BUILD_DIR}/**/*', 'build.yml']
+    exclude: ['build.yml', '={BUILD_DIR}/**/*', '.*', '.*/**/*']
     flat:    false
   # archive type may be tar, tar.gz or zip
   ARC_TYPE:   tar.gz

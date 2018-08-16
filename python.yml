@@ -21,7 +21,13 @@ properties:
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
-    exclude: ['={BUILD_DIR}/**/*', '={VENV_DIR}/**/*', '.*/**/*', 'build.yml']
+    exclude:
+    - '={BUILD_DIR}/**/*'
+    - '={VENV_DIR}/**/*'
+    - '.*/**/*'
+    - '.*'
+    - 'build.yml'
+    - '**/*.pyc'
     flat:    false
   PYTOOLS:
   - pylint

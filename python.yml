@@ -15,7 +15,7 @@ properties:
   YAPFSTYLE:    'google'
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
-  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
+  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", BUILD_DIR+"/**/*", ".*/**/*")'
   PYARGS:       []
   PYSETUP:      'setup.py'
   ARC_FILES:

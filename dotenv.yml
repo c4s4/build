@@ -1,0 +1,34 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+properties:
+  DOTENV_PATTERN: '^(local|stg|prd])$'
+
+targets:
+
+  _dotenv-prompt:
+    doc: Prompt for env and key
+    steps:
+    - prompt:  'Enter env'
+      default: 'local'
+      to:      env
+      pattern: =DOTENV_PATTERN
+    - prompt: 'Enter key'
+      to:     key
+
+  dotenv-decrypt:
+    doc: Decrypt environment file
+    steps:
+    - call: _dotenv-prompt
+    - $: ['/opt/misc/openssl-1.0.2n/bin/openssl', 'aes-256-cbc', '-d',
+          '-in', '.env.={env}.enc', '-k', =key]
+      1>: '.env.={env}'
+      1x: true
+
+  dotenv-encrypt:
+    doc: Encrypt environment file
+    steps:
+    - call: _dotenv-prompt
+    - $: ['/opt/misc/openssl-1.0.2n/bin/openssl', 'aes-256-cbc', '-e',
+          '-in', '.env.={env}', '-k', =key]
+      1>: '.env.={env}.enc'
+      1x: true

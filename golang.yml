@@ -85,6 +85,11 @@ targets:
     - mkdir: =BUILD_DIR
     - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
   
+  install:
+    doc: Build and install binary for current platform
+    steps:
+    - $: ['go', 'install']
+  
   binaries:
     doc: Make binaries for all platforms
     steps:

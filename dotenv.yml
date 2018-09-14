@@ -2,13 +2,19 @@
 
 properties:
   DOTENV_PATTERN: '^(local|stg|prd])$'
-  DOTENV_PF:      'local'
+  DOTENV_DEFAULT: 'local'
 
 targets:
 
-  _dotenv-link:
+  dotenv-link:
     doc: Link dotenv file for platform
     steps:
+    - if: '!defined("DOTENV_PF")'
+      then:
+      - prompt:  'Enter env'
+        default: =DOTENV_DEFAULT
+        pattern: =DOTENV_PATTERN
+        to:      DOTENV_PF
     - delete: '.env'
     - link: '.env.={DOTENV_PF}'
       to:   '.env'
@@ -17,9 +23,9 @@ targets:
     doc: Prompt for env and key
     steps:
     - prompt:  'Enter env'
-      default: 'local'
-      to:      env
+      default: =DOTENV_DEFAULT
       pattern: =DOTENV_PATTERN
+      to:      env
     - prompt: 'Enter key'
       to:     key
 
@@ -27,8 +33,7 @@ targets:
     doc: Decrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['/opt/misc/openssl-1.0.2n/bin/openssl', 'aes-256-cbc', '-d',
-          '-in', '.env.={env}.enc', '-k', =key]
+    - $: ['openssl', 'aes-256-cbc', '-d', '-in', '.env.={env}.enc', '-k', =key]
       1>: '.env.={env}'
       1x: true
 
@@ -36,7 +41,6 @@ targets:
     doc: Encrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['/opt/misc/openssl-1.0.2n/bin/openssl', 'aes-256-cbc', '-e',
-          '-in', '.env.={env}', '-k', =key]
+    - $: ['openssl', 'aes-256-cbc', '-e', '-in', '.env.={env}', '-k', =key]
       1>: '.env.={env}.enc'
       1x: true

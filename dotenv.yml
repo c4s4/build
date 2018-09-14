@@ -2,8 +2,16 @@
 
 properties:
   DOTENV_PATTERN: '^(local|stg|prd])$'
+  DOTENV_PF:      'local'
 
 targets:
+
+  _dotenv-link:
+    doc: Link dotenv file for platform
+    steps:
+    - delete: '.env'
+    - link: '.env.={DOTENV_PF}'
+      to:   '.env'
 
   _dotenv-prompt:
     doc: Prompt for env and key

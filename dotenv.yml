@@ -33,14 +33,12 @@ targets:
     doc: Decrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['openssl', 'aes-256-cbc', '-d', '-in', '.env.={env}.enc', '-k', =key]
-      1>: '.env.={env}'
-      1x: true
+    - $: ['openssl', 'aes-256-cbc', '-d', '-k', =key,
+         '-in', '.env.={env}.enc', '-out', '.env.={env}']
 
   dotenv-encrypt:
     doc: Encrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['openssl', 'aes-256-cbc', '-e', '-in', '.env.={env}', '-k', =key]
-      1>: '.env.={env}.enc'
-      1x: true
+    - $: ['openssl', 'aes-256-cbc', '-e', '-k', =key,
+         '-in', '.env.={env}', '-out', '.env.={env}.enc']

@@ -127,8 +127,13 @@ targets:
     steps:
     - 'files = filter(find(".", PYLINTSRC["includes"]...), PYLINTSRC["excludes"]...)'
     - print: 'Linting ={len(files)} source files...'
-    - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}']
-      +: =files
+    - if: 'PYLINTRC != nil'
+      then:
+      - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}']
+        +: =files
+      else:
+      - $: ['={VENV_DIR}/bin/pylint']
+        +: =files
 
   pylintrc:
     doc: Generate Pylint configuration file

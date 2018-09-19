@@ -101,7 +101,7 @@ targets:
     - print: "Release branch '={branch}' merged"
 
   hotfix-open:
-    doc: Create a hofix branch from develop
+    doc: Create a hofix branch from master
     steps:
     - 'check_no_uncommitted()'
     - 'check_branch_equals(BRANCH_MASTER)'
@@ -115,7 +115,7 @@ targets:
     - print: "Hotfix branch '={branch}' created"
 
   hotfix-close:
-    doc: Close a hotfix branch and return on develop
+    doc: Close a hotfix branch and return on master
     steps:
     - 'check_no_uncommitted()'
     - 'check_branch_starts_with(BRANCH_HOTFIX)'

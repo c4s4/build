@@ -1,7 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 properties:
-  DOTENV_PATTERN: '^(local|stg|prd])$'
+  DOTENV_PATTERN: '^(local|stg|prd)$'
   DOTENV_DEFAULT: 'local'
 
 targets:

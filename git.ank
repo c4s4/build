@@ -1,13 +1,5 @@
 strings = import("strings")
 
-// Constants for branches
-BRANCH_DEVELOP = "develop"
-BRANCH_MASTER  = "master"
-BRANCH_FEATURE = "feature/"
-BRANCH_RELEASE = "release/"
-BRANCH_HOTFIX  = "hotfix/"
-BRANCH_FIX     = "fix/"
-
 // Check that there are no uncommitted changes
 func check_no_uncommitted() {
     changes = run("git", "diff", "HEAD")

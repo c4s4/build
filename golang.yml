@@ -10,9 +10,8 @@ extends:
 - c4s4/build/archive.yml
 
 properties:
-  ARCHIVE:  '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
-  PACKAGE:  ~
   CYCLOMAX: '15'
+  ARCHIVE:  '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
@@ -40,11 +39,6 @@ properties:
   TEST_OPTS:  []
   RUN_ARGS:   []
 
-# Set GOPATH and PATH if necessary
-#environment:
-#  GOPATH: =_BASE
-#  PATH:   '={_BASE}/bin:${PATH}'
-
 targets:
 
   tools:
@@ -68,46 +62,33 @@ targets:
   fmt:
     doc: Format Go code
     steps:
-    - if: PACKAGE == nil
-      then:
-      - $: ['gofmt', '-s', '-w', '.']
-      else:
-      - $: ['gofmt', '-s', '-w', 'src/={PACKAGE}']
+    - $: ['gofmt', '-s', '-w', '.']
 
   test:
     doc: Run Go tests
     steps:
-    - if: 'PACKAGE != nil && len(TEST_CASES) == 0'
+    - if: 'len(TEST_CASES) == 0'
       then:
-      - 'TEST_CASES = [PACKAGE]'
-    - if: 'PACKAGE != nil'
-      then:
-      - $: ['go', 'test', '-cover', '={PACKAGE}/...']
-        +: =TEST_OPTS+TEST_CASES
-      else:
-      - $: ['go', 'test', '-cover']
-        +: =TEST_OPTS+TEST_CASES
+      - 'TEST_CASES = ["./..."]'
+    - $: ['go', 'test', '-cover']
+      +: =TEST_OPTS+TEST_CASES
 
   run:
     doc: Run Go tool
     steps:
-    - if: PACKAGE == nil
-      then:
-      - $: ['go', 'run', '={NAME}.go']
-        +: =RUN_ARGS
-      else:
-      - $: ['go', 'run', 'src/={NAME}.go']
-        +: =RUN_ARGS
+    - $: ['go', 'run', '={NAME}.go']
+      +: =RUN_ARGS
 
   bin:
-    doc: Make binary for current platform
+    doc: Build binary for current platform
     steps:
     - mkdir: =BUILD_DIR
-    - if: PACKAGE == nil
-      then:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
-      else:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}', '={PACKAGE}']
+    - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
+  
+  install:
+    doc: Build and install binary for current platform
+    steps:
+    - $: ['go', 'install']
   
   binaries:
     doc: Make binaries for all platforms
@@ -140,13 +121,8 @@ targets:
   _check-fmt:
     doc: Check code with fmt tool
     steps:
-    - if: PACKAGE == nil
-      then:
-      - $:  ['gofmt', '-l', '.']
-        3=: errors
-      else:
-      - $:  ['gofmt', '-l', 'src/={PACKAGE}']
-        3=: errors
+    - $:  ['gofmt', '-l', '.']
+      3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -158,11 +134,7 @@ targets:
     doc: Check code with vet tool
     steps:
     - try:
-      - if: PACKAGE == nil
-        then:
-        - $: ['go', 'vet']
-        else:
-        - $: ['go', 'vet', '={PACKAGE}/...']
+      - $: ['go', 'vet']
       - print: 'Vet check OK'
       catch:
       - throw: 'Vet check failure'
@@ -171,11 +143,7 @@ targets:
     doc: Check code with gocyclo tool
     steps:
     - try:
-      - if: PACKAGE == nil
-        then:
-        - $: ['gocyclo', '-over', '={CYCLOMAX}', '.']
-        else:
-        - $: ['gocyclo', '-over', '={CYCLOMAX}', 'src/={PACKAGE}']
+      - $: ['gocyclo', '-over', '={CYCLOMAX}', '.']
       - print: 'Cyclo check OK'
       catch:
       - throw: 'Cyclo check failure'
@@ -183,13 +151,8 @@ targets:
   _check-lint:
     doc: Check code with golint tool
     steps:
-    - if: PACKAGE == nil
-      then:
-      - $:  ['golint', './...']
-        3=: errors
-      else:
-      - $:  ['golint', '={PACKAGE}/...']
-        3=: errors
+    - $:  ['golint', './...']
+      3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
@@ -201,11 +164,7 @@ targets:
     doc: Check code with ineffassign tool
     steps:
     - try:
-      - if: PACKAGE == nil
-        then:
-        - $: ['ineffassign', '.']
-        else:
-        - $: ['ineffassign', 'src/={PACKAGE}']
+      - $: ['ineffassign', '.']
       - print: 'Assign check OK'
       catch:
       - throw: 'Assign check failure'
@@ -213,13 +172,10 @@ targets:
   _check-spell:
     doc: Check code with misspell tool
     steps:
-    - if: PACKAGE == nil
-      then:
-      - $:  ['misspell', '.']
-        3=: errors
-      else:
-      - $:  ['misspell', 'src/={PACKAGE}']
-        3=: errors
+    - 'files = find(".", "**/*.go")'
+    - $:  ['misspell']
+      +:  =files
+      3=: errors
     - if: len(errors) > 0
       then:
       - print: '={"- "+join(split(errors, "\n"), "\n- ")}'

@@ -15,13 +15,21 @@ properties:
   YAPFSTYLE:    'google'
   PYTESTFILES:  '*test*.py'
   PYLINTRC:     ~
-  PYLINTSRC:    '=filter(find(_BASE, "**/*.py"), VENV_DIR+"/**/*", ".*/**/*")'
+  PYLINTSRC:
+    includes: ['**/*.py']
+    excludes: ['={VENV_DIR}/**/*', '={BUILD_DIR}/**/*', '.*/**/*']
   PYARGS:       []
   PYSETUP:      'setup.py'
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
-    exclude: ['={BUILD_DIR}/**/*', '={VENV_DIR}/**/*', '.*/**/*', 'build.yml']
+    exclude:
+    - '={BUILD_DIR}/**/*'
+    - '={VENV_DIR}/**/*'
+    - '.*/**/*'
+    - '.*'
+    - 'build.yml'
+    - '**/*.pyc'
     flat:    false
   PYTOOLS:
   - pylint
@@ -117,13 +125,15 @@ targets:
   lint:
     doc: Check code with Pylint
     steps:
+    - 'files = filter(find(".", PYLINTSRC["includes"]...), PYLINTSRC["excludes"]...)'
+    - print: 'Linting ={len(files)} source files...'
     - if: 'PYLINTRC != nil'
       then:
       - $: ['={VENV_DIR}/bin/pylint', '--rcfile=={PYLINTRC}']
-        +: =PYLINTSRC
+        +: =files
       else:
       - $: ['={VENV_DIR}/bin/pylint']
-        +: =PYLINTSRC
+        +: =files
 
   pylintrc:
     doc: Generate Pylint configuration file

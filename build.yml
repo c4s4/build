@@ -5,6 +5,9 @@ doc: Project for my parent build files
 extends:
 - ./git.yml
 
+properties:
+  VERSION: 'UNKNOWN'
+
 targets:
 
   release-info:

@@ -3,5 +3,15 @@
 doc: Project for my parent build files
 
 extends:
-- ./changelog.yml
 - ./git.yml
+
+properties:
+  VERSION: 'UNKNOWN'
+
+targets:
+
+  release-info:
+    doc: Generate release information
+    steps:
+    - 'release_version = replace(replace(now()[0:16], " ", "="), ":", "-")'
+    - 'release_message = "Release on "+now()'

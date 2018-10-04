@@ -170,11 +170,17 @@ targets:
     - copy:  =PYSETUP
       todir: =BUILD_DIR
       flat:  true
-    - replace: '={BUILD_DIR}/={filename(PYSETUP)}'
+    - copy:   =PYSETUP
+      tofile: '={BUILD_DIR}/={filename(PYSETUP)}'
+    - replace: =PYSETUP
       with:
         $VERSION$: =VERSION
-    - $: ['={VENV_DIR}/bin/python', '={BUILD_DIR}/={filename(PYSETUP)}', 'sdist', '--dist-dir', '={BUILD_DIR}']
-    - delete: '={replace(NAME, "-", "_")}.egg-info'
+    - try:
+      - $: ['={VENV_DIR}/bin/python', =PYSETUP, 'sdist', '--dist-dir', '={BUILD_DIR}']
+      - delete: '={replace(NAME, "-", "_")}.egg-info'
+      finally:
+      - copy:   '={BUILD_DIR}/={filename(PYSETUP)}'
+        tofile: =PYSETUP
 
   clean:
     doc: Clean generated files

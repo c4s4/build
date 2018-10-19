@@ -19,7 +19,6 @@ properties:
     includes: ['**/*.py']
     excludes: ['={VENV_DIR}/**/*', '={BUILD_DIR}/**/*', '.*/**/*']
   PYARGS:       []
-  PYSETUP:      'setup.py'
   ARC_FILES:
   - files:   '**/*'
     dir:     '.'
@@ -167,13 +166,16 @@ targets:
     doc: Generate Python package
     steps:
     - mkdir: =BUILD_DIR
-    - copy:  =PYSETUP
+    - copy:  'setup.py'
       todir: =BUILD_DIR
-      flat:  true
-    - replace: '={BUILD_DIR}/={filename(PYSETUP)}'
+    - replace: 'setup.py'
       with:
         $VERSION$: =VERSION
-    - $: ['={VENV_DIR}/bin/python', '={BUILD_DIR}/={filename(PYSETUP)}', 'sdist', '--dist-dir', '={BUILD_DIR}']
+    - try:
+      - $: ['={VENV_DIR}/bin/python', 'setup.py', 'sdist', '--dist-dir', '={BUILD_DIR}']
+      finally:
+      - copy:   '={BUILD_DIR}/setup.py'
+        tofile: 'setup.py'
     - delete: '={replace(NAME, "-", "_")}.egg-info'
 
   clean:

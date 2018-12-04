@@ -28,7 +28,7 @@ targets:
     steps:
     - prompt:  'Release version'
       to:      'release_version'
-      pattern: '^[\w_-]+$'
+      pattern: '^[\w_\-\.]+$'
       error:   'Release version should be made of letters, digits, _ and -'
     - prompt:  'Release Message'
       to:      'release_message'

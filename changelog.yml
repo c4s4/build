@@ -4,19 +4,48 @@ doc: Parent build file for projects with semantic changelog
 context:
 - c4s4/build/changelog.ank
 
-properties:
-  VERSION: '=try_get_changelog_version("UNKNOWN")'
-
 targets:
 
-  release-info:
-    doc: Extract release information from changelog
+  version:
+    doc: Extract release version from changelog if exists, else prompt
     steps:
-    - 'check_changelog_release_date()'
-    - 'release_version = get_changelog_version()'
-    - 'release_message = get_release_message()'
+    - if: 'exists("CHANGELOG.yml")'
+      then:
+      - 'check_changelog_release_date()'
+      - 'VERSION = get_changelog_version()'
+      else:
+      - if: '!defined("VERSION")'
+        then:
+        - prompt:  'Release version'
+          to:      'VERSION'
+          pattern: '^[\w_\-\.]+$'
+          error:   'Release version should be made of letters, digits, dots, _ and -'
 
   changelog:
     doc: Print changelog for current release in markdown fomat
     steps:
-    - $: ['changelog', 'release', 'to', 'markdown']
+    - if: 'exists("CHANGELOG.yml")'
+      then:
+      - $: ['changelog', 'release', 'to', 'markdown']
+      else:
+      # get two last tags (supposed releases)
+      - $: ['git', 'for-each-ref', '--sort=taggerdate', '--format', '%(tag)']
+        1=: tags
+        1x: true
+      - 'lines = split(tags, "\n")'
+      - 'from = lines[len(lines)-2]'
+      - 'to = lines[len(lines)-1]'
+      # prompt for start end end tags
+      - prompt:  'FROM'
+        to:      'from'
+        default: =from
+        pattern: '^[\w_\-\.]+$'
+        error:   'Bad release tag'
+      - prompt:  'TO  '
+        to:      'to'
+        default: =to
+        pattern: '^[\w_\-\.]+$'
+        error:   'Bad release tag'
+      - print: ''
+      # print git log between these tags
+      - $: ['git', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']

@@ -164,6 +164,7 @@ targets:
 
   package:
     doc: Generate Python package
+    depends: version
     steps:
     - mkdir: =BUILD_DIR
     - copy:  'setup.py'

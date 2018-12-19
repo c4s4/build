@@ -10,8 +10,7 @@ properties:
 
 targets:
 
-  release-info:
-    doc: Generate release information
+  version:
+    doc: Generate release version
     steps:
-    - 'release_version = replace(replace(now()[0:16], " ", "="), ":", "-")'
-    - 'release_message = "Release on "+now()'
+    - 'VERSION = replace(replace(now()[0:16], " ", "="), ":", "-")'

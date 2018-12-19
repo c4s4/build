@@ -9,7 +9,7 @@ extends:
 
 properties:
   CYCLOMAX: '15'
-  ARCHIVE:  '={BUILD_DIR}/={NAME}-={VERSION}.tar.gz'
+  ARC_DIR:    '={BUILD_DIR}/archive'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
@@ -96,7 +96,7 @@ targets:
 
   archive:
     doc: Build distribution archive
-    depends: binaries
+    depends: [version, binaries]
     steps:
     - super:
 

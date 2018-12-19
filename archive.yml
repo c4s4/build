@@ -22,8 +22,19 @@ properties:
 
 targets:
 
+  version:
+    doc: Prompt for version
+    steps:
+    - if: '!defined("VERSION")'
+      then:
+      - prompt:  'Release version'
+        to:      'VERSION'
+        pattern: '^[\w_\-\.]+$'
+        error:   'Release version should be made of letters, digits, dots, _ and -'
+
   archive:
     doc: Build an archive
+    depends: version
     steps:
     # copy files to archive directory
     - mkdir: =ARC_DIR

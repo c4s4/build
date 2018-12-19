@@ -6,9 +6,7 @@ default: junit
 
 extends:
 - c4s4/build/buildir.yml
-- c4s4/build/git.yml
 - c4s4/build/archive.yml
-- c4s4/build/changelog.yml
 
 properties:
   JAVA_SRC:  'src'

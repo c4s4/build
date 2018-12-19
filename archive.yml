@@ -16,8 +16,6 @@ properties:
   ARC_TYPE:   tar.gz
   # directory where is built the archive
   ARC_DIR:    '={BUILD_DIR}/archive'
-  # path of the generated archive file
-  ARC_PATH:   '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
   # prefix for file path in archive
   ARC_PREFIX: =NAME
 
@@ -53,10 +51,10 @@ targets:
       then:
       - tar:    '**/*'
         dir:    =ARC_DIR
-        tofile: =ARC_PATH
         prefix: =ARC_PREFIX
+        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
       else:
       - zip:    '**/*'
         dir:    =ARC_DIR
-        tofile: =ARC_PATH
         prefix: =ARC_PREFIX
+        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'

@@ -5,9 +5,7 @@ extends:
 - c4s4/build/buildir.yml
 
 properties:
-  # properties that must be defined in extending build file
-  NAME:      ~
-  VERSION:   ~
+  NAME:      '={filename(_BASE)}'
   # sets of files to copy: list of sets that have same fields than copy task
   ARC_FILES:
   - files:   '**/*'

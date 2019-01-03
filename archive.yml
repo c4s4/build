@@ -1,12 +1,11 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file to generate archive
+extends:
+- c4s4/build/buildir.yml
 
 properties:
-  # properties that must be defined elsewhere
-  # NAME:      'foo'
-  # VERSION:   '1.2.3'
-  # BUILD_DIR: 'build'
+  NAME:      '={filename(_BASE)}'
   # sets of files to copy: list of sets that have same fields than copy task
   ARC_FILES:
   - files:   '**/*'
@@ -17,15 +16,24 @@ properties:
   ARC_TYPE:   tar.gz
   # directory where is built the archive
   ARC_DIR:    '={BUILD_DIR}/archive'
-  # path of the generated archive file
-  ARC_PATH:   '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
   # prefix for file path in archive
   ARC_PREFIX: =NAME
 
 targets:
 
+  version:
+    doc: Prompt for version
+    steps:
+    - if: '!defined("VERSION")'
+      then:
+      - prompt:  'Release version'
+        to:      'VERSION'
+        pattern: '^[\w_\-\.]+$'
+        error:   'Release version should be made of letters, digits, dots, _ and -'
+
   archive:
     doc: Build an archive
+    depends: version
     steps:
     # copy files to archive directory
     - mkdir: =ARC_DIR
@@ -54,10 +62,10 @@ targets:
       then:
       - tar:    '**/*'
         dir:    =ARC_DIR
-        tofile: =ARC_PATH
         prefix: =ARC_PREFIX
+        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
       else:
       - zip:    '**/*'
         dir:    =ARC_DIR
-        tofile: =ARC_PATH
         prefix: =ARC_PREFIX
+        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'

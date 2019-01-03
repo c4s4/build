@@ -3,7 +3,6 @@
 doc: Parent build file to manage build directory
 
 properties:
-  NAME:      '={filename(_BASE)}'
   BUILD_DIR: 'build'
 
 targets:

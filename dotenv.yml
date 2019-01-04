@@ -3,6 +3,7 @@
 properties:
   DOTENV_PATTERN: '^(local|stg|prd)$'
   DOTENV_DEFAULT: 'local'
+  DOTENV_DIR:     '.'
 
 targets:
 
@@ -16,7 +17,7 @@ targets:
         pattern: =DOTENV_PATTERN
         to:      DOTENV_PF
     - delete: '.env'
-    - link: '.env.={DOTENV_PF}'
+    - link: '={DOTENV_DIR}/.env.={DOTENV_PF}'
       to:   '.env'
 
   _dotenv-prompt:
@@ -34,11 +35,13 @@ targets:
     steps:
     - call: _dotenv-prompt
     - $: ['openssl', 'aes-256-cbc', '-d', '-k', =key,
-         '-in', '.env.={env}.enc', '-out', '.env.={env}']
+         '-in', '={DOTENV_DIR}/.env.={env}.enc',
+         '-out', '={DOTENV_DIR}/.env.={env}']
 
   dotenv-encrypt:
     doc: Encrypt environment file
     steps:
     - call: _dotenv-prompt
     - $: ['openssl', 'aes-256-cbc', '-e', '-k', =key,
-         '-in', '.env.={env}', '-out', '.env.={env}.enc']
+         '-in', '={DOTENV_DIR}/.env.={env}',
+         '-out', '={DOTENV_DIR}/.env.={env}.enc']

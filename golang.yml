@@ -33,6 +33,8 @@ properties:
   - golang.org/x/tools/cmd/godoc
   - github.com/sqs/goreturns
   - github.com/derekparker/delve/cmd/dlv
+  - github.com/stamblerre/gocode
+  - github.com/ianthehat/godef
   TEST_CASES: []
   TEST_OPTS:  []
   RUN_ARGS:   []

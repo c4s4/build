@@ -41,7 +41,7 @@ targets:
 
   release:
     doc: Perform a release
-    depends: [version, release-checks]
+    depends: [version, release-check]
     steps:
     - print: 'Releasing version "={VERSION}"'
     # merge develop on master, tag release and return on develop

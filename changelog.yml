@@ -1,6 +1,8 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for projects with semantic changelog
+extends:
+- c4s4/build/git.yml
 
 properties:
   CHANGELOG_FILE: 'CHANGELOG.yml'
@@ -12,11 +14,7 @@ targets:
     steps:
     - if: 'exists(CHANGELOG_FILE)'
       then:
-      - 'release = changelog(CHANGELOG_FILE)[0]'
-      - if: 'release.Date != now()[0:10]'
-        then:
-        - throw: 'Bad release date in changelog'
-      - 'VERSION = release.Version'
+      - 'VERSION = changelog(CHANGELOG_FILE)[0].Version'
       - print: 'Release version: ={VERSION}'
       else:
       - if: '!defined("VERSION")'
@@ -25,6 +23,14 @@ targets:
           to:      'VERSION'
           pattern: '^[\w_\-\.]+$'
           error:   'Release version should be made of letters, digits, dots, _ and -'
+
+  release-check:
+    doc: Perform release checks
+    steps:
+    - if: 'changelog(CHANGELOG_FILE)[0].Date != now()[0:10]'
+      then:
+      - throw: 'Bad release date in changelog'
+    - super:
 
   changelog:
     doc: Print changelog for current release in markdown fomat

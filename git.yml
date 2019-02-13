@@ -32,14 +32,17 @@ targets:
         to:      'VERSION'
         pattern: '^[\w_\-\.]+$'
         error:   'Release version should be made of letters, digits, dots, _ and -'
+  
+  release-check:
+    doc: Perform release checks
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_DEVELOP)'
 
   release:
     doc: Perform a release
-    depends: version
+    depends: [version, release-check]
     steps:
-    # checks before release
-    - 'check_no_uncommitted()'
-    - 'check_branch_equals(BRANCH_DEVELOP)'
     - print: 'Releasing version "={VERSION}"'
     # merge develop on master, tag release and return on develop
     - try:

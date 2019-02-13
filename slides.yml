@@ -8,6 +8,7 @@ extends:
 
 properties:
   TITLE:       ~
+  NAME:        '={filename(_BASE)}'
   OPTIONS:     '{ratio: "4:3"}'
   DESTINATION: 'casa@sweetohm.net:/home/web/slides/={NAME}'
 

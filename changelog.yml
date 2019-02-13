@@ -12,17 +12,8 @@ targets:
   version:
     doc: Extract release version from changelog if exists, else prompt
     steps:
-    - if: 'exists(CHANGELOG_FILE)'
-      then:
-      - 'VERSION = changelog(CHANGELOG_FILE)[0].Version'
-      - print: 'Release version: ={VERSION}'
-      else:
-      - if: '!defined("VERSION")'
-        then:
-        - prompt:  'Release version'
-          to:      'VERSION'
-          pattern: '^[\w_\-\.]+$'
-          error:   'Release version should be made of letters, digits, dots, _ and -'
+    - 'VERSION = changelog(CHANGELOG_FILE)[0].Version'
+    - print: 'Release version: ={VERSION}'
 
   release-check:
     doc: Perform release checks
@@ -35,28 +26,4 @@ targets:
   changelog:
     doc: Print changelog for current release in markdown fomat
     steps:
-    - if: 'exists(CHANGELOG_FILE)'
-      then:
-      - $: ['changelog', 'release', 'to', 'markdown']
-      else:
-      # get two last tags (supposed releases)
-      - $: ['git', 'for-each-ref', '--sort=taggerdate', '--format', '%(tag)']
-        1=: tags
-        1x: true
-      - 'lines = split(tags, "\n")'
-      - 'from = lines[len(lines)-2]'
-      - 'to = lines[len(lines)-1]'
-      # prompt for start end end tags
-      - prompt:  'FROM'
-        to:      'from'
-        default: =from
-        pattern: '^[\w_\-\.]+$'
-        error:   'Bad release tag'
-      - prompt:  'TO  '
-        to:      'to'
-        default: =to
-        pattern: '^[\w_\-\.]+$'
-        error:   'Bad release tag'
-      - print: ''
-      # print git log between these tags
-      - $: ['git', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
+    - $: ['changelog', 'release', 'to', 'markdown']

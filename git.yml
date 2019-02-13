@@ -58,6 +58,22 @@ targets:
       # whatever happens, when return on develop branch
       - $: ['git', 'checkout', =BRANCH_DEVELOP]
 
+  changelog:
+    doc: Print changelog since last release
+    steps:
+    - |
+      tags = split(run("git", "tag"), "\n")
+      from_tag = tags[len(tags)-2]
+      to_tag = tags[len(tags)-1]
+    - prompt:  'From release'
+      default: =from_tag
+      to:      from
+    - prompt:  'To release (or HEAD)'
+      default: =to_tag
+      to:      to
+    - print: 'Changelog from "={from}" to "={to}":'
+    - $: ['git', '--no-pager', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
+
   feature-open:
     doc: Create a feature branch from develop
     steps:

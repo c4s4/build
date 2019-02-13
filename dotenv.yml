@@ -16,7 +16,9 @@ targets:
         default: =DOTENV_DEFAULT
         pattern: =DOTENV_PATTERN
         to:      DOTENV_PF
-    - delete: '.env'
+    - if: 'exists(".env")'
+      then:
+      - delete: '.env'
     - link: '={DOTENV_DIR}/.env.={DOTENV_PF}'
       to:   '.env'
 

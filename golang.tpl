@@ -11,7 +11,7 @@ targets:
     - print: 'This template will generate a Golang project'
     - prompt:  'Name of this project'
       to:      'name'
-      pattern: '^\w+$'
+      pattern: '^[\w_-]+$'
       error:   'Project name must be made of letters, numbers, - and _'
     - if: 'exists(joinpath(_HERE, name))'
       then:

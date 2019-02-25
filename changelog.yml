@@ -24,6 +24,6 @@ targets:
     - super:
 
   changelog:
-    doc: Print changelog for current release in markdown fomat
+    doc: Print changelog for current release in markdown format
     steps:
     - $: ['changelog', 'release', 'to', 'markdown']

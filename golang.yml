@@ -72,12 +72,12 @@ targets:
       - 'TEST_CASES = ["./..."]'
     - $: ['go', 'test', '-cover']
       +: =TEST_OPTS+TEST_CASES
-
-  run:
-    doc: Run Go tool
+  
+  clean:
+    doc: Clean build directory and Go test cache
     steps:
-    - $: ['go', 'run', '={NAME}.go']
-      +: =RUN_ARGS
+    - super:
+    - $: ['go', 'clean', '-testcache']
 
   bin:
     doc: Build binary for current platform
@@ -85,6 +85,13 @@ targets:
     - mkdir: =BUILD_DIR
     - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
   
+  run:
+    doc: Run Go tool
+    depends: bin
+    steps:
+    - $: ['={BUILD_DIR}/={NAME}']
+      +: =RUN_ARGS
+
   install:
     doc: Build and install binary for current platform
     steps:

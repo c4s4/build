@@ -37,6 +37,7 @@ properties:
   - github.com/ianthehat/godef
   TEST_CASES: []
   TEST_OPTS:  []
+  TEST_VERB:  false
   RUN_ARGS:   []
 
 targets:
@@ -70,8 +71,13 @@ targets:
     - if: 'len(TEST_CASES) == 0'
       then:
       - 'TEST_CASES = ["./..."]'
-    - $: ['go', 'test', '-cover']
-      +: =TEST_OPTS+TEST_CASES
+    - if: TEST_VERB
+      then:
+      - $: ['go', 'test', '-v', '-cover']
+        +: =TEST_OPTS+TEST_CASES
+      else:
+      - $: ['go', 'test', '-cover']
+        +: =TEST_OPTS+TEST_CASES
   
   clean:
     doc: Clean build directory and Go test cache

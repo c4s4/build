@@ -1,13 +1,11 @@
-Slides Template Project
-=======================
+# Slides Template Project
 
 Michel Casabianca
 
 casa@sweetohm.net
 
 ---
-Slides Template Project
------------------------
+## Slides Template Project
 
 This is a template project to generate slides using [Remark JS](http://remarkjs.com). Customizable properties in the build file are the following:
 
@@ -25,22 +23,19 @@ The makefile provides following targets:
 You can open generated slides in your favorite browser in *build* directory. You can view these slides in your browser [at this location](http://sweetohm.net/slides/slides).
 
 ---
-Sample slides
-=============
+# Sample slides
 
 Pages of the slides are separated with three dashes, such as `---`. First page with title should start with first level header:
 
 ```md
-Title of my slides
-==================
+# Title of my slides
 
 subtitle
 
 my email address
 
 ---
-Second page title
------------------
+## Second page title
 
 Content ...
 ```
@@ -48,8 +43,7 @@ Content ...
 Content is written with standard [Markdown syntax](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
 
 ---
-Pictures
---------
+## Pictures
 
 To print a picture, put it in the *img* directory and integrate with following syntax:
 
@@ -62,8 +56,7 @@ Which will render as:
 ![The Author](img/casa.png)
 
 ---
-Tables
-------
+## Tables
 
 You can render a table with following syntax:
 
@@ -82,10 +75,8 @@ left aligned | centered      | right aligned   | default
 second line  | second line   | second line     | second line
 
 ---
-Tips
-====
+# Tips
 
 - Your slides will display on the github page of the project (with horizontal separator between pages).
 - To generate PDF, you can display the slides on Chrome and then print them as PDF.
 - As all resources are embbeded in *res* directory, you don't need an internet connection to display your slides locally.
-

@@ -89,6 +89,7 @@ targets:
     doc: Build binary for current platform
     steps:
     - mkdir: =BUILD_DIR
+    - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
     - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
   
   run:

@@ -37,6 +37,7 @@ properties:
   - github.com/ianthehat/godef
   TEST_CASES: []
   TEST_OPTS:  []
+  TEST_VERB:  true
   RUN_ARGS:   []
 
 targets:
@@ -70,21 +71,34 @@ targets:
     - if: 'len(TEST_CASES) == 0'
       then:
       - 'TEST_CASES = ["./..."]'
-    - $: ['go', 'test', '-cover']
-      +: =TEST_OPTS+TEST_CASES
-
-  run:
-    doc: Run Go tool
+    - if: TEST_VERB
+      then:
+      - $: ['go', 'test', '-v', '-cover']
+        +: =TEST_OPTS+TEST_CASES
+      else:
+      - $: ['go', 'test', '-cover']
+        +: =TEST_OPTS+TEST_CASES
+  
+  clean:
+    doc: Clean build directory and Go test cache
     steps:
-    - $: ['go', 'run', '={NAME}.go']
-      +: =RUN_ARGS
+    - super:
+    - $: ['go', 'clean', '-testcache']
 
   bin:
     doc: Build binary for current platform
     steps:
     - mkdir: =BUILD_DIR
+    - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
     - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
   
+  run:
+    doc: Run Go tool
+    depends: bin
+    steps:
+    - $: ['={BUILD_DIR}/={NAME}']
+      +: =RUN_ARGS
+
   install:
     doc: Build and install binary for current platform
     steps:

@@ -37,7 +37,7 @@ properties:
   - github.com/ianthehat/godef
   TEST_CASES: []
   TEST_OPTS:  []
-  TEST_VERB:  true
+  TEST_VERB:  false
   RUN_ARGS:   []
 
 targets:

@@ -21,7 +21,6 @@ targets:
     - if: 'changelog(CHANGELOG_FILE)[0].Date != now()[0:10]'
       then:
       - throw: 'Bad release date in changelog'
-    - super:
 
   changelog:
     doc: Print changelog for current release in markdown format

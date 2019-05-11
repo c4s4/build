@@ -148,7 +148,7 @@ targets:
     doc: Check code with vet tool
     steps:
     - try:
-      - $: ['go', 'vet']
+      - $: ['go', 'vet', './...']
       - print: 'Vet check OK'
       catch:
       - throw: 'Vet check failure'

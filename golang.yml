@@ -8,12 +8,13 @@ extends:
 - c4s4/build/archive.yml
 
 properties:
-  CYCLOMAX: '15'
+  CYCLOMAX:   '15'
   ARC_DIR:    '={BUILD_DIR}/archive'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
-  LIBRARIES: []
+  LIBRARIES:  []
+  WEB_HOME:  'casa@sweetohm.net:/home/web/dist/={NAME}'
   GOTOOLS:
   # cross compilation
   - github.com/mitchellh/gox
@@ -116,9 +117,18 @@ targets:
     steps:
     - super:
 
+  deploy:
+    doc: Deploy installation script and binaries
+    depends: binaries
+    steps:
+    - print: 'Deploying dotrun binaries...'
+    - $: ['scp', 'install', =WEB_HOME]
+    - 'binaries = join(find(".", BUILD_DIR+"/bin/*"), " ")'
+    - $: 'scp ={binaries} ={WEB_HOME}'
+
   release:
     doc: Perform a release
-    depends: [clean, check, test, archive]
+    depends: [clean, check, test, archive, deploy]
     steps:
     - super:
 

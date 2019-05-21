@@ -8,13 +8,13 @@ extends:
 - c4s4/build/archive.yml
 
 properties:
-  CYCLOMAX:   '15'
-  ARC_DIR:    '={BUILD_DIR}/archive'
+  CYCLOMAX:    '15'
+  ARC_DIR:     '={BUILD_DIR}/archive'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
-  LIBRARIES:  []
-  WEB_HOME:  'casa@sweetohm.net:/home/web/dist/={NAME}'
+  LIBRARIES:   []
+  WEB_HOME:    'casa@sweetohm.net:/home/web/dist/={NAME}'
   GOTOOLS:
   # cross compilation
   - github.com/mitchellh/gox
@@ -36,10 +36,12 @@ properties:
   - github.com/derekparker/delve/cmd/dlv
   - github.com/stamblerre/gocode
   - github.com/ianthehat/godef
-  TEST_CASES: []
-  TEST_OPTS:  []
-  TEST_VERB:  false
-  RUN_ARGS:   []
+  TEST_CASES:  []
+  TEST_OPTS:   []
+  TEST_VERB:   false
+  RUN_ARGS:    []
+  PACKAGE:     './...'
+  PACKAGE_DIR: '.'
 
 targets:
 
@@ -145,7 +147,7 @@ targets:
   _check-fmt:
     doc: Check code with fmt tool
     steps:
-    - $:  ['gofmt', '-l', '.']
+    - $:  ['gofmt', '-l', =PACKAGE_DIR]
       3=: errors
     - if: len(errors) > 0
       then:
@@ -158,7 +160,7 @@ targets:
     doc: Check code with vet tool
     steps:
     - try:
-      - $: ['go', 'vet', './...']
+      - $: ['go', 'vet', =PACKAGE]
       - print: 'Vet check OK'
       catch:
       - throw: 'Vet check failure'
@@ -167,7 +169,7 @@ targets:
     doc: Check code with gocyclo tool
     steps:
     - try:
-      - $: ['gocyclo', '-over', '={CYCLOMAX}', '.']
+      - $: ['gocyclo', '-over', '={CYCLOMAX}', =PACKAGE_DIR]
       - print: 'Cyclo check OK'
       catch:
       - throw: 'Cyclo check failure'
@@ -175,7 +177,7 @@ targets:
   _check-lint:
     doc: Check code with golint tool
     steps:
-    - $:  ['golint', './...']
+    - $:  ['golint', =PACKAGE]
       3=: errors
     - if: len(errors) > 0
       then:
@@ -188,7 +190,7 @@ targets:
     doc: Check code with ineffassign tool
     steps:
     - try:
-      - $: ['ineffassign', '.']
+      - $: ['ineffassign', =PACKAGE_DIR]
       - print: 'Assign check OK'
       catch:
       - throw: 'Assign check failure'
@@ -196,7 +198,7 @@ targets:
   _check-spell:
     doc: Check code with misspell tool
     steps:
-    - 'files = find(".", "**/*.go")'
+    - 'files = find(PACKAGE_DIR, "**/*.go")'
     - $:  ['misspell']
       +:  =files
       3=: errors

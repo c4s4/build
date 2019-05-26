@@ -4,7 +4,6 @@ doc: Build file for Go projects
 default: [check, test]
 
 extends:
-- c4s4/build/buildir.yml
 - c4s4/build/archive.yml
 
 properties:
@@ -87,7 +86,7 @@ targets:
     steps:
     - mkdir: =BUILD_DIR
     - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
-    - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}']
+    - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}', =PACKAGE]
   
   run:
     doc: Run Go tool

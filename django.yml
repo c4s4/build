@@ -8,6 +8,7 @@ extends:
 properties:
   TEST_OPTS:  []
   TEST_CASES: []
+  ADDRPORT:   '127.0.0.1:8000'
 
 targets:
 
@@ -20,7 +21,7 @@ targets:
   run:
     doc: Run development server
     steps:
-    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'runserver']
+    - $: ['={VENV_DIR}/bin/python', 'manage.py', 'runserver', =ADDRPORT]
 
   shell:
     doc: Run a shell

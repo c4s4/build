@@ -71,7 +71,7 @@ targets:
     steps:
     - if: 'len(TEST_CASES) == 0'
       then:
-      - 'TEST_CASES = [PACKAGE]'
+      - 'TEST_CASES = [PACKAGE+"/..."]'
     - $: ['go', 'test']
       +: =TEST_OPTS+TEST_CASES
   

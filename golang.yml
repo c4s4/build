@@ -29,12 +29,11 @@ properties:
   - github.com/acroca/go-symbols
   - golang.org/x/tools/cmd/guru
   - golang.org/x/tools/cmd/gorename
-  - github.com/rogpeppe/godef
   - golang.org/x/tools/cmd/godoc
   - github.com/sqs/goreturns
   - github.com/derekparker/delve/cmd/dlv
   - github.com/stamblerre/gocode
-  - github.com/ianthehat/godef
+  #- github.com/rogpeppe/godef
   TEST_CASES:  []
   TEST_OPTS:   ['-v', '-cover']
   RUN_ARGS:    []

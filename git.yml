@@ -60,6 +60,7 @@ targets:
     steps:
     - |
       tags = split(run("git", "tag"), "\n")
+      sortversions(tags)
       from_tag = tags[len(tags)-2]
       to_tag = tags[len(tags)-1]
     - prompt:  'From release'

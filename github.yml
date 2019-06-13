@@ -5,7 +5,7 @@ doc: Build file for Github projects
 properties:
   GITHUB_USER:  'user-name'
   GITHUB_REPO:  'project-repository'
-  GITHUB_TOKEN: 'https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line'
+  GITHUB_TOKEN: 'github-token'
   GITHUB_TITLE: 'release-title'
   GITHUB_DESC:  'release-description'
   # GITHUB_ARC:   'release-archive'
@@ -17,7 +17,7 @@ targets:
   github-release:
     doc: Create Github release and upload archive
     steps:
-    - 'args = ["--user", GITHUB_USER, "--repo", GITHUB_REPO, "--tag", VERSION]'
+    - 'args = ["--security-token", GITHUB_TOKEN, "--user", GITHUB_USER, "--repo", GITHUB_REPO, "--tag", VERSION]'
     - print: 'Creating release on Github...'
     - $: ['gothub', 'release', '--name', =GITHUB_TITLE, '--description', =GITHUB_DESC]
       +: args

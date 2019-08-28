@@ -1,15 +1,11 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-doc: Parent build file for mieuxplacer git stuff
+doc: Parent build file for git stuff
 context:
 - c4s4/build/git.ank
 
 properties:
-  BRANCH_DEVELOP: 'develop'
   BRANCH_MASTER:  'master'
-  BRANCH_FEATURE: 'feature/'
-  BRANCH_FIX:     'fix/'
-  BRANCH_HOTFIX:  'hotfix/'
 
 targets:
 
@@ -38,22 +34,10 @@ targets:
     depends: version
     steps:
     - print: 'Releasing version "={VERSION}"'
-    # perform release checks
     - 'check_no_uncommitted()'
-    - 'check_branch_equals(BRANCH_DEVELOP)'
-    # merge develop on master, tag release and return on develop
-    - try:
-      - $: ['git', 'checkout', =BRANCH_MASTER]
-      - $: ['git', 'pull']
-      - $: ['git', 'merge', '--no-ff', =BRANCH_DEVELOP, '-m', 'Release ={VERSION}']
-      - $: ['git', 'push']
-      - $: ['git', 'tag', '-a', =VERSION, '-m', 'Release ={VERSION}']
-      - $: ['git', 'push', 'origin', =VERSION]
-      catch:
-      - throw: 'performing release'
-      finally:
-      # whatever happens, when return on develop branch
-      - $: ['git', 'checkout', =BRANCH_DEVELOP]
+    - 'check_branch_equals(BRANCH_MASTER)'
+    - $: ['git', 'tag', '-a', =VERSION, '-m', 'Release ={VERSION}']
+    - $: ['git', 'push', 'origin', =VERSION]
 
   changelog:
     doc: Print changelog since last release
@@ -72,80 +56,26 @@ targets:
     - print: 'Changelog from "={from}" to "={to}":'
     - $: ['git', '--no-pager', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
 
-  feature-open:
-    doc: Create a feature branch from develop
-    steps:
-    - 'check_no_uncommitted()'
-    - 'check_branch_equals(BRANCH_DEVELOP)'
-    - prompt:  'Feature'
-      to:      'name'
-      pattern: '^[\w_-]+$'
-      error:   'Feature name should be made of letters, digits, _ and -'
-    - 'branch = BRANCH_FEATURE + name'
-    - $: ['git', 'checkout', '-b', =branch]
-    - $: ['git', 'push', '-u', 'origin', =branch]
-    - print: "Feature branch '={branch}' created"
-
-  feature-close:
-    doc: Close a feature branch and return on develop
-    steps:
-    - 'check_no_uncommitted()'
-    - 'check_branch_starts_with(BRANCH_FEATURE)'
-    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
-      3=: 'branch'
-    - $: ['git', 'checkout', =BRANCH_DEVELOP]
-    - $: ['git', 'merge', '--no-ff', =branch]
-    - $: ['git', 'push', 'origin', =BRANCH_DEVELOP]
-    - print: "Feature branch '={branch}' merged"
-
-  fix-open:
-    doc: Create a fix branch from develop
-    steps:
-    - 'check_no_uncommitted()'
-    - 'check_branch_equals(BRANCH_DEVELOP)'
-    - prompt:  'Fix'
-      to:      'name'
-      pattern: '^[\w_-]+$'
-      error:   'Fix name should be made of letters, digits, _ and -'
-    - 'branch = BRANCH_FIX + name'
-    - $: ['git', 'checkout', '-b', =branch]
-    - $: ['git', 'push', '-u', 'origin', =branch]
-    - print: "Fix branch '={branch}' created"
-
-  fix-close:
-    doc: Close a fix branch and return on develop
-    steps:
-    - 'check_no_uncommitted()'
-    - 'check_branch_starts_with(BRANCH_FIX)'
-    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
-      3=: 'branch'
-    - $: ['git', 'checkout', =BRANCH_DEVELOP]
-    - $: ['git', 'merge', '--no-ff', =branch]
-    - $: ['git', 'push', 'origin', =BRANCH_DEVELOP]
-    - print: "Fix branch '={branch}' merged"
-
-  hotfix-open:
-    doc: Create a hofix branch from master
+  branch-open:
+    doc: Create a branch from master
     steps:
     - 'check_no_uncommitted()'
     - 'check_branch_equals(BRANCH_MASTER)'
-    - prompt:  'Hotfix'
-      to:      'name'
+    - prompt:  'Branch'
+      to:      'branch'
       pattern: '^[\w_-]+$'
-      error:   'Hotfix name should be made of letters, digits, _ and -'
-    - 'branch = BRANCH_HOTFIX + name'
+      error:   'Branch name should be made of letters, digits, _ and -'
     - $: ['git', 'checkout', '-b', =branch]
     - $: ['git', 'push', '-u', 'origin', =branch]
-    - print: "Hotfix branch '={branch}' created"
+    - print: "Branch '={branch}' created"
 
-  hotfix-close:
-    doc: Close a hotfix branch and return on master
+  branch-merge:
+    doc: Merge current branch on master
     steps:
     - 'check_no_uncommitted()'
-    - 'check_branch_starts_with(BRANCH_HOTFIX)'
     - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       3=: 'branch'
     - $: ['git', 'checkout', =BRANCH_MASTER]
     - $: ['git', 'merge', '--no-ff', =branch]
     - $: ['git', 'push', 'origin', =BRANCH_MASTER]
-    - print: "Hotfix branch '={branch}' merged"
+    - print: "Branch '={branch}' merged"

@@ -44,6 +44,9 @@ targets:
     steps:
     - |
       tags = split(run("git", "tag"), "\n")
+      if len(tags) < 2 {
+        throw("There must be at least two tags to build a changelog")
+      }
       sortversions(tags)
       from_tag = tags[len(tags)-2]
       to_tag = tags[len(tags)-1]
@@ -56,7 +59,7 @@ targets:
     - print: 'Changelog from "={from}" to "={to}":'
     - $: ['git', '--no-pager', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
 
-  branch-open:
+  branch-create:
     doc: Create a branch from master
     steps:
     - 'check_no_uncommitted()'

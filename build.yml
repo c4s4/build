@@ -11,3 +11,4 @@ targets:
     doc: Generate release version
     steps:
     - 'VERSION = replace(replace(now()[0:16], " ", "="), ":", "-")'
+    - print: 'VERSION: ={VERSION}'

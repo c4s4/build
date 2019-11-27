@@ -5,9 +5,6 @@ doc: Project for my parent build files
 extends:
 - ./git-master.yml
 
-properties:
-  VERSION: 'UNKNOWN'
-
 targets:
 
   version:

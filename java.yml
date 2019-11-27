@@ -5,7 +5,6 @@ doc: Build file for Java project
 default: junit
 
 extends:
-- c4s4/build/buildir.yml
 - c4s4/build/archive.yml
 
 properties:

@@ -1,0 +1,84 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Parent build file for git stuff
+context:
+- c4s4/build/git.ank
+
+properties:
+  BRANCH_MASTER:  'master'
+
+targets:
+
+  git-init:
+    doc: Git initialization
+    steps:
+    - $: ['git', 'init']
+    - $: ['git', 'add', '*']
+    - if: exists(".gitignore")
+      then:
+      - $: ['git', 'add', '.gitignore']
+    - $: ['git', 'commit', '-m', 'Initial import']
+
+  version:
+    doc: Prompt for version
+    steps:
+    - if: '!defined("VERSION")'
+      then:
+      - prompt:  'Release version'
+        to:      'VERSION'
+        pattern: '^[\w_\-\.]+$'
+        error:   'Release version should be made of letters, digits, dots, _ and -'
+  
+  release:
+    doc: Perform a release
+    depends: version
+    steps:
+    - print: 'Releasing version "={VERSION}"'
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_MASTER)'
+    - $: ['git', 'tag', '-a', =VERSION, '-m', 'Release ={VERSION}']
+    - $: ['git', 'push', 'origin', =VERSION]
+
+  changelog:
+    doc: Print changelog since last release
+    steps:
+    - |
+      tags = split(run("git", "tag"), "\n")
+      if len(tags) < 2 {
+        throw("There must be at least two tags to build a changelog")
+      }
+      sortversions(tags)
+      from_tag = tags[len(tags)-2]
+      to_tag = tags[len(tags)-1]
+    - prompt:  'From release'
+      default: =from_tag
+      to:      from
+    - prompt:  'To release (or HEAD)'
+      default: =to_tag
+      to:      to
+    - print: 'Changelog from "={from}" to "={to}":'
+    - $: ['git', '--no-pager', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
+
+  branch-create:
+    doc: Create a branch from master
+    steps:
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_MASTER)'
+    - prompt:  'Branch'
+      to:      'branch'
+      pattern: '^[\w_-]+$'
+      error:   'Branch name should be made of letters, digits, _ and -'
+    - $: ['git', 'checkout', '-b', =branch]
+    - $: ['git', 'push', '-u', 'origin', =branch]
+    - print: "Branch '={branch}' created"
+
+  branch-merge:
+    doc: Merge current branch on master
+    steps:
+    - 'check_no_uncommitted()'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_MASTER]
+    - $: ['git', 'merge', '--no-ff', =branch]
+    - $: ['git', 'push', 'origin', =BRANCH_MASTER]
+    - print: "Branch '={branch}' merged"

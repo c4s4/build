@@ -1,7 +1,8 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for slides
-default: [clean, slides, publish]
+default: [clean, publish]
+expose:  [TITLE, OPTIONS, DESTINATION, clean, slides, publish]
 
 extends:
 - c4s4/build/buildir.yml
@@ -32,5 +33,6 @@ targets:
 
   publish:
     doc: Publish slides
+    depends: slides
     steps:
     - $: ['rsync', '-av', '={BUILD_DIR}/', '={DESTINATION}/']

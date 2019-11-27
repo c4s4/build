@@ -19,7 +19,7 @@ targets:
     - if: 'exists(".env")'
       then:
       - delete: '.env'
-    - link: '={DOTENV_DIR}/.env.={DOTENV_PF}'
+    - link: '={DOTENV_DIR}/={DOTENV_PF}.env'
       to:   '.env'
 
   _dotenv-prompt:
@@ -36,14 +36,14 @@ targets:
     doc: Decrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['openssl', 'aes-256-cbc', '-d', '-k', =key,
-         '-in', '={DOTENV_DIR}/.env.={env}.enc',
-         '-out', '={DOTENV_DIR}/.env.={env}']
+    - $: ['openssl', 'aes-256-cbc', '-d', '-k', =key, '-md', 'md5',
+          '-in', '={DOTENV_DIR}/={env}.env.enc',
+          '-out', '={DOTENV_DIR}/={env}.env']
 
   dotenv-encrypt:
     doc: Encrypt environment file
     steps:
     - call: _dotenv-prompt
-    - $: ['openssl', 'aes-256-cbc', '-e', '-k', =key,
-         '-in', '={DOTENV_DIR}/.env.={env}',
-         '-out', '={DOTENV_DIR}/.env.={env}.enc']
+    - $: ['openssl', 'aes-256-cbc', '-e', '-k', =key, '-md', 'md5',
+          '-in', '={DOTENV_DIR}/={env}.env',
+          '-out', '={DOTENV_DIR}/={env}.env.enc']

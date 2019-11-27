@@ -3,7 +3,7 @@
 doc: Project for my parent build files
 
 extends:
-- ./git.yml
+- ./git-master.yml
 
 properties:
   VERSION: 'UNKNOWN'

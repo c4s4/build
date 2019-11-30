@@ -28,7 +28,7 @@ targets:
         to:      'VERSION'
         pattern: '^[\w_\-\.]+$'
         error:   'Release version should be made of letters, digits, dots, _ and -'
-  
+
   release:
     doc: Perform a release
     depends: version
@@ -82,3 +82,15 @@ targets:
     - $: ['git', 'merge', '--no-ff', =branch]
     - $: ['git', 'push', 'origin', =BRANCH_MASTER]
     - print: "Branch '={branch}' merged"
+
+  branch-squash:
+    doc: Merge and squash current branch on master
+    steps:
+    - 'check_no_uncommitted()'
+    - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
+      3=: 'branch'
+    - $: ['git', 'checkout', =BRANCH_MASTER]
+    - $: ['git', 'merge', '--squash', =branch]
+    - $: ['git', 'commit']
+    - $: ['git', 'push', 'origin', =BRANCH_MASTER]
+    - print: "Branch '={branch}' squashed and merged"

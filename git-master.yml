@@ -79,6 +79,7 @@ targets:
     - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       3=: 'branch'
     - $: ['git', 'checkout', =BRANCH_MASTER]
+    - $: ['git', 'pull']
     - $: ['git', 'merge', '--no-ff', =branch]
     - $: ['git', 'push', 'origin', =BRANCH_MASTER]
     - print: "Branch '={branch}' merged"
@@ -90,6 +91,7 @@ targets:
     - $:  ['git', 'rev-parse', '--abbrev-ref', 'HEAD']
       3=: 'branch'
     - $: ['git', 'checkout', =BRANCH_MASTER]
+    - $: ['git', 'pull']
     - $: ['git', 'merge', '--squash', =branch]
     - $: ['git', 'commit']
     - $: ['git', 'push', 'origin', =BRANCH_MASTER]

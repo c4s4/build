@@ -108,17 +108,19 @@ targets:
       - $: ['gox', '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}',
             =PACKAGE]
 
+  install:
+    doc: Build and install binary in GOPATH
+    steps:
+    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin", NAME)'
+    - print: 'Building and installing binary in ={path}'
+    - $: ['go', 'build', '-o', =path, =PACKAGE]
+
   run:
     doc: Run Go tool
     depends: bin
     steps:
     - $: ['={BUILD_DIR}/={NAME}']
       +: =RUN_ARGS
-
-  install:
-    doc: Build and install binary for current platform
-    steps:
-    - $: ['go', 'install']
 
   archive:
     doc: Build distribution archive

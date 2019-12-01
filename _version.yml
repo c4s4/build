@@ -1,0 +1,26 @@
+# NeON build file (http://github.com/c4s4/neon)
+
+doc: Parent build file to manage version
+
+properties:
+  VERSION_REGEXP: '^[\w_\-\.]+$'
+
+targets:
+
+  version:
+    doc: Prompt for version
+    steps:
+    - if: '!defined("VERSION")'
+      then:
+      - prompt:  'Release version'
+        to:      'VERSION'
+        pattern: =VERSION_REGEXP
+        error:   'Bad version (should match regexp "={VERSION_REGEXP}"'
+
+  version-test:
+    doc: Generate a test version
+    steps:
+    - if: '!defined("VERSION")'
+      then:
+      - 'VERSION = "TEST"'
+      - print: 'VERSION: ={VERSION}'

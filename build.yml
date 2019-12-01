@@ -2,8 +2,7 @@
 
 doc: Project for my parent build files
 
-extends:
-- ./git-master.yml
+extends: _git_master
 
 targets:
 

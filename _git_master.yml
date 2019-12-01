@@ -1,11 +1,12 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for git stuff
-context:
-- c4s4/build/git.ank
+extends: _version
+context: c4s4/build/_git.ank
 
 properties:
-  BRANCH_MASTER:  'master'
+  BRANCH_MASTER: 'master'
+  BRANCH_REGEXP: '^[\w/_-]+$'
 
 targets:
 
@@ -19,16 +20,6 @@ targets:
       - $: ['git', 'add', '.gitignore']
     - $: ['git', 'commit', '-m', 'Initial import']
 
-  version:
-    doc: Prompt for version
-    steps:
-    - if: '!defined("VERSION")'
-      then:
-      - prompt:  'Release version'
-        to:      'VERSION'
-        pattern: '^[\w_\-\.]+$'
-        error:   'Release version should be made of letters, digits, dots, _ and -'
-
   release:
     doc: Perform a release
     depends: version
@@ -39,8 +30,8 @@ targets:
     - $: ['git', 'tag', '-a', =VERSION, '-m', 'Release ={VERSION}']
     - $: ['git', 'push', 'origin', =VERSION]
 
-  changelog:
-    doc: Print changelog since last release
+  last-tags:
+    doc: Get last tags in last_tag and before_last_tag
     steps:
     - |
       tags = split(run("git", "tag"), "\n")
@@ -48,16 +39,30 @@ targets:
         throw("There must be at least two tags to build a changelog")
       }
       sortversions(tags)
-      from_tag = tags[len(tags)-2]
-      to_tag = tags[len(tags)-1]
+      last_tag = tags[len(tags)-1]
+      before_last_tag = tags[len(tags)-2]
+    - print: 'Last tags: ={before_last_tag} & ={last_tag}'
+
+  changelog:
+    doc: Print changelog since last release
+    depends: last-tags
+    steps:
     - prompt:  'From release'
-      default: =from_tag
+      default: =before_last_tag
       to:      from
     - prompt:  'To release (or HEAD)'
-      default: =to_tag
+      default: =last_tag
       to:      to
     - print: 'Changelog from "={from}" to "={to}":'
     - $: ['git', '--no-pager', 'log', '={from}..={to}', '--no-merges', '--no-color', '--pretty=- %s']
+
+  change-list:
+    doc: Generate a change list since last release
+    depends: last-tags
+    steps:
+    - print: 'Change list:'
+    - $:  ['git', '--no-pager', 'log', '={last_tag}..HEAD', '--no-merges', '--no-color', '--pretty=- %s']
+      1=: CHANGE_LIST
 
   branch-create:
     doc: Create a branch from master
@@ -66,7 +71,7 @@ targets:
     - 'check_branch_equals(BRANCH_MASTER)'
     - prompt:  'Branch'
       to:      'branch'
-      pattern: '^[\w_-]+$'
+      pattern: =BRANCH_REGEXP
       error:   'Branch name should be made of letters, digits, _ and -'
     - $: ['git', 'checkout', '-b', =branch]
     - $: ['git', 'push', '-u', 'origin', =branch]

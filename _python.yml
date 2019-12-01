@@ -2,8 +2,7 @@
 
 doc: Parent build file for Python projects
 default: [format, lint, test]
-extends:
-- c4s4/build/archive.yml
+extends: _archive
 
 properties:
   VENV_DIR:     'venv'
@@ -96,13 +95,13 @@ targets:
     - call: tools
     # install requirements
     - call: libs
-  
+
   tools:
     doc: Install tools
     steps:
     - $: ['={VENV_DIR}/bin/pip', 'install', '-U']
       +: =PYTOOLS
-  
+
   libs:
     doc: Install requirements
     steps:
@@ -111,7 +110,7 @@ targets:
       - $: ['={VENV_DIR}/bin/python', '-m', 'pip', 'install', '-U', '-r', =REQUIREMENTS]
       else:
       - print: 'No requirements file found'
-  
+
   format:
     doc: Format code using yapf
     steps:
@@ -147,7 +146,7 @@ targets:
     doc: Run python script
     steps:
     - $: ['={VENV_DIR}/bin/python', =NAME]
-      +: PYARGS 
+      +: PYARGS
 
   test:
     doc: Run python tests

@@ -2,5 +2,4 @@
 
 default: [lint, test]
 
-extends:
-- c4s4/build/python.yml
+extends: _python

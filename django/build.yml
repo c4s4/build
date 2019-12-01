@@ -2,5 +2,4 @@
 
 default: run
 
-extends:
-- c4s4/build/django.yml
+extends: _django

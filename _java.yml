@@ -4,8 +4,7 @@ doc: Build file for Java project
 
 default: junit
 
-extends:
-- c4s4/build/archive.yml
+extends: _archive
 
 properties:
   JAVA_SRC:  'src'

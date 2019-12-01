@@ -1,0 +1,47 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Build file for Github projects
+extends: _version
+
+properties:
+  GITHUB_REPO:  '={filename(_BASE)}'
+  GITHUB_USER:  'c4s4'
+  # GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+targets:
+
+  release-title:
+    doc: Prompt for release title if not set
+    steps:
+    - if: '!defined("RELEASE_TITLE")'
+      then:
+      - prompt:  'Release title'
+        to:      'RELEASE_TITLE'
+
+  _change_list:
+    doc: Prompt for change list if not set
+    steps:
+    - if: '!defined("CHANGE_LIST")'
+      then:
+      - prompt:  'Change list'
+        to:      'CHANGE_LIST'
+
+  release:
+    doc: Create Github release
+    depends: [version, release-title, _change_list]
+    steps:
+    - print: 'Releasing version "={VERSION}" on Github'
+    - 'check_no_uncommitted()'
+    - 'check_branch_equals(BRANCH_MASTER)'
+    - 'args = ["--security-token", GITHUB_TOKEN, "--user", GITHUB_USER, "--repo", GITHUB_REPO, "--tag", VERSION]'
+    - print: 'Creating release on Github'
+    - $: ['gothub', 'release', '--name', =RELEASE_TITLE, '--description', =CHANGE_LIST]
+      +: args
+
+  upload:
+    doc: Upload archive on github
+    depends: archive
+    steps:
+    - print: 'Uploading archive on Github'
+    - $: ['gothub', 'upload', '--name', =ARCHIVE, '--file', '={joinpath(BUILD_DIR, ARCHIVE)}']
+      +: args

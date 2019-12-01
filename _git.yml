@@ -2,7 +2,7 @@
 
 doc: Parent build file for mieuxplacer git stuff
 context:
-- c4s4/build/git.ank
+- c4s4/build/_git.ank
 
 properties:
   BRANCH_DEVELOP: 'develop'
@@ -32,7 +32,7 @@ targets:
         to:      'VERSION'
         pattern: '^[\w_\-\.]+$'
         error:   'Release version should be made of letters, digits, dots, _ and -'
-  
+
   release:
     doc: Perform a release
     depends: version

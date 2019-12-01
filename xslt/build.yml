@@ -1,10 +1,9 @@
 # NeON Build File (http://github.com/c4s4/neon)
-# 
+#
 # You must configure SAXON_HOME and XSPEC_HOME with path to these tools.
 # Target xspec calls xspec-status (http://github.com/c4s4/xspec-status).
 
-extends:
-- c4s4/build/xslt.yml
+extends: _xslt
 
 properties:
   NAME:       'name'

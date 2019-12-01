@@ -1,8 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file to generate archive
-extends:
-- c4s4/build/buildir.yml
+extends: _buildir
 
 properties:
   NAME:      '={filename(_BASE)}'
@@ -35,6 +34,9 @@ targets:
     doc: Build an archive
     depends: version
     steps:
+    - if: '!defined("ARCHIVE")'
+      then:
+      - 'ARCHIVE = NAME + "-" + VERSION + "." + ARC_TYPE'
     # copy files to archive directory
     - mkdir: =ARC_DIR
     - for: set
@@ -63,9 +65,9 @@ targets:
       - tar:    '**/*'
         dir:    =ARC_DIR
         prefix: =ARC_PREFIX
-        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
+        tofile: '={BUILD_DIR}/={ARCHIVE}'
       else:
       - zip:    '**/*'
         dir:    =ARC_DIR
         prefix: =ARC_PREFIX
-        tofile: '={BUILD_DIR}/={NAME}-={VERSION}.={ARC_TYPE}'
+        tofile: '={BUILD_DIR}/={ARCHIVE}'

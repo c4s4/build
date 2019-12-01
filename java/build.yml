@@ -1,7 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-extends:
-- c4s4/build/java.yml
+extends: _java
 
 properties:
   NAME:      'main'

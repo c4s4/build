@@ -64,6 +64,7 @@ targets:
   fmt:
     doc: Format Go code
     steps:
+    - print: 'Formatting Go source files'
     - $: ['gofmt', '-s', '-w', '.']
 
   test:
@@ -152,6 +153,8 @@ targets:
     - _check-lint
     - _check-assign
     - _check-spell
+    steps:
+    - print: 'All checks OK'
 
   _check-fmt:
     doc: Check code with fmt tool

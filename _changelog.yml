@@ -12,7 +12,7 @@ targets:
     doc: Extract release version from changelog if exists, else prompt
     steps:
     - 'VERSION = changelog(CHANGELOG_FILE)[0].Version'
-    - print: 'Release version: ={VERSION}'
+    - print: 'VERSION from CHANGELOG is "={VERSION}"'
 
   release-check:
     doc: Perform release checks

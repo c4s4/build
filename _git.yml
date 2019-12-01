@@ -1,6 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for mieuxplacer git stuff
+extends: _version
 context:
 - c4s4/build/_git.ank
 
@@ -22,16 +23,6 @@ targets:
       then:
       - $: ['git', 'add', '.gitignore']
     - $: ['git', 'commit', '-m', 'Initial import']
-
-  version:
-    doc: Prompt for version
-    steps:
-    - if: '!defined("VERSION")'
-      then:
-      - prompt:  'Release version'
-        to:      'VERSION'
-        pattern: '^[\w_\-\.]+$'
-        error:   'Release version should be made of letters, digits, dots, _ and -'
 
   release:
     doc: Perform a release

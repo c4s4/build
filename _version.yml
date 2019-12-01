@@ -16,6 +16,8 @@ targets:
         to:      'VERSION'
         pattern: =VERSION_REGEXP
         error:   'Bad version (should match regexp "={VERSION_REGEXP}"'
+      else:
+      - print: 'VERSION already set to "={VERSION}"'
 
   version-test:
     doc: Generate a test version
@@ -23,4 +25,4 @@ targets:
     - if: '!defined("VERSION")'
       then:
       - 'VERSION = "TEST"'
-      - print: 'VERSION: ={VERSION}'
+      - print: 'Setting VERSION to "={VERSION}"'

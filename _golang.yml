@@ -91,9 +91,11 @@ targets:
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
       - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
-            '-ldflags', '-X ={VERSION_PATH}=={VERSION}', =PACKAGE]
+            '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
+            =PACKAGE]
       else:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}', =PACKAGE]
+      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
+            '-ldflags', '-s -f', =PACKAGE]
 
   binaries:
     doc: Make binaries for all platforms
@@ -102,19 +104,19 @@ targets:
     - mkdir: '={BUILD_DIR}/bin'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
-      - $: ['gox', '-ldflags', '-X ={VERSION_PATH}=={VERSION}',
+      - $: ['gox', '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
             '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}',
             =PACKAGE]
       else:
       - $: ['gox', '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}',
-            =PACKAGE]
+            '-ldflags', '-s -f', =PACKAGE]
 
   install:
     doc: Build and install binary in GOPATH
     steps:
     - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin", NAME)'
     - print: 'Building and installing binary in ={path}'
-    - $: ['go', 'build', '-o', =path, =PACKAGE]
+    - $: ['go', 'build', '-o', =path, '-ldflags', '-s -f', =PACKAGE]
 
   run:
     doc: Run Go tool

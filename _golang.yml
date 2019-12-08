@@ -22,13 +22,14 @@ properties:
   - github.com/gordonklaus/ineffassign
   - github.com/client9/misspell/cmd/misspell
   # vscode tools
+  - golang.org/x/tools/gopls
+  - golang.org/x/tools/cmd/guru
+  - golang.org/x/tools/cmd/gorename
+  - golang.org/x/tools/cmd/godoc
   - github.com/nsf/gocode
   - github.com/uudashr/gopkgs/cmd/gopkgs
   - github.com/ramya-rao-a/go-outline
   - github.com/acroca/go-symbols
-  - golang.org/x/tools/cmd/guru
-  - golang.org/x/tools/cmd/gorename
-  - golang.org/x/tools/cmd/godoc
   - github.com/sqs/goreturns
   - github.com/derekparker/delve/cmd/dlv
   - github.com/stamblerre/gocode

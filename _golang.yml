@@ -47,11 +47,12 @@ targets:
   tools:
     doc: Install tools
     steps:
+    - 'gotools = env("GOTOOLS"); if gotools == "" { gotools = env("GOPATH") }'
     - for: 'tool'
       in:  'GOTOOLS'
       do:
       - print: 'Getting tool ={tool}'
-      - $: ['go', 'get', '-u', =tool]
+      - $: 'GOPATH=={gotools} go get -u ={tool}'
 
   libs:
     doc: Install libraries

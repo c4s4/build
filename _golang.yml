@@ -16,6 +16,8 @@ properties:
   GOTOOLS:
   # cross compilation
   - github.com/mitchellh/gox
+  # github tools
+  - github.com/itchio/gothub
   # check tools
   - github.com/fzipp/gocyclo
   - golang.org/x/lint/golint
@@ -34,8 +36,6 @@ properties:
   - github.com/derekparker/delve/cmd/dlv
   - github.com/stamblerre/gocode
   #- github.com/rogpeppe/godef
-  # github tools
-  - github.com/itchio/gothub
   TEST_CASES:  []
   TEST_OPTS:   ['-v', '-cover']
   RUN_ARGS:    []

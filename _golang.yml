@@ -52,7 +52,7 @@ targets:
       in:  'GOTOOLS'
       do:
       - print: 'Getting tool ={tool}'
-      - $: 'GOPATH=={gotools} go get -u ={tool}'
+      - $: 'GOPATH=={gotools} GO111MODULE=off go get -u ={tool}'
 
   libs:
     doc: Install libraries

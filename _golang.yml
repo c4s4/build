@@ -90,7 +90,7 @@ targets:
     - super:
     - $: ['go', 'clean', '-testcache']
 
-  bin:
+  build:
     doc: Build binary for current platform
     depends: version
     steps:
@@ -98,11 +98,11 @@ targets:
     - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
+      - $: ['go', 'build', '-o', =BUILD_DIR,
             '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
             =PACKAGE]
       else:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
+      - $: ['go', 'build', '-o', =BUILD_DIR,
             '-ldflags', '-s -f', =PACKAGE]
 
   binaries:
@@ -128,7 +128,7 @@ targets:
 
   run:
     doc: Run Go tool
-    depends: bin
+    depends: build
     steps:
     - $: ['={BUILD_DIR}/={NAME}']
       +: =RUN_ARGS

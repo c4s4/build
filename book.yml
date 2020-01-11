@@ -1,0 +1,61 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+extends: [_buildir, _git_master, _github]
+default: publish
+configuration: '~/.neon/github.yml'
+# GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+properties:
+  TITLE:    ~
+  AUTHOR:   ~
+  NAME:     '={AUTHOR} - ={TITLE}'
+  WEB_HOME: 'casa@sweetohm.net:/home/web/public'
+  SOURCE:   'README.md'
+
+targets:
+
+  epub:
+    doc: 'Generate EPUB format'
+    steps:
+    - mkdir: =BUILD_DIR
+    - $: ['pandoc', '-o', '={BUILD_DIR}/={NAME}.epub', =SOURCE]
+
+  mobi:
+    doc: 'Generate MOBI format'
+    depends: epub
+    steps:
+    - $: ['ebook-convert', '={BUILD_DIR}/={NAME}.epub', '={BUILD_DIR}/={NAME}.mobi']
+
+  pdf:
+    doc: 'Generate PDF format'
+    steps:
+    - mkdir: =BUILD_DIR
+    - $: ['md2pdf', '-o', '={BUILD_DIR}/={NAME}.pdf', =SOURCE]
+
+  book:
+    doc: 'Generate book files'
+    depends: [epub, mobi, pdf]
+
+  publish:
+    doc: 'Publish on website'
+    depends: book
+    steps:
+    - $: 'scp ={BUILD_DIR}/* ={WEB_HOME}'
+
+  upload:
+    doc: Upload book on github
+    depends: book
+    steps:
+    - print: 'Uploading book on Github'
+    - for: file
+      in:  find(BUILD_DIR, "*")
+      do:
+      - $: ['gothub', 'upload', '--name', =file, '--file', '={joinpath(BUILD_DIR, file)}']
+        +: args
+
+  release:
+    doc: Perform release
+    depends: [clean, last-tags, version, release-title, change-list, publish]
+    steps:
+    - super:
+    - call: upload

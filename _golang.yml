@@ -6,7 +6,6 @@ default: [check, test]
 extends: _archive
 
 properties:
-  LIBRARIES:    []
   VERSION_PATH: 'main.Version'
   CYCLOMAX:     '15'
   WEB_HOME:     'casa@sweetohm.net:/home/web/dist/={NAME}'
@@ -60,27 +59,18 @@ targets:
       - print: 'Getting tool ={tool}'
       - $: 'GOPATH=={gotools} GO111MODULE=off go get -u ={tool}'
 
-  libs:
-    doc: Install libraries
-    steps:
-    - for: 'library'
-      in:  'LIBRARIES'
-      do:
-      - print: 'Getting library ={library}'
-      - $: ['go', 'get', '-u', =library]
-
   fmt:
     doc: Format Go code
     steps:
     - print: 'Formatting Go source files'
-    - $: ['gofmt', '-s', '-w', '.']
+    - $: ['gofmt', '-s', '-w', =PACKAGE]
 
   test:
     doc: Run Go tests
     steps:
     - if: 'len(TEST_CASES) == 0'
       then:
-      - 'TEST_CASES = [PACKAGE+"/..."]'
+      - 'TEST_CASES = [PACKAGE]'
     - $: ['go', 'test']
       +: =TEST_OPTS+TEST_CASES
 
@@ -98,11 +88,11 @@ targets:
     - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
-      - $: ['go', 'build', '-o', =BUILD_DIR,
+      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
             '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
             =PACKAGE]
       else:
-      - $: ['go', 'build', '-o', =BUILD_DIR,
+      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
             '-ldflags', '-s -f', =PACKAGE]
 
   binaries:

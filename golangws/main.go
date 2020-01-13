@@ -1,20 +1,23 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
 )
 
-func setupRouter() *gin.Engine {
-	router := gin.Default()
-	router.GET("/hello/:name", func(ctx *gin.Context) {
-		name := ctx.Param("name")
-		ctx.String(http.StatusOK, "Hello %s!", name)
+func setupHandler() *http.ServeMux {
+	handler := http.NewServeMux()
+	handler.HandleFunc("/hello", func(response http.ResponseWriter, request *http.Request) {
+		name := request.URL.Query().Get("name")
+		if name == "" {
+			name = "World"
+		}
+		fmt.Fprintf(response, "Hello %s!", name)
 	})
-	return router
+	return handler
 }
 
 func main() {
-	router := setupRouter()
-	router.Run()
+	handler := setupHandler()
+	http.ListenAndServe(":8080", handler)
 }

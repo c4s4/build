@@ -112,7 +112,7 @@ targets:
   install:
     doc: Build and install binary in GOPATH
     steps:
-    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin")'
+    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin", NAME)'
     - print: 'Building and installing binary in ={path}'
     - $: ['go', 'build', '-o', =path, '-ldflags', '-s -f', =PACKAGE]
 

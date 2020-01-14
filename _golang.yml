@@ -63,7 +63,7 @@ targets:
     doc: Format Go code
     steps:
     - print: 'Formatting Go source files'
-    - $: ['gofmt', '-s', '-w', =PACKAGE]
+    - $: ['gofmt', '-s', '-w', =PACKAGE_DIR]
 
   test:
     doc: Run Go tests

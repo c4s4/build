@@ -88,11 +88,11 @@ targets:
     - print: 'Generating binary in ={BUILD_DIR}/={NAME}'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
+      - $: ['go', 'build', '-o', '={BUILD_DIR}',
             '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
             =PACKAGE]
       else:
-      - $: ['go', 'build', '-o', '={BUILD_DIR}/={NAME}',
+      - $: ['go', 'build', '-o', '={BUILD_DIR}',
             '-ldflags', '-s -f', =PACKAGE]
 
   binaries:
@@ -112,7 +112,7 @@ targets:
   install:
     doc: Build and install binary in GOPATH
     steps:
-    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin", NAME)'
+    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin")'
     - print: 'Building and installing binary in ={path}'
     - $: ['go', 'build', '-o', =path, '-ldflags', '-s -f', =PACKAGE]
 

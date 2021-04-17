@@ -3,7 +3,7 @@
 doc: Build file for Go projects
 default: [check, test]
 
-extends: _archive
+extends: [_archive, _deploy]
 
 properties:
   VERSION_PATH: 'main.Version'
@@ -17,30 +17,13 @@ properties:
   - github.com/mitchellh/gox
   # github tools
   - github.com/itchio/gothub
+  # go language server
+  - golang.org/x/tools/gopls
   # check tools
-  - github.com/fzipp/gocyclo
   - golang.org/x/lint/golint
+  - github.com/fzipp/gocyclo/cmd/gocyclo
   - github.com/gordonklaus/ineffassign
   - github.com/client9/misspell/cmd/misspell
-  # vscode tools
-  - github.com/acroca/go-symbols
-  - github.com/cweill/gotests/...
-  - github.com/davidrjenni/reftools/cmd/fillstruct
-  - github.com/fatih/gomodifytags
-  - github.com/go-delve/delve/cmd/dlv
-  - github.com/godoctor/godoctor
-  - github.com/haya14busa/goplay/cmd/goplay
-  - github.com/josharian/impl
-  - github.com/mdempsky/gocode
-  - github.com/ramya-rao-a/go-outline
-  - github.com/rogpeppe/godef
-  - github.com/sqs/goreturns
-  - github.com/stamblerre/gocode
-  - github.com/uudashr/gopkgs/cmd/gopkgs
-  - golang.org/x/tools/cmd/gorename
-  - golang.org/x/tools/cmd/guru
-  - golang.org/x/tools/gopls
-  #- github.com/rogpeppe/godef
   TEST_CASES:  []
   TEST_OPTS:   ['-v', '-cover']
   RUN_ARGS:    []
@@ -133,15 +116,6 @@ targets:
     depends: [version, binaries]
     steps:
     - super:
-
-  deploy:
-    doc: Deploy installation script and binaries
-    depends: binaries
-    steps:
-    - print: 'Deploying dotrun binaries...'
-    - $: ['scp', 'install', =WEB_HOME]
-    - 'binaries = join(find(".", BUILD_DIR+"/bin/*"), " ")'
-    - $: 'scp ={binaries} ={WEB_HOME}'
 
   release:
     doc: Perform a release

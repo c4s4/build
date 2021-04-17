@@ -99,15 +99,20 @@ targets:
     doc: Make binaries for all platforms
     depends: version
     steps:
+    - $:  'go tool dist list | grep -v android | grep -v dragonfly | grep -v plan9 | grep -v solaris'
+      1=: GOOSARCH
+      3x:
+    - 'GOOSARCH = replace(GOOSARCH, "\n", " ")'
     - mkdir: '={BUILD_DIR}/bin'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'
       then:
       - $: ['gox', '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
+            '-osarch="={GOOSARCH}"',
             '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}',
             =PACKAGE]
       else:
       - $: ['gox', '-output=={BUILD_DIR}/bin/{{.Dir}}-{{.OS}}-{{.Arch}}',
-            '-ldflags', '-s -f', =PACKAGE]
+            '-osarch="={GOOSARCH}"', '-ldflags', '-s -f', =PACKAGE]
 
   install:
     doc: Build and install binary in GOPATH

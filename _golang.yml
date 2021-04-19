@@ -133,7 +133,7 @@ targets:
     doc: Deploy installation script and binaries
     depends: binaries
     steps:
-    - print: 'Deploying dotrun binaries...'
+    - print: 'Deploying binaries...'
     - $: ['scp', 'install', =WEB_HOME]
     - 'binaries = join(find(".", BUILD_DIR+"/bin/*"), " ")'
     - $: 'scp ={binaries} ={WEB_HOME}'

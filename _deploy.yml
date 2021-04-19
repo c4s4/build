@@ -5,6 +5,7 @@ doc: Parent build file to deploy binaries on server
 properties:
   PATH:     'https://sweetohm.net/dist'
   WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
+  PLUGIN:   'c4s4/build'
 
 targets:
 
@@ -13,8 +14,7 @@ targets:
     depends: [version, binaries]
     steps:
     - print: 'Deploying binaries on ={PATH}/={NAME}'
-    # FIXME: should not hard code plugin path
-    - copy: '={_REPO}/c4s4/build/install'
+    - copy: '={_REPO}/={PLUGIN}/install'
       todir: =BUILD_DIR
     - replace: '={BUILD_DIR}/install'
       with:

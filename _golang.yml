@@ -84,7 +84,7 @@ targets:
     steps:
     - $:  'go tool dist list | grep -v android | grep -v dragonfly | grep -v plan9 | grep -v solaris'
       1=: GOOSARCH
-      3x:
+      1x: true
     - 'GOOSARCH = replace(GOOSARCH, "\n", " ")'
     - mkdir: '={BUILD_DIR}/bin'
     - if: 'defined("VERSION_PATH") && VERSION_PATH != nil'

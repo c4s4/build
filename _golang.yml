@@ -8,7 +8,7 @@ extends: [_archive, _deploy]
 properties:
   VERSION_PATH: 'main.Version'
   CYCLOMAX:     '15'
-  WEB_HOME:     'casa@sweetohm.net:/home/web/dist/={NAME}'
+  WEB_HOME:     'casa@sweetohm.net:/web/app/dist/={NAME}'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
@@ -16,9 +16,9 @@ properties:
   # cross compilation
   - github.com/mitchellh/gox
   # github tools
-  - github.com/itchio/gothub
+  #- github.com/itchio/gothub
   # go language server
-  - golang.org/x/tools/gopls
+  #- golang.org/x/tools/gopls
   # check tools
   - golang.org/x/lint/golint
   - github.com/fzipp/gocyclo/cmd/gocyclo
@@ -130,8 +130,8 @@ targets:
     - _check-vet
     - _check-cyclo
     - _check-lint
-    - _check-assign
     - _check-spell
+    #- _check-assign
     steps:
     - print: 'All checks OK'
 

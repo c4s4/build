@@ -9,7 +9,7 @@ properties:
   TITLE:    ~
   AUTHOR:   ~
   NAME:     '={AUTHOR} - ={TITLE}'
-  WEB_HOME: 'casa@sweetohm.net:/home/web/public'
+  WEB_HOME: 'casa@sweetohm.net:/web/app/public'
   SOURCE:   'README.md'
 
 targets:

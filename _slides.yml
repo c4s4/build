@@ -10,7 +10,7 @@ properties:
   TITLE:       ~
   NAME:        '={filename(_BASE)}'
   OPTIONS:     '{ratio: "4:3"}'
-  DESTINATION: 'casa@sweetohm.net:/home/web/slides/={NAME}'
+  DESTINATION: 'casa@sweetohm.net:/web/app/slides/={NAME}'
   ARC_TYPE:    zip
   ARC_FILES:
   - files:   '**/*'

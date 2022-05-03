@@ -35,7 +35,7 @@ targets:
     - 'check_branch_equals(BRANCH_MASTER)'
     - 'args = ["--security-token", GITHUB_TOKEN, "--user", GITHUB_USER, "--repo", GITHUB_REPO, "--tag", VERSION]'
     - print: 'Creating release on Github'
-    - $: ['gothub', 'release', '--name', =RELEASE_TITLE, '--description', =CHANGE_LIST]
+    - $: ['github-release', 'release', '--name', =RELEASE_TITLE, '--description', =CHANGE_LIST]
       +: args
 
   upload:
@@ -43,5 +43,5 @@ targets:
     depends: archive
     steps:
     - print: 'Uploading archive on Github'
-    - $: ['gothub', 'upload', '--name', =ARCHIVE, '--file', '={joinpath(BUILD_DIR, ARCHIVE)}']
+    - $: ['github-release', 'upload', '--name', =ARCHIVE, '--file', '={joinpath(BUILD_DIR, ARCHIVE)}']
       +: args

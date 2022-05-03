@@ -2,7 +2,7 @@
 
 doc: Parent build file for slides
 default: [clean, publish]
-expose:  [TITLE, OPTIONS, DESTINATION, clean, slides, publish]
+expose:  [TITLE, OPTIONS, INCLUDES, DESTINATION, clean, slides, publish]
 
 extends: _archive
 
@@ -10,6 +10,7 @@ properties:
   TITLE:       ~
   NAME:        '={filename(_BASE)}'
   OPTIONS:     '{ratio: "4:3"}'
+  INCLUDES:    false
   DESTINATION: 'casa@sweetohm.net:/web/app/slides/={NAME}'
   ARC_TYPE:    zip
   ARC_FILES:
@@ -33,6 +34,20 @@ targets:
         '<? CONTENT ?>': =content
     - copy:  ['res/**/*', 'img/**/*']
       todir: =BUILD_DIR
+    # process <? INCLUDE path/to/file ?> instructions if INCLUDES set to true
+    - if: =INCLUDES
+      then:
+      - read: '={BUILD_DIR}/index.html'
+        to:   content
+      - |
+        regexp = import("regexp")
+        r = regexp.MustCompile(`<\? INCLUDE .*? \?>`)
+        content = r.ReplaceAllStringFunc(content, func(match) {
+          file = match[11:len(match)-3]
+          return read(file)
+        })
+      - write: '={BUILD_DIR}/index.html'
+        text:  =content
 
   publish:
     doc: Publish slides on server

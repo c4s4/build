@@ -7,23 +7,13 @@ extends: [_archive, _deploy]
 
 properties:
   VERSION_PATH: 'main.Version'
-  CYCLOMAX:     '15'
   WEB_HOME:     'casa@sweetohm.net:/web/app/dist/={NAME}'
   ARC_FILES:
   - files: ['README.md', 'CHANGELOG.yml', 'LICENSE.txt']
   - {files: 'bin/*', dir: =BUILD_DIR}
   GOTOOLS:
-  # cross compilation
-  - github.com/mitchellh/gox
-  # github tools
-  #- github.com/itchio/gothub
-  # go language server
-  #- golang.org/x/tools/gopls
-  # check tools
-  - golang.org/x/lint/golint
-  - github.com/fzipp/gocyclo/cmd/gocyclo
-  - github.com/gordonklaus/ineffassign
-  - github.com/client9/misspell/cmd/misspell
+  - github.com/mitchellh/gox@latest
+  - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
   TEST_CASES:  []
   TEST_OPTS:   ['-v', '-cover']
   RUN_ARGS:    []
@@ -40,7 +30,13 @@ targets:
       in:  'GOTOOLS'
       do:
       - print: 'Getting tool ={tool}'
-      - $: 'GOPATH=={gotools} GO111MODULE=off go get -u ={tool}'
+      - $: 'GOPATH=={gotools} go install ={tool}'
+
+  check:
+    doc: Check code with golangci-lint
+    steps:
+    - print: 'Checking Go code'
+    - $: ['golangci-lint', 'run', =PACKAGE]
 
   fmt:
     doc: Format Go code
@@ -122,80 +118,3 @@ targets:
     depends: [clean, check, test, archive, deploy]
     steps:
     - super:
-
-  check:
-    doc: Check code with tools
-    depends:
-    - _check-fmt
-    - _check-vet
-    - _check-cyclo
-    - _check-lint
-    - _check-spell
-    #- _check-assign
-    steps:
-    - print: 'All checks OK'
-
-  _check-fmt:
-    doc: Check code with fmt tool
-    steps:
-    - $:  ['gofmt', '-l', =PACKAGE_DIR]
-      3=: errors
-    - if: len(errors) > 0
-      then:
-      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
-      - throw: 'Fmt check failure'
-      else:
-      - print: 'Fmt check OK'
-
-  _check-vet:
-    doc: Check code with vet tool
-    steps:
-    - try:
-      - $: ['go', 'vet', =PACKAGE]
-      - print: 'Vet check OK'
-      catch:
-      - throw: 'Vet check failure'
-
-  _check-cyclo:
-    doc: Check code with gocyclo tool
-    steps:
-    - try:
-      - $: ['gocyclo', '-over', '={CYCLOMAX}', =PACKAGE_DIR]
-      - print: 'Cyclo check OK'
-      catch:
-      - throw: 'Cyclo check failure'
-
-  _check-lint:
-    doc: Check code with golint tool
-    steps:
-    - $:  ['golint', =PACKAGE]
-      3=: errors
-    - if: len(errors) > 0
-      then:
-      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
-      - throw: 'Lint check failure'
-      else:
-      - print: 'Lint check OK'
-
-  _check-assign:
-    doc: Check code with ineffassign tool
-    steps:
-    - try:
-      - $: ['ineffassign', =PACKAGE_DIR]
-      - print: 'Assign check OK'
-      catch:
-      - throw: 'Assign check failure'
-
-  _check-spell:
-    doc: Check code with misspell tool
-    steps:
-    - 'files = find(PACKAGE_DIR, "**/*.go")'
-    - $:  ['misspell']
-      +:  =files
-      3=: errors
-    - if: len(errors) > 0
-      then:
-      - print: '={"- "+join(split(errors, "\n"), "\n- ")}'
-      - throw: 'Spell check failure'
-      else:
-      - print: 'Spell check OK'

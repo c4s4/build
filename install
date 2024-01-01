@@ -10,6 +10,9 @@
 
 set -e
 
+NAME="$NAME$"
+DIST_URL="$PATH$"
+
 # get OS and ARCH and build binary name
 os=`uname | tr '[:upper:]' '[:lower:]'`
 arch=`uname -m`
@@ -18,14 +21,14 @@ if [ "$arch" = "i386" ]; then
     arch="386"
 elif [ "$arch" = "x86_64" ]; then
     arch="amd64"
-elif [ "$arch" = "arm" ]; then
-    arch="arm"
+elif [ "$arch" = "aarch64" ]; then
+    arch="arm64"
 fi
 
 echo "os: ${os}"
 echo "arch: ${arch}"
 
-binary="$NAME$-${os}-${arch}"
+binary="${NAME}-${os}-${arch}"
 
 # set default installation directory
 if [ -d "/opt/local/bin" ]
@@ -56,9 +59,9 @@ else
     exit 1
 fi
 
-# download binary in /tmp/$NAME$ and make it executable
-${command} /tmp/$NAME$ $PATH$/$NAME$/${binary}
-chmod +x /tmp/$NAME$
+# download binary in /tmp/${NAME} and make it executable
+${command} /tmp/${NAME} ${DIST_URL}/${NAME}/${binary}
+chmod +x /tmp/${NAME}
 
 # prompt for installation directory
 read -p "Installation directory [${DEFAULT_DIR}]? " directory
@@ -70,10 +73,10 @@ fi
 # copy binary to installation directory
 if [ -w "${directory}" ]
 then
-    mv /tmp/$NAME$ ${directory}
+    mv /tmp/${NAME} ${directory}
 else
-    sudo mv /tmp/$NAME$ ${directory}
-    sudo chown root: ${directory}/$NAME$
+    sudo mv /tmp/${NAME} ${directory}
+    sudo chown root: ${directory}/${NAME}
 fi
 
-echo "$NAME$ installed in '${directory}' directory"
+echo "${NAME} installed in '${directory}' directory"

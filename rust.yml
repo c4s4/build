@@ -1,0 +1,83 @@
+# Build Rust project
+# Using tool toml installed with `cargo install toml-cli`
+
+default: lint
+
+properties:
+  NAME: '={filename(_BASE)}'
+  PATH: 'https://sweetohm.net/dist'
+  PLUGIN: 'c4s4/build'
+  TARGETS:
+    aarch64-unknown-linux-gnu: linux-arm64
+    x86_64-unknown-linux-gnu: linux-amd64
+    aarch64-apple-darwin: darwin-arm64
+    x86_64-apple-darwin: darwin-amd64
+    x86_64-pc-windows-gnu: windows-amd64
+
+targets:
+
+  env:
+    steps:
+    - if: '_OS == "darwin" && _ARCH == "arm64"'
+      then:
+      - setenv: 'CROSS_CONTAINER_OPTS'
+        value:  '--platform linux/amd64'
+
+  lint:
+    depends: env
+    steps:
+    - $: [cargo, check]
+
+  build:
+    depends: env
+    steps:
+    - $: [cargo, build]
+
+  install:
+    depends: env
+    steps:
+    - $: [cargo, install, --path, .]
+
+  binaries:
+    depends: env
+    steps:
+    - mkdir: 'target/={NAME}'
+    - for: target
+      in:  =keys(TARGETS)
+      do:
+      - 'name = TARGETS[target]'
+      - print: "Building for target ={name}..."
+      - $: [cross, build, --release, --target, =target]
+      - copy:  'target/={target}/release/={NAME}'
+        tofile: 'target/={NAME}/={NAME}-={name}'
+      - copy:  'target/={target}/release/={NAME}.exe'
+        tofile: 'target/={NAME}/={NAME}-={name}.exe'
+
+  archive:
+    depends: [binaries]
+    steps:
+    - zip: '={NAME}/*'
+      dir: 'target'
+      tofile: 'target/={NAME}.zip'
+
+  release:
+    depends: [clean, archive]
+    steps:
+    - $: [toml, get, Cargo.toml, package.version, --raw]
+      1=: version
+      1x: true
+    - $: [git, tag, =version]
+    - move: 'target/={NAME}.zip'
+      tofile: 'target/={NAME}-={version}.zip'
+    - copy: '={_REPO}/={PLUGIN}/install'
+      todir: 'target/={NAME}/'
+    - replace: 'target/={NAME}/install'
+      with:
+        $NAME$: =NAME
+        $PATH$: =PATH
+    - $: 'scp target/={NAME}/* elrond:/web/app/dist/={NAME}/'
+    - $: [git, push, --tags]
+
+  clean:
+    steps:
+    - $: [cargo, clean]

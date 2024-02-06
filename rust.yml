@@ -26,21 +26,31 @@ targets:
 
   lint:
     depends: env
+    doc: "Lint Rust code"
     steps:
     - $: [cargo, check]
 
+  fmt:
+    depends: env
+    doc: "Format Rust code"
+    steps:
+    - $: [cargo, fmt]
+
   build:
     depends: env
+    doc: "Build Rust project"
     steps:
     - $: [cargo, build]
 
   install:
     depends: env
+    doc: "Install Rust binary in ~/.cargo/bin"
     steps:
     - $: [cargo, install, --path, .]
 
   binaries:
     depends: env
+    doc: "Build binaries for all targets"
     steps:
     - mkdir: 'target/={NAME}'
     - for: target
@@ -56,7 +66,10 @@ targets:
 
   archive:
     depends: [binaries]
+    doc: "Generate and archive with binaries for all target"
     steps:
+    - copy: ['={_BASE}/README*', '={_BASE}/LICENSE*']
+      todir: 'target/={NAME}/'
     - zip: '={NAME}/*'
       dir: 'target'
       tofile: 'target/={NAME}.zip'

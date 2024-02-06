@@ -5,8 +5,9 @@ default: lint
 
 properties:
   NAME: '={filename(_BASE)}'
-  PATH: 'https://sweetohm.net/dist'
   PLUGIN: 'c4s4/build'
+  DIST_URL: 'https://sweetohm.net/dist'
+  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64
     x86_64-unknown-linux-gnu: linux-amd64
@@ -74,8 +75,8 @@ targets:
     - replace: 'target/={NAME}/install'
       with:
         $NAME$: =NAME
-        $PATH$: =PATH
-    - $: 'scp target/={NAME}/* elrond:/web/app/dist/={NAME}/'
+        $DIST_URL$: =DIST_URL
+    - $: 'scp target/={NAME}/* ={WEB_HOME}'
     - $: [git, push, --tags]
 
   clean:

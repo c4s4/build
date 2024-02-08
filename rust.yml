@@ -1,7 +1,7 @@
 # Build Rust project
 # Using tool toml installed with `cargo install toml-cli`
 
-default: lint
+default: [lint, fmt]
 
 properties:
   NAME: '={filename(_BASE)}'

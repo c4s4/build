@@ -2,16 +2,16 @@
 #
 # Installation script for Unix platforms. To run installation, type :
 #
-#     sh -c "$(curl $PATH$/$NAME$/install)"
+#     sh -c "$(curl $DIST_URL$/$NAME$/install)"
 #
 # or (if you don't have curl installed):
 #
-#     sh -c "$(wget -O - $PATH$/$NAME$/install)"
+#     sh -c "$(wget -O - $DIST_URL$/$NAME$/install)"
 
 set -e
 
 NAME="$NAME$"
-DIST_URL="$PATH$"
+DIST_URL="$DIST_URL$"
 
 # get OS and ARCH and build binary name
 os=`uname | tr '[:upper:]' '[:lower:]'`

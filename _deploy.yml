@@ -3,9 +3,9 @@
 doc: Parent build file to deploy binaries on server
 
 properties:
-  PATH:     'https://sweetohm.net/dist'
-  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
   PLUGIN:   'c4s4/build'
+  DIST_URL: 'https://sweetohm.net/dist'
+  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
 
 targets:
 
@@ -13,13 +13,13 @@ targets:
     doc: Deploy installation script and binaries
     depends: [version, binaries]
     steps:
-    - print: 'Deploying binaries on ={PATH}/={NAME}'
+    - print: 'Deploying binaries on ={DIST_URL}/={NAME}'
     - copy: '={_REPO}/={PLUGIN}/install'
       todir: =BUILD_DIR
     - replace: '={BUILD_DIR}/install'
       with:
         $NAME$: =NAME
-        $PATH$: =PATH
+        $DIST_URL$: =DIST_URL
     - $: ['scp', '={BUILD_DIR}/install', =WEB_HOME]
     - write: '={BUILD_DIR}/version'
       text:  =VERSION

@@ -1,0 +1,97 @@
+# Build Rust project
+# Using tool toml installed with `cargo install toml-cli`
+
+default: [lint, fmt]
+
+properties:
+  NAME: '={filename(_BASE)}'
+  PLUGIN: 'c4s4/build'
+  DIST_URL: 'https://sweetohm.net/dist'
+  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
+  TARGETS:
+    aarch64-unknown-linux-gnu: linux-arm64
+    x86_64-unknown-linux-gnu: linux-amd64
+    aarch64-apple-darwin: darwin-arm64
+    x86_64-apple-darwin: darwin-amd64
+    x86_64-pc-windows-gnu: windows-amd64
+
+targets:
+
+  env:
+    steps:
+    - if: '_OS == "darwin" && _ARCH == "arm64"'
+      then:
+      - setenv: 'CROSS_CONTAINER_OPTS'
+        value:  '--platform linux/amd64'
+
+  lint:
+    depends: env
+    doc: "Lint Rust code"
+    steps:
+    - $: [cargo, check]
+
+  fmt:
+    depends: env
+    doc: "Format Rust code"
+    steps:
+    - $: [cargo, fmt]
+
+  build:
+    depends: env
+    doc: "Build Rust project"
+    steps:
+    - $: [cargo, build]
+
+  install:
+    depends: env
+    doc: "Install Rust binary in ~/.cargo/bin"
+    steps:
+    - $: [cargo, install, --path, .]
+
+  binaries:
+    depends: env
+    doc: "Build binaries for all targets"
+    steps:
+    - mkdir: 'target/={NAME}'
+    - for: target
+      in:  =keys(TARGETS)
+      do:
+      - 'name = TARGETS[target]'
+      - print: "Building for target ={name}..."
+      - $: [cross, build, --release, --target, =target]
+      - copy:  'target/={target}/release/={NAME}'
+        tofile: 'target/={NAME}/={NAME}-={name}'
+      - copy:  'target/={target}/release/={NAME}.exe'
+        tofile: 'target/={NAME}/={NAME}-={name}.exe'
+
+  archive:
+    depends: [binaries]
+    doc: "Generate and archive with binaries for all target"
+    steps:
+    - copy: ['={_BASE}/README*', '={_BASE}/LICENSE*']
+      todir: 'target/={NAME}/'
+    - zip: '={NAME}/*'
+      dir: 'target'
+      tofile: 'target/={NAME}.zip'
+
+  release:
+    depends: [clean, archive]
+    steps:
+    - $: [toml, get, Cargo.toml, package.version, --raw]
+      1=: version
+      1x: true
+    - $: [git, tag, =version]
+    - move: 'target/={NAME}.zip'
+      tofile: 'target/={NAME}-={version}.zip'
+    - copy: '={_REPO}/={PLUGIN}/install'
+      todir: 'target/={NAME}/'
+    - replace: 'target/={NAME}/install'
+      with:
+        $NAME$: =NAME
+        $DIST_URL$: =DIST_URL
+    - $: 'scp target/={NAME}/* ={WEB_HOME}'
+    - $: [git, push, --tags]
+
+  clean:
+    steps:
+    - $: [cargo, clean]

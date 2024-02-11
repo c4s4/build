@@ -80,9 +80,18 @@ targets:
     - $: [toml, get, Cargo.toml, package.version, --raw]
       1=: version
       1x: true
-    - $: [git, tag, =version]
     - move: 'target/={NAME}.zip'
       tofile: 'target/={NAME}-={version}.zip'
+    - if: '_OS == "linux"'
+      then:
+      - copy: '={NAME}-={version}.zip'
+        dir: 'target'
+        todir: '~/dsk/'
+      else:
+      - copy: '={NAME}-={version}.zip'
+        dir: 'target'
+        todir: '~/Desktop/'
+    - $: [git, tag, =version]
     - copy: '={_REPO}/={PLUGIN}/install'
       todir: 'target/={NAME}/'
     - replace: 'target/={NAME}/install'

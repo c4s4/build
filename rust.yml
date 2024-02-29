@@ -5,6 +5,7 @@ default: [lint, fmt]
 
 properties:
   NAME: '={filename(_BASE)}'
+  ARGS: []
   PLUGIN: 'c4s4/build'
   DIST_URL: 'https://sweetohm.net/dist'
   WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
@@ -41,6 +42,12 @@ targets:
     doc: "Build Rust project"
     steps:
     - $: [cargo, build]
+
+  run:
+    doc: "Run Rust project"
+    steps:
+    - $: [cargo, run]
+      +: =ARGS
 
   install:
     depends: env

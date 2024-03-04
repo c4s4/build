@@ -33,6 +33,11 @@ targets:
     steps:
     - $: [cargo, check]
 
+  audit:
+    doc: "Audit creates for vulnerabilities"
+    steps:
+    - $: [cargo, audit]
+
   fmt:
     depends: env
     doc: "Format Rust code"

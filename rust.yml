@@ -6,6 +6,8 @@ default: [lint, fmt]
 properties:
   NAME: '={filename(_BASE)}'
   ARGS: []
+  BIN_DIR: 'target/binaries'
+  ARC_DIR: 'target/archive'
   PLUGIN: 'c4s4/build'
   DIST_URL: 'https://sweetohm.net/dist'
   WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
@@ -59,7 +61,7 @@ targets:
     depends: env
     doc: "Build binaries for all targets"
     steps:
-    - mkdir: 'target/={NAME}'
+    - mkdir: =BIN_DIR
     - for: target
       in:  =keys(TARGETS)
       do:
@@ -67,18 +69,23 @@ targets:
       - print: "Building for target ={name}..."
       - $: [cross, build, --release, --target, =target]
       - copy:  'target/={target}/release/={NAME}'
-        tofile: 'target/={NAME}/={NAME}-={name}'
+        tofile: '={BIN_DIR}/={NAME}-={name}'
       - copy:  'target/={target}/release/={NAME}.exe'
-        tofile: 'target/={NAME}/={NAME}-={name}.exe'
+        tofile: '={BIN_DIR}/={NAME}-={name}.exe'
 
   archive:
     depends: [binaries]
     doc: "Generate and archive with binaries for all target"
     steps:
-    - copy: ['={_BASE}/README*', '={_BASE}/LICENSE*']
-      todir: 'target/={NAME}/'
-    - zip: '={NAME}/*'
-      dir: 'target'
+    - mkdir: =ARC_DIR
+    - copy: '={NAME}-*'
+      dir: =BIN_DIR
+      todir: =ARC_DIR
+    - copy: ['README*', 'LICENSE*']
+      dir: =_BASE
+      todir: =ARC_DIR
+    - zip: '*'
+      dir: =ARC_DIR
       tofile: 'target/={NAME}.zip'
 
   release:

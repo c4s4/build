@@ -110,14 +110,14 @@ targets:
       - copy: '={NAME}-={version}.zip'
         dir: 'target'
         todir: '~/Desktop/'
-    - $: [git, tag, =version]
     - copy: '={_REPO}/={PLUGIN}/install'
-      todir: 'target/={NAME}/'
-    - replace: 'target/={NAME}/install'
+      todir: =BIN_DIR
+    - replace: '={BIN_DIR}/install'
       with:
         $NAME$: =NAME
         $DIST_URL$: =DIST_URL
-    - $: 'scp target/={NAME}/* ={WEB_HOME}'
+    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
+    - $: [git, tag, =version]
     - $: [git, push, --tags]
 
   clean:

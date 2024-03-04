@@ -11,3 +11,9 @@ targets:
     steps:
     - 'VERSION = replace(replace(now()[0:16], " ", "="), ":", "-")'
     - print: 'Setting VERSION to "={VERSION}"'
+
+  clean:
+    doc: Clean generated files
+    steps:
+    - delete: 'rust/target'
+    - delete: 'rust/Cargo.lock'

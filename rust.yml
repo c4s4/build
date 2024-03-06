@@ -38,6 +38,11 @@ targets:
     steps:
     - $: [cargo, audit]
 
+  test:
+    doc: "Run Rust tests"
+    steps:
+    - $: [cargo, test]
+
   fmt:
     depends: env
     doc: "Format Rust code"

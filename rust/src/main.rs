@@ -20,5 +20,5 @@ fn main() {
 
 /// Describe function here
 fn run() {
-    panic!("Crash and burn!")
+    println!("Hello World!")
 }

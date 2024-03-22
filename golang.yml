@@ -2,10 +2,9 @@
 
 doc: Build file for Go projects
 default: [lint, test]
-extends: [buildir]
+extends: [archive, version, deploy]
 
 properties:
-  VERSION: "UNKNOWN"
   VERSION_PATH: 'main.Version'
   GOTOOLS:
   - github.com/mitchellh/gox@latest

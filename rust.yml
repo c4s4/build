@@ -6,6 +6,7 @@ default: [lint, fmt]
 properties:
   NAME: '={filename(_BASE)}'
   ARGS: []
+  TESTS: []
   BIN_DIR: 'target/binaries'
   ARC_DIR: 'target/archive'
   PLUGIN: 'c4s4/build'
@@ -47,6 +48,7 @@ targets:
     doc: "Run Rust tests"
     steps:
     - $: [cargo, test]
+      +: =TESTS
 
   fmt:
     depends: env

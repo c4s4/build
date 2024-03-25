@@ -38,6 +38,11 @@ targets:
     steps:
     - $: [cargo, audit]
 
+  mod:
+    doc: "List Rust modules"
+    steps:
+    - $: [cargo, modules, structure]
+
   test:
     doc: "Run Rust tests"
     steps:

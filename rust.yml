@@ -6,6 +6,7 @@ default: [lint, fmt]
 properties:
   NAME: '={filename(_BASE)}'
   ARGS: []
+  TESTS: []
   BIN_DIR: 'target/binaries'
   ARC_DIR: 'target/archive'
   PLUGIN: 'c4s4/build'
@@ -21,6 +22,7 @@ properties:
 targets:
 
   env:
+    doc: "Set environment variables"
     steps:
     - if: '_OS == "darwin" && _ARCH == "arm64"'
       then:
@@ -38,10 +40,16 @@ targets:
     steps:
     - $: [cargo, audit]
 
+  mod:
+    doc: "List Rust modules"
+    steps:
+    - $: [cargo, modules, structure]
+
   test:
     doc: "Run Rust tests"
     steps:
     - $: [cargo, test]
+      +: =TESTS
 
   fmt:
     depends: env
@@ -85,7 +93,7 @@ targets:
 
   archive:
     depends: [binaries]
-    doc: "Generate and archive with binaries for all target"
+    doc: "Generate and archive with binaries for all targets"
     steps:
     - mkdir: =ARC_DIR
     - copy: '={NAME}-*'
@@ -126,5 +134,6 @@ targets:
     - $: [git, push, --tags]
 
   clean:
+    doc: "Clean generated files"
     steps:
     - $: [cargo, clean]

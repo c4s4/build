@@ -1,6 +1,6 @@
-# Project
+# Rust
 
-Project description here.
+Rust description here.
 
 ## Installation
 

@@ -36,7 +36,7 @@ targets:
     - $: [cargo, check]
 
   audit:
-    doc: "Audit creates for vulnerabilities"
+    doc: "Audit creates for vulnerabilities (install with `cargo install cargo-audit`)"
     steps:
     - $: [cargo, audit]
 

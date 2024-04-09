@@ -24,8 +24,12 @@ targets:
     # rename project in Cargo.toml
     - replace: '={_HERE}/={name}/Cargo.toml'
       with:    {'rust': =name}
+    - replace: '={_HERE}/={name}/src/main.rs'
+      with:    {'rust': =name}
+    - replace: '={_HERE}/={name}/tests/integration_test.rs'
+      with:    {'rust': =name}
     - replace: '={_HERE}/={name}/README.md'
       with:
-        project: =name
-        Project: '={uppercase(name[0])+name[1:]}'
+        rust: =name
+        Rust: '={uppercase(name[0])+name[1:]}'
     - print: "Project generated in '={name}' directory"

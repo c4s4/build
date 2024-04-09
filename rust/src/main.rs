@@ -1,4 +1,6 @@
+use anyhow::{Context, Result};
 use clap::Parser;
+use rust::library;
 
 /// Describe project here
 #[derive(Parser)]
@@ -15,10 +17,27 @@ fn main() {
     // print argument
     println!("Argument: {}", args.arg);
     // run function
-    run();
+    // run function
+    match run() {
+        Ok(_) => println!("OK"),
+        Err(e) => eprintln!("ERROR: {:#}", e),
+    }
 }
 
 /// Describe function here
-fn run() {
-    println!("Hello World!")
+fn run() -> Result<()> {
+    println!("Answer: {}", library());
+    let _ = buggy()?;
+    Ok(())
+}
+
+/// Buggy function
+pub fn buggy() -> Result<i32> {
+    let bug = root_cause().context("there was a bug");
+    bug
+}
+
+/// Root cause of the bug
+pub fn root_cause() -> Result<i32> {
+    Err(anyhow::anyhow!("root cause"))
 }

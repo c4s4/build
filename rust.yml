@@ -40,6 +40,11 @@ targets:
     steps:
     - $: [cargo, audit]
 
+  update:
+    doc: "Update Rust dependencies"
+    steps:
+    - $: [cargo, update]
+
   mod:
     doc: "List Rust modules"
     steps:
@@ -62,6 +67,12 @@ targets:
     doc: "Build Rust project"
     steps:
     - $: [cargo, build]
+
+  make:
+    depends: env
+    doc: "Build Rust project for release"
+    steps:
+    - $: [cargo, build, --release]
 
   run:
     doc: "Run Rust project"

@@ -17,10 +17,12 @@ fn main() {
     // print argument
     println!("Argument: {}", args.arg);
     // run function
-    // run function
     match run() {
         Ok(_) => println!("OK"),
-        Err(e) => eprintln!("ERROR: {:#}", e),
+        Err(e) => {
+            eprintln!("ERROR {:#}", e);
+            std::process::exit(1);
+        }
     }
 }
 

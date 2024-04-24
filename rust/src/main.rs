@@ -41,5 +41,5 @@ pub fn buggy() -> Result<i32> {
 
 /// Root cause of the bug
 pub fn root_cause() -> Result<i32> {
-    Err(anyhow::anyhow!("root cause"))
+    anyhow::bail!("root cause")
 }

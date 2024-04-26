@@ -55,6 +55,10 @@ targets:
     steps:
     - $: [cargo, test]
       +: =TESTS
+    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+      then:
+      - $: [cargo, test, --, --ignored]
+        +: =TESTS
 
   fmt:
     depends: env

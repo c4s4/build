@@ -73,12 +73,6 @@ targets:
     steps:
     - $: [cargo, build, --release]
 
-  make:
-    depends: env
-    doc: "Build Rust project for debug"
-    steps:
-    - $: [cargo, build]
-
   docker:
     doc: "Build docker image"
     steps:

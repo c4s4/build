@@ -4,14 +4,15 @@
 default: [lint, fmt]
 
 properties:
-  NAME: '={filename(_BASE)}'
-  ARGS: []
-  TESTS: []
-  BIN_DIR: 'target/binaries'
-  ARC_DIR: 'target/archive'
-  PLUGIN: 'c4s4/build'
-  DIST_URL: 'https://sweetohm.net/dist'
-  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
+  NAME:       '={filename(_BASE)}'
+  ARGS:       []
+  TESTS:      []
+  BIN_DIR:    'target/binaries'
+  ARC_DIR:    'target/archive'
+  DOCKET_TAG: '={NAME}:latest'
+  PLUGIN:     'c4s4/build'
+  DIST_URL:   'https://sweetohm.net/dist'
+  WEB_HOME:   'casa@sweetohm.net:/web/app/dist/={NAME}'
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64
     x86_64-unknown-linux-gnu: linux-amd64
@@ -68,15 +69,20 @@ targets:
 
   build:
     depends: env
-    doc: "Build Rust project"
-    steps:
-    - $: [cargo, build]
-
-  make:
-    depends: env
     doc: "Build Rust project for release"
     steps:
     - $: [cargo, build, --release]
+
+  make:
+    depends: env
+    doc: "Build Rust project for debug"
+    steps:
+    - $: [cargo, build]
+
+  docker:
+    doc: "Build docker image"
+    steps:
+    - $: [docker, build, --target, build, -t, =DOCKET_TAG, .]
 
   run:
     doc: "Run Rust project"

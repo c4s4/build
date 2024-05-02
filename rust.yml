@@ -76,7 +76,7 @@ targets:
   docker:
     doc: "Build docker image"
     steps:
-    - $: [docker, build, --no-cache, --target, image, --tag, =DOCKER_TAG, .]
+    - $: [docker, build, --target, image, --tag, =DOCKER_TAG, .]
 
   run:
     doc: "Run Rust project"

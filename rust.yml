@@ -9,7 +9,7 @@ properties:
   TESTS:      []
   BIN_DIR:    'target/binaries'
   ARC_DIR:    'target/archive'
-  DOCKET_TAG: '={NAME}:latest'
+  DOCKER_TAG: '={NAME}:latest'
   PLUGIN:     'c4s4/build'
   DIST_URL:   'https://sweetohm.net/dist'
   WEB_HOME:   'casa@sweetohm.net:/web/app/dist/={NAME}'
@@ -82,7 +82,7 @@ targets:
   docker:
     doc: "Build docker image"
     steps:
-    - $: [docker, build, --no-cache, --target, image, -t, =DOCKET_TAG, .]
+    - $: [docker, build, --no-cache, --target, image, --tag, =DOCKER_TAG, .]
 
   run:
     doc: "Run Rust project"

@@ -76,7 +76,14 @@ targets:
   docker:
     doc: "Build docker image"
     steps:
-    - $: [docker, build, --target, image, --tag, =DOCKER_TAG, .]
+    - $: >
+          docker build
+          --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+          --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+          --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+          --target image
+          --tag ={DOCKER_TAG}
+          .
 
   run:
     doc: "Run Rust project"

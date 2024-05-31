@@ -130,6 +130,7 @@ targets:
 
   release:
     depends: [clean, archive]
+    doc: "Release project"
     steps:
     - $: [toml, get, Cargo.toml, package.version, --raw]
       1=: version

@@ -115,7 +115,7 @@ targets:
 
   archive:
     depends: [binaries]
-    doc: "Generate and archive with binaries for all targets"
+    doc: "Generate archive with binaries for all targets"
     steps:
     - mkdir: =ARC_DIR
     - copy: '={NAME}-*'

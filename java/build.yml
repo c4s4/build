@@ -1,6 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-extends: _java
+extends: java
 
 properties:
   NAME:      'main'

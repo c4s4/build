@@ -2,7 +2,7 @@
 
 default: [lint, test]
 
-extends: _python
+extends: python
 
 environment:
   FLASK_APP: '={NAME}.py'

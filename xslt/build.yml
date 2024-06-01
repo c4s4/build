@@ -3,7 +3,7 @@
 # You must configure SAXON_HOME and XSPEC_HOME with path to these tools.
 # Target xspec calls xspec-status (http://github.com/c4s4/xspec-status).
 
-extends: _xslt
+extends: xslt
 
 properties:
   NAME:       'name'

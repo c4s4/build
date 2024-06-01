@@ -4,7 +4,7 @@ doc: Build file for Java project
 
 default: junit
 
-extends: _archive
+extends: archive
 
 properties:
   JAVA_SRC:  'src'

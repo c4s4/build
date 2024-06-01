@@ -2,7 +2,7 @@
 
 doc: Project for my parent build files
 
-extends: _git_master
+extends: git_master
 
 targets:
 

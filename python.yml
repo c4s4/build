@@ -2,7 +2,7 @@
 
 doc: Parent build file for Python projects
 default: [format, lint, test]
-extends: _archive
+extends: archive
 
 properties:
   VENV_DIR:     'venv'

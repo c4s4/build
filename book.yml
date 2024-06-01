@@ -1,6 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-extends: [_buildir, _git_master, _github]
+extends: [buildir, git_master, github]
 default: publish
 configuration: '~/.neon/github.yml'
 # GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'

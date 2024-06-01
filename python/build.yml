@@ -2,4 +2,4 @@
 
 default: [lint, test]
 
-extends: _python
+extends: python

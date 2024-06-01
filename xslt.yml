@@ -3,7 +3,7 @@
 doc: Parent build file for XSLT project
 default: xspec
 
-extends: _archive
+extends: archive
 
 properties:
   NAME:       ~

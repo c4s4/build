@@ -1,7 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for projects with semantic changelog
-extends: _git
+extends: git
 
 properties:
   CHANGELOG_FILE: 'CHANGELOG.yml'

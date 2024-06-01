@@ -2,4 +2,4 @@
 
 default: run
 
-extends: _django
+extends: django

@@ -1,8 +1,8 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Parent build file for git stuff
-extends: _version
-context: c4s4/build/_git.ank
+extends: version
+context: c4s4/build/git.ank
 
 properties:
   BRANCH_MASTER: 'master'

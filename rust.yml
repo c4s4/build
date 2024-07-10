@@ -7,6 +7,7 @@ properties:
   NAME:       '={filename(_BASE)}'
   ARGS:       []
   TESTS:      []
+  BIN_NAMES:  [=NAME]
   BIN_DIR:    'target/binaries'
   ARC_DIR:    'target/archive'
   DOCKER_TAG: '={NAME}:latest'
@@ -105,13 +106,16 @@ targets:
     - for: target
       in:  =keys(TARGETS)
       do:
-      - 'name = TARGETS[target]'
-      - print: "Building for target ={name}..."
+      - 'target_name = TARGETS[target]'
+      - print: "Building for target ={target_name}..."
       - $: [cross, build, --release, --target, =target]
-      - copy:  'target/={target}/release/={NAME}'
-        tofile: '={BIN_DIR}/={NAME}-={name}'
-      - copy:  'target/={target}/release/={NAME}.exe'
-        tofile: '={BIN_DIR}/={NAME}-={name}.exe'
+      - for: bin_name
+        in: =BIN_NAMES
+        do:
+        - copy:  'target/={target}/release/={bin_name}'
+          tofile: '={BIN_DIR}/={bin_name}-={target_name}'
+        - copy:  'target/={target}/release/={bin_name}.exe'
+          tofile: '={BIN_DIR}/={bin_name}-={target_name}.exe'
 
   archive:
     depends: [binaries]

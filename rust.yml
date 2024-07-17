@@ -157,7 +157,7 @@ targets:
         $NAME$: =NAME
         $DIST_URL$: =DIST_URL
     - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
-    - $: [git, tag, 'v={version}']
+    - $: [git, tag, =version']
     - $: [git, push, --tags]
 
   clean:

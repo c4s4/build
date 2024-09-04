@@ -12,6 +12,7 @@ set -e
 
 NAME="$NAME$"
 DIST_URL="$DIST_URL$"
+DIRECTORY=$1
 
 # get OS and ARCH and build binary name
 os=`uname | tr '[:upper:]' '[:lower:]'`
@@ -63,11 +64,17 @@ fi
 ${command} /tmp/${NAME} ${DIST_URL}/${NAME}/${binary}
 chmod +x /tmp/${NAME}
 
-# prompt for installation directory
-read -p "Installation directory [${DEFAULT_DIR}]? " directory
-if [ -z "$directory" ]
+if [ -z "$DIRECTORY" ]
 then
-    directory=${DEFAULT_DIR}
+    # prompt for installation directory
+    read -p "Installation directory [${DEFAULT_DIR}]? " directory
+    if [ -z "$directory" ]
+    then
+        directory=${DEFAULT_DIR}
+    fi
+else
+    # installation directory was passed as argument
+    directory=${DIRECTORY}
 fi
 
 # copy binary to installation directory

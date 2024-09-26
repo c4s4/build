@@ -1,5 +1,0 @@
-# NeON Build File (http://github.com/c4s4/neon)
-
-default: [lint, test]
-
-extends: python

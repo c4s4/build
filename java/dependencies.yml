@@ -1,4 +1,0 @@
-- group:    junit
-  artifact: junit
-  version:  4.8.2
-  scopes:   [test]

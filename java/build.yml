@@ -1,8 +1,0 @@
-# NeON Build File (http://github.com/c4s4/neon)
-
-extends: java
-
-properties:
-  NAME:      'main'
-  VERSION:   '1.0.0'
-  JAVA_MAIN: 'package.Main'

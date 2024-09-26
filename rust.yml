@@ -5,11 +5,13 @@ default: [lint, fmt]
 
 properties:
   NAME:       '={filename(_BASE)}'
+  VERSION:    'UNKNOWN'
   ARGS:       []
   TESTS:      []
   BUILD_DIR:  'target'
   BIN_NAMES:  [=NAME]
   BIN_DIR:    '={BUILD_DIR}/binaries'
+  BIN_FILES:  '={NAME}-*'
   ARC_DIR:    '={BUILD_DIR}/archive'
   DOCKER_TAG: '={NAME}:latest'
   PLUGIN:     'c4s4/build'
@@ -39,6 +41,22 @@ targets:
     steps:
     - $: [cargo, check]
 
+  fmt:
+    depends: env
+    doc: "Format Rust code"
+    steps:
+    - $: [cargo, fmt]
+
+  test:
+    doc: "Run Rust tests"
+    steps:
+    - $: [cargo, test]
+      +: =TESTS
+    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+      then:
+      - $: [cargo, test, --, --ignored]
+        +: =TESTS
+
   audit:
     doc: "Audit creates for vulnerabilities (install with `cargo install cargo-audit`)"
     steps:
@@ -54,39 +72,23 @@ targets:
     steps:
     - $: [cargo, modules, structure]
 
-  test:
-    doc: "Run Rust tests"
-    steps:
-    - $: [cargo, test]
-      +: =TESTS
-    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
-      then:
-      - $: [cargo, test, --, --ignored]
-        +: =TESTS
-
-  fmt:
-    depends: env
-    doc: "Format Rust code"
-    steps:
-    - $: [cargo, fmt]
-
   build:
     depends: env
     doc: "Build Rust project for release"
     steps:
     - $: [cargo, build, --release]
 
-  run:
-    doc: "Run Rust project"
-    steps:
-    - $: [cargo, run]
-      +: =ARGS
-
   install:
     depends: env
     doc: "Install Rust binary in ~/.cargo/bin"
     steps:
     - $: [cargo, install, --path, .]
+
+  run:
+    doc: "Run Rust project"
+    steps:
+    - $: [cargo, run]
+      +: =ARGS
 
   binaries:
     depends: env
@@ -109,10 +111,11 @@ targets:
 
   archive:
     depends: [clean, binaries]
-    doc: "Generate archive with binaries for all targets"
+    doc: "Generate archive with binaries and documentation"
     steps:
+    # generate archive
     - mkdir: =ARC_DIR
-    - copy: '={NAME}-*'
+    - copy: =BIN_FILES
       dir: =BIN_DIR
       todir: =ARC_DIR
     - copy: ['README*', 'LICENSE*']
@@ -120,26 +123,21 @@ targets:
       todir: =ARC_DIR
     - zip: '*'
       dir: =ARC_DIR
-      tofile: '={BUILD_DIR}/={NAME}.zip'
-
-  release:
-    depends: [lint, test, archive]
-    doc: "Perform a release"
-    steps:
-    - $: [toml, get, Cargo.toml, package.version, --raw]
-      1=: version
-      1x: true
-    - move: '={BUILD_DIR}/={NAME}.zip'
-      tofile: '={BUILD_DIR}/={NAME}-={version}.zip'
+      tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+    # copy archive on desktop
     - if: '_OS == "linux"'
       then:
-      - copy: '={NAME}-={version}.zip'
+      - copy: '={NAME}-={VERSION}.zip'
         dir: =BUILD_DIR
         todir: '~/dsk/'
       else:
-      - copy: '={NAME}-={version}.zip'
+      - copy: '={NAME}-={VERSION}.zip'
         dir: =BUILD_DIR
         todir: '~/Desktop/'
+
+  deploy:
+    doc: "Deploy binaries on dist server"
+    steps:
     - copy: '={_BASE}/install'
       todir: =BIN_DIR
     - replace: '={BIN_DIR}/install'
@@ -147,7 +145,19 @@ targets:
         $NAME$: =NAME
         $DIST_URL$: =DIST_URL
     - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
-    - $: [git, tag, =version]
+
+  version:
+    doc: "Get version from Cargo.toml"
+    steps:
+    - $: [toml, get, Cargo.toml, package.version, --raw]
+      1=: VERSION
+      1x: true
+
+  release:
+    depends: [version, lint, test, archive]
+    doc: "Perform a release"
+    steps:
+    - $: [git, tag, =VERSION]
     - $: [git, push, --tags]
 
   clean:

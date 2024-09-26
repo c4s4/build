@@ -20,7 +20,6 @@ properties:
   BIN_DIR: '={BUILD_DIR}/bin'
   BIN_FILES: '*'
   #OS_ARCH: [darwin/amd64, darwin/arm64, linux/amd64, windows/amd64]
-  GITLAB_HOSTNAME: 'gitlab.datalf.chat'
   ARC_DIR: '={BUILD_DIR}/arc'
   RUN_ARGS: []
   DOCKER_TAG: '={NAME}:latest'
@@ -67,12 +66,10 @@ targets:
       else:
       - print: "Gobinsec check disabled"
 
-  clean:
-    doc: "Clean build directory and Go test cache"
+  update:
+    doc: "Update Go dependencies"
     steps:
-    - delete: =BUILD_DIR
-    - $: ['go', 'clean', '-cache']
-    - $: ['go', 'clean', '-testcache']
+    - $: ['go', 'get', '-u', =PACKAGE]
 
   build:
     doc: "Build binary for current platform"
@@ -118,8 +115,9 @@ targets:
 
   archive:
     depends: [clean, binaries]
-    doc: "Generate archive with binaries"
+    doc: "Generate archive with binaries and documentation"
     steps:
+    # generate archive
     - mkdir: =ARC_DIR
     - copy: =BIN_FILES
       dir: =BIN_DIR
@@ -129,23 +127,21 @@ targets:
       todir: =ARC_DIR
     - zip: '*'
       dir: =ARC_DIR
-      tofile: '={BUILD_DIR}/={NAME}.zip'
-
-  release:
-    depends: [lint, test, archive]
-    doc: "Perform a release"
-    steps:
-    - move: '={BUILD_DIR}/={NAME}.zip'
       tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+    # copy archive on desktop
     - if: '_OS == "linux"'
       then:
-      - copy: '={NAME}-={version}.zip'
+      - copy: '={NAME}-={VERSION}.zip'
         dir: =BUILD_DIR
         todir: '~/dsk/'
       else:
-      - copy: '={NAME}-={version}.zip'
+      - copy: '={NAME}-={VERSION}.zip'
         dir: =BUILD_DIR
         todir: '~/Desktop/'
+
+  deploy:
+    doc: "Deploy binaries on dist server"
+    steps:
     - copy: '={_BASE}/install'
       todir: =BIN_DIR
     - replace: '={BIN_DIR}/install'
@@ -153,5 +149,23 @@ targets:
         $NAME$: =NAME
         $DIST_URL$: =DIST_URL
     - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
-    - $: [git, tag, 'v={VERSION}']
+
+  version:
+    doc: "Prompt for release version"
+    steps:
+    - prompt: "Enter release version"
+      to: VERSION
+
+  release:
+    depends: [version, lint, test, archive]
+    doc: "Perform a release"
+    steps:
+    - $: [git, tag, =VERSION]
     - $: [git, push, --tags]
+
+  clean:
+    doc: "Clean build directory and Go test cache"
+    steps:
+    - delete: =BUILD_DIR
+    - $: ['go', 'clean', '-cache']
+    - $: ['go', 'clean', '-testcache']

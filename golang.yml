@@ -159,6 +159,17 @@ targets:
   version:
     doc: "Prompt for release version"
     steps:
+    - $: ['git', 'tag']
+      1=: tags
+      1x: true
+    - |
+      tags = split(tags, "\n")
+      sortversions(tags)
+      if len(tags) > 10 {
+        tags = tags[len(tags)-10:]
+      }
+      tags = join(tags, ", ")
+    - print: "Last tags: ={tags}"
     - prompt: "Enter release version"
       to: VERSION
 

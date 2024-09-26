@@ -154,7 +154,7 @@ targets:
       1x: true
 
   release:
-    depends: [version, lint, test, archive]
+    depends: [version, lint, test, archive, deploy]
     doc: "Perform a release"
     steps:
     - $: [git, tag, =VERSION]

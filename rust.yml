@@ -10,9 +10,11 @@ properties:
   TESTS:      []
   BUILD_DIR:  'target'
   BIN_NAMES:  [=NAME]
-  BIN_DIR:    '={BUILD_DIR}/binaries'
-  BIN_FILES:  '={NAME}-*'
-  ARC_DIR:    '={BUILD_DIR}/archive'
+  BIN_DIR:    'binaries'
+  BIN_FILES:  '*'
+  ARC_DIR:    'archive'
+  ARC_FILES:
+    =_BASE: ['README*', 'LICENSE*']
   DOCKER_TAG: '={NAME}:latest'
   PLUGIN:     'c4s4/build'
   DIST_URL:   'https://sweetohm.net/dist'
@@ -94,7 +96,7 @@ targets:
     depends: env
     doc: "Build binaries for all targets"
     steps:
-    - mkdir: =BIN_DIR
+    - mkdir: '={BUILD_DIR}/={BIN_DIR}'
     - for: target
       in:  =keys(TARGETS)
       do:
@@ -105,25 +107,29 @@ targets:
         in: =BIN_NAMES
         do:
         - copy:  '={BUILD_DIR}/={target}/release/={bin_name}'
-          tofile: '={BIN_DIR}/={bin_name}-={target_name}'
+          tofile: '={BUILD_DIR}/={BIN_DIR}/={bin_name}-={target_name}'
         - copy:  '={BUILD_DIR}/={target}/release/={bin_name}.exe'
-          tofile: '={BIN_DIR}/={bin_name}-={target_name}.exe'
+          tofile: '={BUILD_DIR}/={BIN_DIR}/={bin_name}-={target_name}.exe'
 
   archive:
-    depends: [clean, binaries]
+    depends: [binaries]
     doc: "Generate archive with binaries and documentation"
     steps:
     # generate archive
-    - mkdir: =ARC_DIR
+    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
     - copy: =BIN_FILES
-      dir: =BIN_DIR
-      todir: =ARC_DIR
-    - copy: ['README*', 'LICENSE*']
-      dir: =_BASE
-      todir: =ARC_DIR
-    - zip: '*'
-      dir: =ARC_DIR
+      dir: '={BUILD_DIR}/={BIN_DIR}'
+      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
+    - for: dir
+      in: keys(ARC_FILES)
+      do:
+      - copy: =ARC_FILES[dir]
+        dir: =dir
+        todir: '={BUILD_DIR}/={ARC_DIR}'
+    - zip: '**/*'
+      dir: '={BUILD_DIR}/={ARC_DIR}'
       tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+      prefix: '={NAME}-={VERSION}'
     # copy archive on desktop
     - if: '_OS == "linux"'
       then:
@@ -154,7 +160,7 @@ targets:
       1x: true
 
   release:
-    depends: [version, lint, test, archive, deploy]
+    depends: [version, clean, lint, test, archive, deploy]
     doc: "Perform a release"
     steps:
     - $: [git, tag, =VERSION]

@@ -17,14 +17,16 @@ properties:
   - github.com/intercloud/gobinsec@latest
   TEST_CASES: =PACKAGE
   TEST_OPTS: ['-cover']
-  BIN_DIR: '={BUILD_DIR}/bin'
-  BIN_FILES: '*'
-  #OS_ARCH: [darwin/amd64, darwin/arm64, linux/amd64, windows/amd64]
-  ARC_DIR: '={BUILD_DIR}/arc'
+  BIN_DIR:    'bin'
+  BIN_FILES:  '*'
+  ARC_DIR:    'arc'
+  ARC_FILES:
+    =_BASE: ['README*', 'LICENSE*']
   RUN_ARGS: []
   DOCKER_TAG: '={NAME}:latest'
   DOCKER_OPTIONS: ''
   GOBINSEC_ENABLED: false
+  #OS_ARCH: [darwin/amd64, darwin/arm64, linux/amd64, windows/amd64]
 
 targets:
 
@@ -110,24 +112,28 @@ targets:
     - $: ['gox',
           '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
           '-osarch', '={os_arch}',
-          '-output', '={BIN_DIR}/{{.Dir}}-{{.OS}}-{{.Arch}}',
+          '-output', '={BUILD_DIR}/={BIN_DIR}/{{.Dir}}-{{.OS}}-{{.Arch}}',
           =PACKAGE]
 
   archive:
-    depends: [clean, binaries]
+    depends: [binaries]
     doc: "Generate archive with binaries and documentation"
     steps:
     # generate archive
-    - mkdir: =ARC_DIR
+    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
     - copy: =BIN_FILES
-      dir: =BIN_DIR
-      todir: =ARC_DIR
-    - copy: ['README*', 'LICENSE*']
-      dir: =_BASE
-      todir: =ARC_DIR
-    - zip: '*'
-      dir: =ARC_DIR
+      dir: '={BUILD_DIR}/={BIN_DIR}'
+      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
+    - for: dir
+      in: keys(ARC_FILES)
+      do:
+      - copy: =ARC_FILES[dir]
+        dir: =dir
+        todir: '={BUILD_DIR}/={ARC_DIR}'
+    - zip: '**/*'
+      dir: '={BUILD_DIR}/={ARC_DIR}'
       tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+      prefix: '={NAME}-={VERSION}'
     # copy archive on desktop
     - if: '_OS == "linux"'
       then:

@@ -1,0 +1,156 @@
+# Build Rust project
+# Using tool toml installed with `cargo install toml-cli`
+
+default: [lint, fmt]
+
+properties:
+  NAME:       '={filename(_BASE)}'
+  ARGS:       []
+  TESTS:      []
+  BUILD_DIR:  'target'
+  BIN_NAMES:  [=NAME]
+  BIN_DIR:    '={BUILD_DIR}/binaries'
+  ARC_DIR:    '={BUILD_DIR}/archive'
+  DOCKER_TAG: '={NAME}:latest'
+  PLUGIN:     'c4s4/build'
+  DIST_URL:   'https://sweetohm.net/dist'
+  WEB_HOME:   'casa@sweetohm.net:/web/app/dist/={NAME}'
+  TARGETS:
+    aarch64-unknown-linux-gnu: linux-arm64
+    x86_64-unknown-linux-gnu: linux-amd64
+    aarch64-apple-darwin: darwin-arm64
+    x86_64-apple-darwin: darwin-amd64
+    x86_64-pc-windows-gnu: windows-amd64
+  DOCKER_OPTIONS: ''
+
+targets:
+
+  env:
+    doc: "Set environment variables"
+    steps:
+    - if: '_OS == "darwin" && _ARCH == "arm64"'
+      then:
+      - setenv: 'CROSS_CONTAINER_OPTS'
+        value:  '--platform linux/amd64'
+
+  lint:
+    depends: env
+    doc: "Lint Rust code"
+    steps:
+    - $: [cargo, check]
+
+  audit:
+    doc: "Audit creates for vulnerabilities (install with `cargo install cargo-audit`)"
+    steps:
+    - $: [cargo, audit]
+
+  update:
+    doc: "Update Rust dependencies"
+    steps:
+    - $: [cargo, update]
+
+  mod:
+    doc: "List Rust modules"
+    steps:
+    - $: [cargo, modules, structure]
+
+  test:
+    doc: "Run Rust tests"
+    steps:
+    - $: [cargo, test]
+      +: =TESTS
+    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+      then:
+      - $: [cargo, test, --, --ignored]
+        +: =TESTS
+
+  fmt:
+    depends: env
+    doc: "Format Rust code"
+    steps:
+    - $: [cargo, fmt]
+
+  build:
+    depends: env
+    doc: "Build Rust project for release"
+    steps:
+    - $: [cargo, build, --release]
+
+  run:
+    doc: "Run Rust project"
+    steps:
+    - $: [cargo, run]
+      +: =ARGS
+
+  install:
+    depends: env
+    doc: "Install Rust binary in ~/.cargo/bin"
+    steps:
+    - $: [cargo, install, --path, .]
+
+  binaries:
+    depends: env
+    doc: "Build binaries for all targets"
+    steps:
+    - mkdir: =BIN_DIR
+    - for: target
+      in:  =keys(TARGETS)
+      do:
+      - 'target_name = TARGETS[target]'
+      - print: "Building for target ={target_name}..."
+      - $: [cross, build, --release, --target, =target]
+      - for: bin_name
+        in: =BIN_NAMES
+        do:
+        - copy:  '={BUILD_DIR}/={target}/release/={bin_name}'
+          tofile: '={BIN_DIR}/={bin_name}-={target_name}'
+        - copy:  '={BUILD_DIR}/={target}/release/={bin_name}.exe'
+          tofile: '={BIN_DIR}/={bin_name}-={target_name}.exe'
+
+  archive:
+    depends: [clean, binaries]
+    doc: "Generate archive with binaries for all targets"
+    steps:
+    - mkdir: =ARC_DIR
+    - copy: '={NAME}-*'
+      dir: =BIN_DIR
+      todir: =ARC_DIR
+    - copy: ['README*', 'LICENSE*']
+      dir: =_BASE
+      todir: =ARC_DIR
+    - zip: '*'
+      dir: =ARC_DIR
+      tofile: '={BUILD_DIR}/={NAME}.zip'
+
+  release:
+    depends: [lint, test, archive]
+    doc: "Perform a release"
+    steps:
+    - $: [toml, get, Cargo.toml, package.version, --raw]
+      1=: version
+      1x: true
+    - move: '={BUILD_DIR}/={NAME}.zip'
+      tofile: '={BUILD_DIR}/={NAME}-={version}.zip'
+    - if: '_OS == "linux"'
+      then:
+      - copy: '={NAME}-={version}.zip'
+        dir: =BUILD_DIR
+        todir: '~/dsk/'
+      else:
+      - copy: '={NAME}-={version}.zip'
+        dir: =BUILD_DIR
+        todir: '~/Desktop/'
+    - copy: '={_BASE}/install'
+      todir: =BIN_DIR
+    - replace: '={BIN_DIR}/install'
+      with:
+        $NAME$: =NAME
+        $DIST_URL$: =DIST_URL
+    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
+    - $: [git, tag, =version]
+    - $: [git, push, --tags]
+
+  clean:
+    doc: "Clean generated files"
+    steps:
+    - $: [cargo, clean]

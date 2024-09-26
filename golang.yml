@@ -1,0 +1,157 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: Build file for Go projects
+default: [lint, test]
+
+properties:
+  NAME: '={filename(_BASE)}'
+  VERSION: 'UNKNOWN'
+  BUILD_DIR: 'build'
+  PACKAGE: './...'
+  PACKAGE_DIR: '.'
+  VERSION_PATH: 'main.Version'
+  LINT_TIMEOUT: 5m
+  GOTOOLS:
+  - github.com/mitchellh/gox@latest
+  - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  - github.com/intercloud/gobinsec@latest
+  TEST_CASES: =PACKAGE
+  TEST_OPTS: ['-cover']
+  BIN_DIR: '={BUILD_DIR}/bin'
+  BIN_FILES: '*'
+  #OS_ARCH: [darwin/amd64, darwin/arm64, linux/amd64, windows/amd64]
+  GITLAB_HOSTNAME: 'gitlab.datalf.chat'
+  ARC_DIR: '={BUILD_DIR}/arc'
+  RUN_ARGS: []
+  DOCKER_TAG: '={NAME}:latest'
+  DOCKER_OPTIONS: ''
+  GOBINSEC_ENABLED: false
+
+targets:
+
+  tools:
+    doc: "Install tools"
+    steps:
+    - 'gotools = env("GOTOOLS"); if gotools == "" { gotools = env("GOPATH") }'
+    - for: tool
+      in:  GOTOOLS
+      do:
+      - print: "Getting tool ={tool}"
+      - $: 'GOPATH=={gotools} go install ={tool}'
+
+  lint:
+    doc: "Lint code with golangci-lint"
+    steps:
+    - print: "Linting Go code"
+    - $: ['golangci-lint', 'run', '--timeout', =LINT_TIMEOUT, =PACKAGE]
+
+  fmt:
+    doc: "Format Go code"
+    steps:
+    - print: "Formatting Go source files"
+    - $: ['gofmt', '-s', '-w', =PACKAGE_DIR]
+
+  test:
+    doc: "Run Go tests"
+    steps:
+    - $: ['go', 'test']
+      +: =TEST_OPTS+TEST_CASES
+
+  gobinsec:
+    doc: "Check binary for vulnerabilities"
+    depends: build
+    steps:
+    - if: GOBINSEC_ENABLED
+      then:
+      - $: 'gobinsec -config .gobinsec.yml -wait $(find ={BUILD_DIR}/* -perm -u+x)'
+      else:
+      - print: "Gobinsec check disabled"
+
+  clean:
+    doc: "Clean build directory and Go test cache"
+    steps:
+    - delete: =BUILD_DIR
+    - $: ['go', 'clean', '-cache']
+    - $: ['go', 'clean', '-testcache']
+
+  build:
+    doc: "Build binary for current platform"
+    steps:
+    - mkdir: =BUILD_DIR
+    - print: "Generating binary in ={BUILD_DIR}/={NAME}"
+    - $: ['go', 'build', '-o', '={BUILD_DIR}',
+          '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
+          =PACKAGE]
+
+  install:
+    doc: "Build and install binary in GOPATH"
+    steps:
+    - 'path = joinpath(split(env("GOPATH"), ":")[0], "bin")'
+    - print: 'Building and installing binary in ={path}'
+    - $: ['go', 'build', '-o', =path, '-ldflags', '-s -f', =PACKAGE]
+
+  run:
+    doc: Run Go tool
+    depends: build
+    steps:
+    - $: ['={BUILD_DIR}/={NAME}']
+      +: =RUN_ARGS
+
+  binaries:
+    doc: "Make binaries for all platforms"
+    steps:
+    - if: 'defined("OS_ARCH")'
+      then:
+      - 'os_arch = join(OS_ARCH, " ")'
+      else:
+      - $:  'go tool dist list | grep -v android | grep -v dragonfly | grep -v plan9 | grep -v solaris'
+        1=: os_arch
+        1x: true
+      - 'os_arch = replace(os_arch, "\n", " ")'
+    - mkdir: '={BUILD_DIR}/bin'
+    - print: 'Generating binaries for ={replace(os_arch, " ", ", ")}'
+    - $: ['gox',
+          '-ldflags', '-X ={VERSION_PATH}=={VERSION} -s -f',
+          '-osarch', '={os_arch}',
+          '-output', '={BIN_DIR}/{{.Dir}}-{{.OS}}-{{.Arch}}',
+          =PACKAGE]
+
+  archive:
+    depends: [clean, binaries]
+    doc: "Generate archive with binaries"
+    steps:
+    - mkdir: =ARC_DIR
+    - copy: =BIN_FILES
+      dir: =BIN_DIR
+      todir: =ARC_DIR
+    - copy: ['README*', 'LICENSE*']
+      dir: =_BASE
+      todir: =ARC_DIR
+    - zip: '*'
+      dir: =ARC_DIR
+      tofile: '={BUILD_DIR}/={NAME}.zip'
+
+  release:
+    depends: [lint, test, archive]
+    doc: "Perform a release"
+    steps:
+    - move: '={BUILD_DIR}/={NAME}.zip'
+      tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+    - if: '_OS == "linux"'
+      then:
+      - copy: '={NAME}-={version}.zip'
+        dir: =BUILD_DIR
+        todir: '~/dsk/'
+      else:
+      - copy: '={NAME}-={version}.zip'
+        dir: =BUILD_DIR
+        todir: '~/Desktop/'
+    - copy: '={_BASE}/install'
+      todir: =BIN_DIR
+    - replace: '={BIN_DIR}/install'
+      with:
+        $NAME$: =NAME
+        $DIST_URL$: =DIST_URL
+    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
+    - $: [git, tag, 'v={VERSION}']
+    - $: [git, push, --tags]

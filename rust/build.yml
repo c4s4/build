@@ -1,0 +1,14 @@
+# NeON build file (https://github.com/c4s4/neon)
+
+extends: rust
+default: [lint, test, run]
+
+# environment:
+#   RUST_BACKTRACE: '1'
+
+properties:
+  ARGS: ['test']
+  TESTS: []
+  # to show output: ['--', '--show-output']
+  # to run tests in one thread: ['--', '--test-threads=1']
+  # to run #[ignore]d tests: ['--', '--ignored'] or ['--', '--include-ignored']

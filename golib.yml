@@ -1,8 +1,9 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Build file for Go library projects
-default: [lint, test]
-extends: chandago/neon/golang.yml
+default: [fmt, lint, test]
+extends:
+- c4s4/build/golang.yml
 
 properties:
   BUILD_OPTIONS: []

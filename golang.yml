@@ -1,49 +1,30 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-doc: Build file for Go projects
-default: [lint, test]
+doc: "Build file for Go projects"
+default: [fmt, lint, test]
+extends:
+- chandago/neon/common.yml
 
 properties:
   NAME: '={filename(_BASE)}'
-  VERSION: 'UNKNOWN'
+  VERSION: 'draft'
   BUILD_DIR: 'build'
   PACKAGE: './...'
   PACKAGE_DIR: '.'
   VERSION_PATH: 'main.Version'
   LINT_TIMEOUT: 5m
+  TEST_CASES: =PACKAGE
+  TEST_OPTS: ['-cover']
+  RUN_ARGS: []
+  GITLAB_HOSTNAME: 'gitlab.datalf.chat'
+  AUDIT_ENABLED: false
   GOTOOLS:
   - github.com/mitchellh/gox@latest
   - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
   - github.com/intercloud/gobinsec@latest
-  TEST_CASES: =PACKAGE
-  TEST_OPTS: ['-cover']
-  BIN_DIR: 'bin'
-  BIN_FILES: '*'
-  ARC_DIR: 'arc'
-  ARC_FILES:
-    =_BASE: ['README*', 'LICENSE*']
-  WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
-  RUN_ARGS: []
-  GOBINSEC_ENABLED: false
   #OS_ARCH: [darwin/amd64, darwin/arm64, linux/amd64, windows/amd64]
 
 targets:
-
-  tools:
-    doc: "Install tools"
-    steps:
-    - 'gotools = env("GOTOOLS"); if gotools == "" { gotools = env("GOPATH") }'
-    - for: tool
-      in:  GOTOOLS
-      do:
-      - print: "Getting tool ={tool}"
-      - $: 'GOPATH=={gotools} go install ={tool}'
-
-  lint:
-    doc: "Lint code with golangci-lint"
-    steps:
-    - print: "Linting Go code"
-    - $: ['golangci-lint', 'run', '--timeout', =LINT_TIMEOUT, =PACKAGE]
 
   fmt:
     doc: "Format Go code"
@@ -51,17 +32,23 @@ targets:
     - print: "Formatting Go source files"
     - $: ['gofmt', '-s', '-w', =PACKAGE_DIR]
 
+  lint:
+    doc: "Lint code with golangci-lint"
+    steps:
+    - print: "Linting Go code"
+    - $: ['golangci-lint', 'run', '--timeout', =LINT_TIMEOUT, =PACKAGE]
+
   test:
     doc: "Run Go tests"
     steps:
     - $: ['go', 'test']
       +: =TEST_OPTS+TEST_CASES
 
-  gobinsec:
-    doc: "Check binary for vulnerabilities"
+  audit:
+    doc: "Audit dependencies with gobinsec"
     depends: build
     steps:
-    - if: GOBINSEC_ENABLED
+    - if: AUDIT_ENABLED
       then:
       - $: 'gobinsec -config .gobinsec.yml -wait $(find ={BUILD_DIR}/* -perm -u+x)'
       else:
@@ -114,47 +101,6 @@ targets:
           '-output', '={BUILD_DIR}/={BIN_DIR}/{{.Dir}}-{{.OS}}-{{.Arch}}',
           =PACKAGE]
 
-  archive:
-    depends: [binaries]
-    doc: "Generate archive with binaries and documentation"
-    steps:
-    # generate archive
-    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
-    - copy: =BIN_FILES
-      dir: '={BUILD_DIR}/={BIN_DIR}'
-      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
-    - for: dir
-      in: keys(ARC_FILES)
-      do:
-      - copy: =ARC_FILES[dir]
-        dir: =dir
-        todir: '={BUILD_DIR}/={ARC_DIR}'
-    - zip: '**/*'
-      dir: '={BUILD_DIR}/={ARC_DIR}'
-      tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
-      prefix: '={NAME}-={VERSION}'
-    # copy archive on desktop
-    - if: '_OS == "linux"'
-      then:
-      - copy: '={NAME}-={VERSION}.zip'
-        dir: =BUILD_DIR
-        todir: '~/dsk/'
-      else:
-      - copy: '={NAME}-={VERSION}.zip'
-        dir: =BUILD_DIR
-        todir: '~/Desktop/'
-
-  deploy:
-    doc: "Deploy binaries on dist server"
-    steps:
-    - copy: '={_BASE}/install'
-      todir: =BIN_DIR
-    - replace: '={BIN_DIR}/install'
-      with:
-        $NAME$: =NAME
-        $DIST_URL$: =DIST_URL
-    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
-
   version:
     doc: "Prompt for release version"
     steps:
@@ -172,16 +118,19 @@ targets:
     - prompt: "Enter release version"
       to: VERSION
 
-  release:
-    depends: [version, lint, test, archive, deploy]
-    doc: "Perform a release"
-    steps:
-    - $: [git, tag, =VERSION]
-    - $: [git, push, --tags]
-
   clean:
     doc: "Clean build directory and Go test cache"
     steps:
     - delete: =BUILD_DIR
     - $: ['go', 'clean', '-cache']
     - $: ['go', 'clean', '-testcache']
+
+  tools:
+    doc: "Install tools"
+    steps:
+    - 'gotools = env("GOTOOLS"); if gotools == "" { gotools = env("GOPATH") }'
+    - for: tool
+      in:  GOTOOLS
+      do:
+      - print: "Getting tool ={tool}"
+      - $: 'GOPATH=={gotools} go install ={tool}'

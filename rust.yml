@@ -1,14 +1,16 @@
 # Build Rust project
 # Using tool toml installed with `cargo install toml-cli`
 
-default: [lint, fmt]
+default: [fmt, lint, test]
+extends:
+- chandago/neon/common.yml
 
 properties:
   NAME:       '={filename(_BASE)}'
-  VERSION:    'UNKNOWN'
+  VERSION:    'draft'
+  BUILD_DIR:  'target'
   ARGS:       []
   TESTS:      []
-  BUILD_DIR:  'target'
   BIN_NAMES:  [=NAME]
   BIN_DIR:    'binaries'
   BIN_FILES:  '*'
@@ -16,35 +18,27 @@ properties:
   ARC_FILES:
     =_BASE: ['README*', 'LICENSE*']
   DOCKER_TAG: '={NAME}:latest'
+  DOCKER_OPTIONS: ''
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64
     x86_64-unknown-linux-gnu: linux-amd64
     aarch64-apple-darwin: darwin-arm64
     x86_64-apple-darwin: darwin-amd64
     x86_64-pc-windows-gnu: windows-amd64
-  DOCKER_OPTIONS: ''
 
 targets:
-
-  env:
-    doc: "Set environment variables"
-    steps:
-    - if: '_OS == "darwin" && _ARCH == "arm64"'
-      then:
-      - setenv: 'CROSS_CONTAINER_OPTS'
-        value:  '--platform linux/amd64'
-
-  lint:
-    depends: env
-    doc: "Lint Rust code"
-    steps:
-    - $: [cargo, check]
 
   fmt:
     depends: env
     doc: "Format Rust code"
     steps:
     - $: [cargo, fmt]
+
+  lint:
+    depends: env
+    doc: "Lint Rust code"
+    steps:
+    - $: [cargo, check]
 
   test:
     doc: "Run Rust tests"
@@ -108,62 +102,31 @@ targets:
         - copy:  '={BUILD_DIR}/={target}/release/={bin_name}.exe'
           tofile: '={BUILD_DIR}/={BIN_DIR}/={bin_name}-={target_name}.exe'
 
-  archive:
-    depends: [binaries]
-    doc: "Generate archive with binaries and documentation"
-    steps:
-    # generate archive
-    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
-    - copy: =BIN_FILES
-      dir: '={BUILD_DIR}/={BIN_DIR}'
-      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
-    - for: dir
-      in: keys(ARC_FILES)
-      do:
-      - copy: =ARC_FILES[dir]
-        dir: =dir
-        todir: '={BUILD_DIR}/={ARC_DIR}'
-    - zip: '**/*'
-      dir: '={BUILD_DIR}/={ARC_DIR}'
-      tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
-      prefix: '={NAME}-={VERSION}'
-    # copy archive on desktop
-    - if: '_OS == "linux"'
-      then:
-      - copy: '={NAME}-={VERSION}.zip'
-        dir: =BUILD_DIR
-        todir: '~/dsk/'
-      else:
-      - copy: '={NAME}-={VERSION}.zip'
-        dir: =BUILD_DIR
-        todir: '~/Desktop/'
-
-  deploy:
-    doc: "Deploy binaries on dist server"
-    steps:
-    - copy: '={_BASE}/install'
-      todir: =BIN_DIR
-    - replace: '={BIN_DIR}/install'
-      with:
-        $NAME$: =NAME
-        $DIST_URL$: =DIST_URL
-    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
-
   version:
-    doc: "Get version from Cargo.toml"
+    doc: "Confirm version from Cargo.toml"
     steps:
     - $: [toml, get, Cargo.toml, package.version, --raw]
       1=: VERSION
       1x: true
-
-  release:
-    depends: [version, clean, lint, test, archive, deploy]
-    doc: "Perform a release"
-    steps:
-    - $: [git, tag, =VERSION]
-    - $: [git, push, --tags]
+    - print: "You are about to release version ={VERSION}"
+    - prompt: "OK (y/n)?"
+      to: confirm
+      default: "y"
+      pattern: "^[YyNn]$"
+      error: "Please answer y or n"
+    - if: 'confirm != "y" && confirm != "Y"'
+      then:
+      - throw: "Release aborted"
 
   clean:
     doc: "Clean generated files"
     steps:
     - $: [cargo, clean]
+
+  env:
+    doc: "Set environment variables"
+    steps:
+    - if: '_OS == "darwin" && _ARCH == "arm64"'
+      then:
+      - setenv: 'CROSS_CONTAINER_OPTS'
+        value:  '--platform linux/amd64'

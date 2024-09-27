@@ -1,0 +1,70 @@
+  # NeON Build File (http://github.com/c4s4/neon)
+
+properties:
+  MAIN_BRANCH: 'main'
+  BIN_DIR: 'bin'
+  BIN_FILES: '*'
+  ARC_DIR: 'arc'
+  ARC_FILES:
+    =_BASE: ['README*', 'LICENSE*']
+  WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
+
+targets:
+
+  branch:
+    doc: "Check that we are on main branch"
+    steps:
+    - $: [git, rev-parse, --abbrev-ref, HEAD]
+      1=: branch
+      1x: true
+    - if: 'branch != MAIN_BRANCH'
+      then:
+      - throw: "We must be on branch ={MAIN_BRANCH} to perform release"
+
+  archive:
+    depends: [binaries]
+    doc: "Generate archive with binaries and documentation"
+    steps:
+    # generate archive
+    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
+    - copy: =BIN_FILES
+      dir: '={BUILD_DIR}/={BIN_DIR}'
+      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
+    - for: dir
+      in: keys(ARC_FILES)
+      do:
+      - copy: =ARC_FILES[dir]
+        dir: =dir
+        todir: '={BUILD_DIR}/={ARC_DIR}'
+    - zip: '**/*'
+      dir: '={BUILD_DIR}/={ARC_DIR}'
+      tofile: '={BUILD_DIR}/={NAME}-={VERSION}.zip'
+      prefix: '={NAME}-={VERSION}'
+    # copy archive on desktop
+    - if: '_OS == "linux"'
+      then:
+      - copy: '={NAME}-={VERSION}.zip'
+        dir: =BUILD_DIR
+        todir: '~/dsk/'
+      else:
+      - copy: '={NAME}-={VERSION}.zip'
+        dir: =BUILD_DIR
+        todir: '~/Desktop/'
+
+  deploy:
+    doc: "Deploy binaries on dist server"
+    steps:
+    - copy: '={_BASE}/install'
+      todir: =BIN_DIR
+    - replace: '={BIN_DIR}/install'
+      with:
+        $NAME$: =NAME
+        $DIST_URL$: =DIST_URL
+    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
+
+  release:
+    depends: [branch, version, clean, lint, test, archive, deploy]
+    doc: "Perform a release"
+    steps:
+    - $: [git, tag, =VERSION]
+    - $: [git, push, --tags]

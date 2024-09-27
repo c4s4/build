@@ -3,7 +3,7 @@
 doc: "Build file for Go projects"
 default: [fmt, lint, test]
 extends:
-- chandago/neon/common.yml
+- c4s4/build/common.yml
 
 properties:
   NAME: '={filename(_BASE)}'
@@ -16,7 +16,9 @@ properties:
   TEST_CASES: =PACKAGE
   TEST_OPTS: ['-cover']
   RUN_ARGS: []
-  GITLAB_HOSTNAME: 'gitlab.datalf.chat'
+  ARC_FILES:
+    =_BASE: ['README*']
+    '={BUILD_DIR}': ['={BIN_DIR}/*']
   AUDIT_ENABLED: false
   GOTOOLS:
   - github.com/mitchellh/gox@latest

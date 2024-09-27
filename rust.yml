@@ -3,7 +3,7 @@
 
 default: [fmt, lint, test]
 extends:
-- chandago/neon/common.yml
+- c4s4/build/common.yml
 
 properties:
   NAME:       '={filename(_BASE)}'
@@ -13,12 +13,10 @@ properties:
   TESTS:      []
   BIN_NAMES:  [=NAME]
   BIN_DIR:    'binaries'
-  BIN_FILES:  '*'
   ARC_DIR:    'archive'
   ARC_FILES:
-    =_BASE: ['README*', 'LICENSE*']
-  DOCKER_TAG: '={NAME}:latest'
-  DOCKER_OPTIONS: ''
+    =_BASE: ['README*']
+    '={BUILD_DIR}': ['={BIN_DIR}/={NAME}-*']
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64
     x86_64-unknown-linux-gnu: linux-amd64

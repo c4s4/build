@@ -1,4 +1,4 @@
-  # NeON Build File (http://github.com/c4s4/neon)
+# NeON Build File (http://github.com/c4s4/neon)
 
 properties:
   MAIN_BRANCH: 'main'
@@ -26,10 +26,7 @@ targets:
     doc: "Generate archive with binaries and documentation"
     steps:
     # generate archive
-    - mkdir: '={BUILD_DIR}/={ARC_DIR}/bin'
-    - copy: =BIN_FILES
-      dir: '={BUILD_DIR}/={BIN_DIR}'
-      todir: '={BUILD_DIR}/={ARC_DIR}/bin'
+    - mkdir: '={BUILD_DIR}/={ARC_DIR}'
     - for: dir
       in: keys(ARC_FILES)
       do:

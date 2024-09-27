@@ -1,0 +1,11 @@
+# NeON build file (http://github.com/c4s4/neon)
+
+extends: slides
+expose:  [slides, publish, release, TITLE, OPTIONS]
+configuration: '~/.neon/github.yml'
+# GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'
+
+properties:
+  TITLE:   'Slides Title'
+  #OPTIONS: '{ratio: "4:3"}'
+  OPTIONS: "{ratio: '16:9'}"

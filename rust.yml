@@ -13,7 +13,7 @@ properties:
   TESTS:      []
   BIN_NAMES:  [=NAME]
   BIN_DIR:    'binaries'
-  DOC_DIR:    'documentation'
+  DOC_DIR:    '={BUILD_DIR}/documentation'
   ARC_DIR:    'archive'
   ARC_FILES:
     =_BASE: ['LICENSE*']

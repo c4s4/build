@@ -4,7 +4,7 @@ properties:
   MAIN_BRANCH: 'main'
   BIN_DIR: 'bin'
   BIN_FILES: '*'
-  DOC_DIR: 'doc'
+  DOC_DIR: '={BUILD_DIR}/doc'
   ARC_DIR: 'arc'
   ARC_FILES:
     =_BASE: ['LICENSE*']

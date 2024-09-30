@@ -13,9 +13,11 @@ properties:
   TESTS:      []
   BIN_NAMES:  [=NAME]
   BIN_DIR:    'binaries'
+  DOC_DIR:    'documentation'
   ARC_DIR:    'archive'
   ARC_FILES:
-    =_BASE: ['README*']
+    =_BASE: ['LICENSE*']
+    =DOC_DIR: ['README.pdf']
     '={BUILD_DIR}': ['={BIN_DIR}/={NAME}-*']
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64

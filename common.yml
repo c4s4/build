@@ -4,9 +4,11 @@ properties:
   MAIN_BRANCH: 'main'
   BIN_DIR: 'bin'
   BIN_FILES: '*'
+  DOC_DIR: 'doc'
   ARC_DIR: 'arc'
   ARC_FILES:
-    =_BASE: ['README*', 'LICENSE*']
+    =_BASE: ['LICENSE*']
+    =DOC_DIR: ['README.pdf']
   WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
 
 targets:
@@ -21,8 +23,19 @@ targets:
       then:
       - throw: "We must be on branch ={MAIN_BRANCH} to perform release"
 
+  doc:
+    doc: "Build PDF documentation"
+    steps:
+    - mkdir: =DOC_DIR
+    - copy: README.md
+      todir: =DOC_DIR
+    - replace: '={DOC_DIR}/README.md'
+      with:
+        '[[_TOC_]]': ''
+    - $: [md2pdf, -o, '={DOC_DIR}/README.pdf', '={DOC_DIR}/README.md']
+
   archive:
-    depends: [binaries]
+    depends: [binaries, doc]
     doc: "Generate archive with binaries and documentation"
     steps:
     # generate archive

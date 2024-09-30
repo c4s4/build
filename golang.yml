@@ -17,7 +17,9 @@ properties:
   TEST_OPTS: ['-cover']
   RUN_ARGS: []
   ARC_FILES:
-    =_BASE: ['README*']
+  ARC_FILES:
+    =_BASE: ['LICENSE*']
+    =DOC_DIR: ['README.pdf']
     '={BUILD_DIR}': ['={BIN_DIR}/*']
   AUDIT_ENABLED: false
   GOTOOLS:

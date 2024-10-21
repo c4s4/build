@@ -1,6 +1,6 @@
 # NeON build file (https://github.com/c4s4/neon)
 
-extends: rust
+extends: c4s4/build/rust.yml
 default: [lint, test, run]
 
 # environment:

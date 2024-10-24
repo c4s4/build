@@ -1,7 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 extends: c4s4/build/golang.yml
-default: [fmt, check, test]
-expose:  [fmt, check, test, release]
+default: [fmt, lint, test]
+expose:  [fmt, lint, test, release]
 # configuration: '~/.neon/github.yml'
 # GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'

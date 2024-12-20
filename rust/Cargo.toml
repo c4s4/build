@@ -12,7 +12,7 @@ clap = { version = "4.5.7", features = ["derive"] }
 [profile.release]
 strip = true      # Automatically strip symbols from the binary
 opt-level = "z"   # Optimize for size
-lto = true        # Link time optimizatin, removes dead code
+lto = true        # Link time optimization, removes dead code
 codegen-units = 1 # Allow for maximum size reduction optimizations
 # panic = "abort"   # Don't print stack trace on panic
 # Set RUSTFLAGS="-Zlocation-detail=none" to remove file, line and column information

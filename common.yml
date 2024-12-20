@@ -10,6 +10,7 @@ properties:
     =_BASE: ['LICENSE*']
     =DOC_DIR: ['README.pdf']
   WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
+  DIST_URL: 'https://sweetohm.net/dist/={NAME}'
 
 targets:
 

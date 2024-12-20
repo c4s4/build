@@ -9,8 +9,8 @@ properties:
   ARC_FILES:
     =_BASE: ['LICENSE*']
     =DOC_DIR: ['README.pdf']
-  WEB_HOME: 'casa@sweetohm.net:/home/web/dist/={NAME}'
-  DIST_URL: 'https://sweetohm.net/dist/={NAME}'
+  WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
+  DIST_URL: 'https://sweetohm.net/dist'
 
 targets:
 
@@ -65,13 +65,13 @@ targets:
   deploy:
     doc: "Deploy binaries on dist server"
     steps:
-    - copy: '={_BASE}/install'
-      todir: =BIN_DIR
-    - replace: '={BIN_DIR}/install'
+    - copy: '={_REPO}/c4s4/build/install'
+      todir: '={BUILD_DIR}/={BIN_DIR}'
+    - replace: '={BUILD_DIR}/={BIN_DIR}/install'
       with:
         $NAME$: =NAME
         $DIST_URL$: =DIST_URL
-    - $: 'scp ={BIN_DIR}/* ={WEB_HOME}'
+    - $: 'scp ={BUILD_DIR}/={BIN_DIR}/* ={WEB_HOME}'
 
   version:
     doc: "Prompt for release version"

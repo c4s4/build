@@ -1,5 +1,4 @@
 # NeON Build File (http://github.com/c4s4/neon)
-# TEST 7
 
 properties:
   MAIN_BRANCH: 'main'

@@ -3,11 +3,11 @@
 doc: "Build file for Go projects"
 default: [fmt, lint, test]
 extends:
-- c4s4/build/common.yml
+- chandago/neon/common.yml
 
 properties:
   NAME: '={filename(_BASE)}'
-  VERSION: '={run("git", "rev-parse", "HEAD")[0:8]}'
+  VERSION: =try {run("git", "rev-parse", "HEAD")[0:8]} catch {"draft"}
   BUILD_DIR: 'build'
   PACKAGE: './...'
   PACKAGE_DIR: '.'
@@ -17,11 +17,10 @@ properties:
   TEST_OPTS: ['-cover']
   RUN_ARGS: []
   ARC_FILES:
-  ARC_FILES:
-    =_BASE: ['LICENSE*']
     =DOC_DIR: ['README.pdf']
     '={BUILD_DIR}': ['={BIN_DIR}/*']
   AUDIT_ENABLED: false
+  AUDIT_OPTIONS: '-wait'
   GOTOOLS:
   - github.com/mitchellh/gox@latest
   - github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -54,7 +53,7 @@ targets:
     steps:
     - if: AUDIT_ENABLED
       then:
-      - $: 'gobinsec -config .gobinsec.yml -wait $(find ={BUILD_DIR}/* -perm -u+x)'
+      - $: 'gobinsec -config .gobinsec.yml ={AUDIT_OPTIONS} $(find ={BUILD_DIR}/* -type f -perm -u+x)'
       else:
       - print: "Gobinsec check disabled"
 

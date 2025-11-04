@@ -25,6 +25,6 @@ targets:
       tofile: '={_HERE}/={name}/={name}.go'
     - move:   '={_HERE}/={name}/main_test.go'
       tofile: '={_HERE}/={name}/={name}_test.go'
-    - replace: '={_HERE}/={name}/build.yml'
-      with:    {'main': =name}
+    - replace: '={_HERE}/={name}/go.mod'
+      with:    {'name': =name}
     - print: "Project generated in '={name}' directory"

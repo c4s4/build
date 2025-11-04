@@ -1,6 +1,6 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
-extends: chandago/neon/golang.yml
+extends: c4s4/build/golang.yml
 default: [fmt, lint, test]
 expose:  [fmt, lint, test, release]
 # configuration: '~/.neon/github.yml'

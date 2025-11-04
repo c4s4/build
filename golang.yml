@@ -3,7 +3,7 @@
 doc: "Build file for Go projects"
 default: [fmt, lint, test]
 extends:
-- chandago/neon/common.yml
+- c4s4/build/common.yml
 
 properties:
   NAME: '={filename(_BASE)}'

@@ -1,0 +1,51 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: "Build file for library projects"
+default: [fmt, lint, test]
+
+properties:
+  BUILD_OPTIONS: []
+  TEST_OPTIONS: []
+  TEST_PACKAGE: './...'
+  COVER_PACKAGE: './...'
+  EXAMPLE: 'integ/cmd/example/main.go'
+
+targets:
+
+  start:
+    doc: "Start tool"
+    depends: stop
+    steps:
+    - try:
+      - $: [docker, network, create, =NAME]
+        3x: true
+    - $: [docker, compose, create, =NAME]
+    - $: [docker, compose, start, =NAME]
+    - 'stop = false'
+    - while: '!stop'
+      do:
+      - try:
+        - call: ping
+        - 'stop = true'
+        catch:
+        - sleep: 1.0
+
+  ping:
+    doc: "Call tool to check if it is running"
+    steps:
+    - print: "Checking if tool is running..."
+
+  stop:
+    doc: "Stop tool"
+    steps:
+    - $: [docker, compose, down]
+
+  logs:
+    doc: "Print logs"
+    steps:
+    - $: [docker, compose, logs]
+
+  tail:
+    doc: "Print new logs"
+    steps:
+    - $: [docker, compose, logs, -f]

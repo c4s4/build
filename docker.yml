@@ -1,0 +1,73 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+properties:
+  DOCKER_TAG: '={NAME}:latest'
+  DOCKER_OPTIONS: ''
+
+targets:
+
+  docker:
+    doc: "Build Docker image"
+    steps:
+    - $: >
+        docker build
+        --build-arg GOPRIVATE=$GOPRIVATE
+        --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+        --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+        --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+        --target image
+        --tag ={DOCKER_TAG}
+        ={DOCKER_OPTIONS}
+        .
+
+  docker-lint:
+    doc: "Lint in Docker"
+    steps:
+    - $: >
+        docker build
+        --build-arg GOPRIVATE=$GOPRIVATE
+        --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+        --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+        --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+        --target lint
+        ={DOCKER_OPTIONS}
+        .
+
+  docker-test:
+    doc: "Test in Docker"
+    steps:
+    - $: >
+        docker build
+        --build-arg GOPRIVATE=$GOPRIVATE
+        --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+        --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+        --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+        --target test
+        ={DOCKER_OPTIONS}
+        .
+
+  docker-build:
+    doc: "Build in Docker"
+    steps:
+    - $: >
+        docker build
+        --build-arg GOPRIVATE=$GOPRIVATE
+        --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+        --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+        --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+        --target build
+        ={DOCKER_OPTIONS}
+        .
+
+  docker-audit:
+    doc: "Audit dependencies in docker"
+    steps:
+    - $: >
+        docker build
+        --build-arg GOPRIVATE=$GOPRIVATE
+        --build-arg SFBX_GIT_REPOSITORY=$SFBX_GIT_REPOSITORY
+        --build-arg SFBX_GIT_USERNAME=$SFBX_GIT_USERNAME
+        --build-arg SFBX_GIT_PASSWORD=$SFBX_GIT_PASSWORD
+        --target audit
+        ={DOCKER_OPTIONS}
+        .

@@ -1,9 +1,10 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: Build file for Go library projects
-default: [fmt, lint, test]
+default: [fmt, lint, integ, example]
 extends:
 - c4s4/build/golang.yml
+- c4s4/build/library.yml
 
 properties:
   BUILD_OPTIONS: []
@@ -11,29 +12,64 @@ properties:
   TEST_PACKAGE: './...'
   COVER_PACKAGE: './...'
   EXAMPLE: 'integ/cmd/example/main.go'
+  STOP_SERVICES_ON_ERROR: true
 
 targets:
 
   test:
+    doc: "Start, run unit tests and stop"
+    steps:
+    - call: start
+    - try:
+      - call: tst
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Unit tests failed"
+
+  tst:
     doc: "Run unit tests"
-    depends: start
     steps:
     - $: [dotenv, --, go, test]
       +: =BUILD_OPTIONS+TEST_OPTIONS+TEST_PACKAGE
-    - call: stop
 
   integ:
+    doc: "Start, run integration tests and stop"
+    steps:
+    - call: start
+    - try:
+      - call: itg
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Integration tests failed"
+
+  itg:
     doc: "Run integration tests"
-    depends: start
     steps:
     - mkdir: =BUILD_DIR
     - $: [dotenv, --, go, test, '-coverpkg=={COVER_PACKAGE}', -cover]
       +: =BUILD_OPTIONS+TEST_OPTIONS+TEST_PACKAGE
-    - call: stop
 
   integ-cover:
+    doc: "Start, run integration tests with coverage report and stop"
+    steps:
+    - call: start
+    - try:
+      - call: itg-cover
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Integration tests with coverage report failed"
+
+  itg-cover:
     doc: "Run integration tests with coverage report"
-    depends: start
     steps:
     - mkdir: =BUILD_DIR
     - $: [dotenv, --, go, test, -coverpkg, =COVER_PACKAGE, -coverprofile, '={BUILD_DIR}/cover.out']
@@ -41,38 +77,28 @@ targets:
     - $: [go, tool, cover, -html, '={BUILD_DIR}/cover.out', -o, '={BUILD_DIR}/coverage.html']
     - 'url =  "file://" + _BASE + "/" + BUILD_DIR + "/coverage.html"'
     - print: 'Coverage report generated at ={color("blue", termlink(url, ""))}'
-    - call: stop
 
   example:
+    doc: "Start, run example program and stop"
+    steps:
+    - call: start
+    - try:
+      - call: ex
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Example program failed"
+
+  ex:
     doc: "Run example program"
-    depends: start
     steps:
     - $: [dotenv, go, run, =EXAMPLE]
-    - call: stop
 
-  start:
-    doc: "Start tool"
-    depends: stop
+  release:
+    depends: [branch, version, clean, lint, test]
+    doc: "Perform a release"
     steps:
-    - try:
-      - $: [docker, network, create, =NAME]
-    - $: [docker, compose, create, =NAME]
-    - $: [docker, compose, start, =NAME]
-    - 'stop = false'
-    - while: '!stop'
-      do:
-      - try:
-        - call: ping
-        - 'stop = true'
-        catch:
-        - sleep: 1.0
-
-  ping:
-    doc: "Call tool to check if it is running"
-    steps:
-    - print: "Checking if tool is running..."
-
-  stop:
-    doc: "Stop tool"
-    steps:
-    - $: [docker, compose, down]
+    - $: [git, tag, 'v={VERSION}']
+    - $: [git, push, --tags]

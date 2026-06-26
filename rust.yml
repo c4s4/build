@@ -6,19 +6,22 @@ extends:
 - c4s4/build/common.yml
 
 properties:
-  NAME:       '={filename(_BASE)}'
-  VERSION:    'draft'
-  BUILD_DIR:  'target'
-  ARGS:       []
-  TESTS:      []
-  BIN_NAMES:  [=NAME]
-  BIN_DIR:    'binaries'
-  DOC_DIR:    '={BUILD_DIR}/documentation'
-  ARC_DIR:    'archive'
+  NAME:         '={filename(_BASE)}'
+  VERSION:      'draft'
+  BUILD_DIR:    'target'
+  BINARY_DIR:   '={BUILD_DIR}/release'
+  ARGS:         []
+  TESTS:        []
+  TEST_IGNORED: false
+  BIN_NAMES:    [=NAME]
+  BIN_DIR:      'binaries'
+  DOC_DIR:      '={BUILD_DIR}/documentation'
+  ARC_DIR:      'archive'
   ARC_FILES:
     =_BASE: ['LICENSE*']
     =DOC_DIR: ['README.pdf']
     '={BUILD_DIR}': ['={BIN_DIR}/={NAME}-*']
+  CLEAN_DS_STORE: true
   TARGETS:
     aarch64-unknown-linux-gnu: linux-arm64
     x86_64-unknown-linux-gnu: linux-amd64
@@ -45,7 +48,7 @@ targets:
     steps:
     - $: [cargo, test]
       +: =TESTS
-    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+    - if: 'TEST_IGNORED || lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
       then:
       - $: [cargo, test, --, --ignored]
         +: =TESTS
@@ -105,6 +108,17 @@ targets:
   version:
     doc: "Confirm version from Cargo.toml"
     steps:
+    - $: ['git', 'tag']
+      1=: tags
+      1x: true
+    - |
+      tags = split(tags, "\n")
+      sortversions(tags)
+      if len(tags) > 10 {
+        tags = tags[len(tags)-10:]
+      }
+      tags = join(tags, ", ")
+    - print: "Last tags: ={tags}"
     - $: [toml, get, Cargo.toml, package.version, --raw]
       1=: VERSION
       1x: true
@@ -122,6 +136,9 @@ targets:
     doc: "Clean generated files"
     steps:
     - $: [cargo, clean]
+    - if: =CLEAN_DS_STORE
+      then:
+      - delete: '**/.DS_Store'
 
   env:
     doc: "Set environment variables"

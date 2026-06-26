@@ -9,6 +9,7 @@ properties:
   ARC_FILES:
     =_BASE: ['LICENSE*']
     =DOC_DIR: ['README.pdf']
+    =BUILD_DIR: ['bin/*']
   WEB_HOME: 'casa@sweetohm.net:/web/app/dist/={NAME}'
   DIST_URL: 'https://sweetohm.net/dist'
 
@@ -27,13 +28,15 @@ targets:
   doc:
     doc: "Build PDF documentation"
     steps:
-    - mkdir: =DOC_DIR
-    - copy: README.md
-      todir: =DOC_DIR
-    - replace: '={DOC_DIR}/README.md'
-      with:
-        '[[_TOC_]]': ''
-    - $: [md2pdf, -o, '={DOC_DIR}/README.pdf', '={DOC_DIR}/README.md']
+    - if: 'exists("README.md")'
+      then:
+      - mkdir: =DOC_DIR
+      - copy: README.md
+        todir: =DOC_DIR
+      - replace: '={DOC_DIR}/README.md'
+        with:
+          '[[_TOC_]]': ''
+      - $: [md2pdf, -o, '={DOC_DIR}/README.pdf', '={DOC_DIR}/README.md']
 
   archive:
     depends: [binaries, doc]
@@ -96,9 +99,9 @@ targets:
     steps:
     - if: 'exists("go.mod")'
       then:
-      # GO tag vX.Y.Z
-      - $: [git, tag, 'v={VERSION}']
+      # GO project: get tag vX.Y.Z from Gitlab
+      - $: [git, pull, --rebase]
       else:
-      # others tag X.Y.Z
+      # Not a GO project: tag X.Y.Z and push to Gitlab
       - $: [git, tag, =VERSION]
-    - $: [git, push, --tags]
+      - $: [git, push, --tags]

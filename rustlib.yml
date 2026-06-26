@@ -1,0 +1,90 @@
+# NeON Build File (http://github.com/c4s4/neon)
+
+doc: "Build file for Rust library projects"
+default: [fmt, lint, integ, example]
+extends:
+- c4s4/build/rust.yml
+- c4s4/build/library.yml
+
+properties:
+  BUILD_OPTIONS: []
+  TEST_OPTIONS: []
+  TEST_PACKAGE: './...'
+  COVER_PACKAGE: './...'
+  EXAMPLE: 'integ/cmd/example/main.go'
+  STOP_SERVICES_ON_ERROR: true
+
+targets:
+
+  test:
+    doc: "Run unit tests"
+    steps:
+    - call: start
+    - try:
+      - call: tst
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Unit tests failed"
+
+  tst:
+    doc: "Run unit tests"
+    steps:
+    - $: [dotenv, cargo, test, --, --, --test-threads=1]
+      +: =TESTS
+    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+      then:
+      - $: [dotenv, cargo, test, --, --, --test-threads=1, --ignored]
+        +: =TESTS
+
+  integ:
+    doc: "Start, run integration tests and stop"
+    steps:
+    - call: start
+    - try:
+      - call: itg
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Integration tests failed"
+
+  itg:
+    doc: "Run integration tests"
+    steps:
+    - $: [dotenv, cargo, test, --, --, --test-threads=1]
+      +: =TESTS
+    - if: 'lowercase(env("TEST_IGNORED")) in ["true", "yes", "on", "1"]'
+      then:
+      - $: [dotenv, cargo, test, --, --, --test-threads=1, --ignored]
+        +: =TESTS
+
+  example:
+    doc: "Run example"
+    steps:
+    - call: start
+    - try:
+      - call: ex
+      - call: stop
+      catch:
+      - if: =STOP_SERVICES_ON_ERROR
+        then:
+        - call: stop
+      - throw: "Example failed"
+
+  ex:
+    doc: "Run example"
+    depends: [build]
+    steps:
+    - print: "Running example..."
+    - $: [dotenv, target/release/example]
+
+  release:
+    depends: [branch, version, clean, lint, test]
+    doc: "Perform a release"
+    steps:
+    - $: [git, tag, =VERSION]
+    - $: [git, push, --tags]

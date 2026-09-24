@@ -1,7 +1,7 @@
 # NeON Build File (http://github.com/c4s4/neon)
 
 doc: "Parent build file for slides"
-default: [clean, publish]
+default: [clean, slides]
 expose:  [TITLE, OPTIONS, INCLUDES, DESTINATION, clean, slides, publish]
 extends:
 - c4s4/build/common.yml

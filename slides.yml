@@ -2,7 +2,9 @@
 
 doc: "Parent build file for slides"
 default: [clean, slides]
-expose:  [TITLE, OPTIONS, INCLUDES, DESTINATION, clean, slides, publish]
+expose:  [TITLE, OPTIONS, INCLUDES, BG_IMAGE, BG_ALPHA, BG_WIDTH,
+          BG_IMAGE_X, BG_IMAGE_Y, BG_COLOR, TEXT_COLOR, LINK_COLOR,
+          DESTINATION, clean, slides, publish]
 extends:
 - c4s4/build/common.yml
 
@@ -10,11 +12,19 @@ properties:
   TITLE:       ~
   NAME:        '={filename(_BASE)}'
   BUILD_DIR:   'build'
-  #OPTIONS:     '{ratio: "4:3"}'
+  # OPTIONS:     '{ratio: "4:3"}'
   OPTIONS:     '{ratio: "16:9"}'
   INCLUDES:    false
+  BG_IMAGE:    ''
+  BG_ALPHA:    100
+  BG_WIDTH:    50
+  BG_IMAGE_X:  50
+  BG_IMAGE_Y:  50
+  BG_COLOR:    '#FFFFFF'
+  TEXT_COLOR:  '#000000'
+  LINK_COLOR:  '#0000EE'
   DESTINATION: 'casa@sweetohm.net:/web/app/slides/={NAME}'
-  ARC_DIR: 'arc'
+  ARC_DIR:     'arc'
   ARC_FILES:
     =BUILD_DIR: ['**/*']
 
@@ -28,11 +38,55 @@ targets:
       tofile: '={BUILD_DIR}/index.html'
     - read: 'README.md'
       to:   'content'
+    # an unquoted #RRGGBB color is a YAML comment, thus a nil property
+    - if: 'BG_COLOR == nil || TEXT_COLOR == nil || LINK_COLOR == nil'
+      then:
+      - throw: "colors must be written 0xRRGGBB or quoted '#RRGGBB'"
+    - |
+      fmt = import("fmt")
+      strings = import("strings")
+      # colors are written 0xRRGGBB, which YAML reads as an integer, or
+      # quoted as '#RRGGBB', the hash sign being a YAML comment otherwise
+      func color(c) {
+        if typeOf(c) != "string" {
+          return fmt.Sprintf("#%06X", c)
+        }
+        if strings.HasPrefix(c, "#") {
+          return c
+        }
+        return "#" + c
+      }
+      backgroundColor = color(BG_COLOR)
+      textColor       = color(TEXT_COLOR)
+      linkColor       = color(LINK_COLOR)
+      backgroundWidth = fmt.Sprintf("%v", BG_WIDTH)
+      backgroundX     = fmt.Sprintf("%v", BG_IMAGE_X)
+      backgroundY     = fmt.Sprintf("%v", BG_IMAGE_Y)
+      backgroundAlpha = fmt.Sprintf("%.4g", toFloat(BG_ALPHA) / 100.0)
+    # the pseudo element holding the image is dropped when no image was set
+    - if: 'BG_IMAGE == ""'
+      then:
+      - |
+        backgroundContent = "none"
+        background = "none"
+      else:
+      - |
+        backgroundContent = "\"\""
+        background = fmt.Sprintf("url(%s)", BG_IMAGE)
     - replace: '={BUILD_DIR}/index.html'
       with:
-        '<? OPTIONS ?>': =OPTIONS
-        '<? TITLE ?>':   =TITLE
-        '<? CONTENT ?>': =content
+        '<? OPTIONS ?>':      =OPTIONS
+        '<? TITLE ?>':        =TITLE
+        '<? CONTENT ?>':      =content
+        '<? BACKGROUND ?>':   =background
+        '<? BG_CONTENT ?>':   =backgroundContent
+        '<? BG_WIDTH ?>':     =backgroundWidth
+        '<? BACKGROUND_X ?>': =backgroundX
+        '<? BACKGROUND_Y ?>': =backgroundY
+        '<? BG_ALPHA ?>':     =backgroundAlpha
+        '<? BG_COLOR ?>':     =backgroundColor
+        '<? TEXT_COLOR ?>':   =textColor
+        '<? LINK_COLOR ?>':   =linkColor
     - copy:  ['res/**/*', 'img/**/*']
       todir: =BUILD_DIR
     # process <? INCLUDE path/to/file ?> instructions if INCLUDES set to true

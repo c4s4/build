@@ -4,6 +4,34 @@
     <title><? TITLE ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" type="text/css" href="res/style.css"/>
+    <style>
+      /* the background color is carried by the scaler, which is the root of the
+         stacking context, so that the background image can sit behind the slide */
+      .remark-slide-scaler { background-color: <? BG_COLOR ?>; }
+      .remark-slide-content {
+        background-color: transparent;
+        color: <? TEXT_COLOR ?>;
+      }
+      .remark-slide-content a { color: <? LINK_COLOR ?>; }
+      /* background image, centered on BG_IMAGE_X and BG_IMAGE_Y;
+         it is a background rather than the content itself because Chrome ignores
+         the width of a pseudo element whose content is an image */
+      .remark-slide-content::after {
+        content: <? BG_CONTENT ?>;
+        position: absolute;
+        left: <? BACKGROUND_X ?>%;
+        top: <? BACKGROUND_Y ?>%;
+        width: <? BG_WIDTH ?>%;
+        height: 100%;
+        transform: translate(-50%, -50%);
+        background-image: <? BACKGROUND ?>;
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: <? BG_ALPHA ?>;
+        z-index: -1;
+      }
+    </style>
   </head>
   <body>
     <textarea id="source">

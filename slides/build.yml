@@ -6,6 +6,14 @@ configuration: '~/.neon/github.yml'
 # GITHUB_TOKEN: 'abcdefghijklmnopqrstuvwxyz0123456789'
 
 properties:
-  TITLE:   'Slides Title'
-  #OPTIONS: '{ratio: "4:3"}'
-  OPTIONS: "{ratio: '16:9'}"
+  TITLE:      "Slides Title"
+  OPTIONS:    '{ratio: "16:9"}'
+  # OPTIONS:    '{ratio: "4:3"}'
+  # BG_IMAGE:   'path/to/background-image.png'
+  # BG_ALPHA:   100
+  # BG_WIDTH:   50
+  # BG_IMAGE_X: 50
+  # BG_IMAGE_Y: 50
+  # BG_COLOR:   '#FFFFFF'
+  # TEXT_COLOR: '#000000'
+  # LINK_COLOR: '#0000FF'

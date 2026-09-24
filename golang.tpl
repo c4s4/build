@@ -27,4 +27,6 @@ targets:
       tofile: '={_HERE}/={name}/={name}_test.go'
     - replace: '={_HERE}/={name}/go.mod'
       with:    {'name': =name}
+    - replace: '={_HERE}/={name}/AGENTS.md'
+      with:    {'name': =name}
     - print: "Project generated in '={name}' directory"
